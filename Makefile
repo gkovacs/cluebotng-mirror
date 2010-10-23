@@ -29,12 +29,15 @@ bayes_db:
 	@echo Creating bayesian database
 	./create_bayes_db ./data/bayes.db ./data/main_bayes_train.dat
 
-ann_train:
+ann_train_only:
+	@echo Training ANN
+	./create_ann ./data/main_ann.fann ./data/main_ann_train.dat 250 0.05 100 100
+
+ann_train_data:
 	@echo Creating ANN training set
 	./cluebotng -f $(TRAINING_SET) -m create_ann_train
-	@echo Training ANN
-	# ANNFile TrainFile MaxEpochs DesiredError HiddenLayerSize
-	./create_ann ./data/main_ann.fann ./data/main_ann_train.dat 90 0.05 100
+
+ann_train: ann_train_data ann_train_only
 
 trial:
 	@echo Performing trial
