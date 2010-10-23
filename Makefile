@@ -3,7 +3,7 @@ CFLAGS=-g -O2
 all: cluebotng create_ann create_bayes_db print_bayes_db
 
 cluebotng: bayesdb.hpp framework.hpp xmleditloader.hpp bayesprocessors.hpp faststringops.hpp neuralnet.hpp standardprocessors.hpp main.cpp
-	g++ $(CFLAGS) main.cpp -lexpat -lmatheval -ldb_cxx -liconv -lfann -lconfig++ -lm -ocluebotng
+	g++ $(CFLAGS) main.cpp -lexpat -lmatheval -ldb_cxx -liconv -lfann -lconfig++ -lboost_thread -lm -ocluebotng
 
 create_ann: create_ann.cpp
 	g++ ${CFLAGS} create_ann.cpp -lfann -ocreate_ann
@@ -31,7 +31,7 @@ bayes_db:
 
 ann_train_only:
 	@echo Training ANN
-	./create_ann ./data/main_ann.fann ./data/main_ann_train.dat 250 0.05 100 100
+	./create_ann ./data/main_ann.fann ./data/main_ann_train.dat 200 0.05 150 25
 
 ann_train_data:
 	@echo Creating ANN training set

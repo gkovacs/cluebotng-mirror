@@ -1,5 +1,8 @@
 #include <iostream>
 #include <string>
+#include <deque>
+#include <boost/thread.hpp>
+#include <boost/shared_ptr.hpp>
 #include <libconfig.h++>
 #include "framework.hpp"
 #include "standardprocessors.hpp"
@@ -68,6 +71,81 @@ void addChainLink(EditProcessChain & procchain, const string & modulename, Setti
 	}
 }
 
+class EditThreadPool {
+	public:
+		EditThreadPool(EditProcessChain & chainr, int nthreads = 3, int queue_size = 16) : chain(chainr) {
+			max_queue_size = queue_size;
+			stopflag = false;
+			for(int i = 0; i < nthreads; ++i) {
+				boost::shared_ptr<boost::thread> tptr(new boost::thread(boost::ref(*this)));
+				threads.push_back(tptr);
+			}
+		}
+		~EditThreadPool() {
+			stopThreads();
+		}
+		
+		void stopThreads() {
+			if(threads.size()) {
+				{
+					boost::lock_guard<boost::mutex> lock(mut);
+					stopflag = true;
+				}
+				thread_wait_cond.notify_all();
+				for(std::vector<boost::shared_ptr<boost::thread> >::iterator it = threads.begin(); it != threads.end(); ++it) {
+					(*it)->join();
+				}
+				threads.clear();
+			}
+		}
+		
+		void waitForAllDataProcessed() {
+			boost::unique_lock<boost::mutex> lock(mut);
+			while(editqueue.size() != 0) {
+				main_wait_cond.wait(lock);
+			}
+		}
+		
+		void threadMain() {
+			for(;;) {
+				Edit ed;
+				{
+					boost::unique_lock<boost::mutex> lock(mut);
+					while(editqueue.size() == 0 && !stopflag) {
+						thread_wait_cond.wait(lock);
+					}
+					if(stopflag) return;
+					ed = editqueue.back();
+					editqueue.pop_back();
+				}
+				main_wait_cond.notify_one();
+				chain.process(ed);
+			}
+		}
+		void operator()() {
+			threadMain();
+		}
+		
+		void submitEdit(Edit & ed) {
+			boost::unique_lock<boost::mutex> lock(mut);
+			while(editqueue.size() >= max_queue_size) {
+				main_wait_cond.wait(lock);
+			}
+			editqueue.push_front(ed);
+			thread_wait_cond.notify_one();
+		}
+		
+	private:
+		boost::mutex mut;
+		boost::condition_variable thread_wait_cond;
+		boost::condition_variable main_wait_cond;
+		std::deque<Edit> editqueue;
+		bool stopflag;
+		EditProcessChain & chain;
+		int max_queue_size;
+		std::vector<boost::shared_ptr<boost::thread> > threads;
+};
+
 void addConfigChain(EditProcessChain & procchain, Setting & configchain, Setting & linkcfgs, Setting & chaincfgs) {
 	for(int i = 0; i < configchain.getLength(); ++i) {
 		string chainelname = configchain[i];
@@ -134,6 +212,11 @@ int main(int argc, char **argv) {
 		if(!rootconfig.exists("xml_edit_parser")) throw std::runtime_error("No xml_edit_parser section of config.");
 		XMLEditParser editparser(rootconfig["xml_edit_parser"]);
 		editparser.parseFile_start(editfile);
+		
+		int nthreads = 3;
+		if(rootconfig.exists("threads")) nthreads = rootconfig["threads"];
+		EditThreadPool tpool(chain, nthreads);
+		
 		while(editparser.parseFile_more()) {
 			while(editparser.availableEdits()) {
 				Edit ed = editparser.nextEdit();
@@ -141,10 +224,13 @@ int main(int argc, char **argv) {
 					ed.setProp<unsigned long long int>("input_xml_file_size", editparser.parseFile_size());
 					ed.setProp<unsigned long long int>("input_xml_file_pos", editparser.parseFile_pos());
 				}
-				chain.process(ed);
+				//chain.process(ed);
+				tpool.submitEdit(ed);
 				++num_edits;
 			}
 		}
+		tpool.waitForAllDataProcessed();
+		tpool.stopThreads();
 		chain.finished();
 		cout << "Processed " << num_edits << " edits.\n";
 	}

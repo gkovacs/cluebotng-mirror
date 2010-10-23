@@ -3,6 +3,7 @@
 
 #include "standardprocessors.hpp"
 #include "bayesdb.hpp"
+#include <boost/thread.hpp>
 
 namespace WPCluebot {
 
@@ -16,6 +17,7 @@ class BayesTrainDataCreator : public EditProcessor {
 		}
 		
 		void process(Edit & ed) {
+			boost::lock_guard<boost::mutex> lock(mut);
 			std::string wsprop = (const char *)configuration["words"];
 			std::string isvandprop("isvandalism");
 			if(configuration.exists("is_vandalism")) isvandprop = (const char *)configuration["is_vandalism"];
@@ -29,6 +31,7 @@ class BayesTrainDataCreator : public EditProcessor {
 		}
 	private:
 		std::ofstream filestream;
+		boost::mutex mut;
 };
 
 class BayesScorer : public EditProcessor {
@@ -47,6 +50,7 @@ class BayesScorer : public EditProcessor {
 		}
 		
 		void process(Edit & ed) {
+			boost::lock_guard<boost::mutex> lock(mut);	// This may not be necessary.  Better safe than sorry.
 			/* First, calculate probability for each word in the list.
 			 * Then, only use the top 20 most weighted words.  Calculated the magnitude of the "weight"
 			 * by subtracting from 0.5 and taking the asbolute value. */
@@ -92,6 +96,7 @@ class BayesScorer : public EditProcessor {
 		int min_edits;
 		int num_words;
 		float default_score;
+		boost::mutex mut;
 };
 
 

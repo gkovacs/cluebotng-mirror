@@ -13,6 +13,7 @@
 #include <math.h>
 #include <iconv.h>
 #include <errno.h>
+#include <boost/thread.hpp>
 #include "faststringops.hpp"
 
 #define is_lcase(c) ((c) >= 'a' && (c) <= 'z')
@@ -36,6 +37,7 @@ class TrialRunReport : public EditProcessor {
 		}
 		
 		void process(Edit & ed) {
+			boost::lock_guard<boost::mutex> lock(mut);
 			editinfo einfo;
 			einfo.is_vandalism = ed.getProp<bool>(prop_isvand);
 			einfo.score = ed.getProp<float>(prop_score);
@@ -66,6 +68,8 @@ class TrialRunReport : public EditProcessor {
 		std::string prop_id;
 		
 		float primary_threshold;
+	
+		boost::mutex mut;
 	
 		struct editinfo {
 			bool is_vandalism;
@@ -197,6 +201,7 @@ class EditDump : public EditProcessor {
 		}
 
 		void process(Edit & ed) {
+			boost::lock_guard<boost::mutex> lock(mut);
 			dumpstream << "<WPEdit>\n";
 			ed.dump(dumpstream, maxfieldlen);
 			dumpstream << "</WPEdit>\n\n\n";
@@ -204,6 +209,7 @@ class EditDump : public EditProcessor {
 	private:
 		std::ofstream dumpstream;
 		int maxfieldlen;
+		boost::mutex mut;
 };
 
 class WriteProperties : public EditProcessor {
@@ -215,6 +221,7 @@ class WriteProperties : public EditProcessor {
 		}
 
 		void process(Edit & ed) {
+			boost::lock_guard<boost::mutex> lock(mut);
 			libconfig::Setting & proplist = configuration["properties"];
 			for(int i = 0; i < proplist.getLength(); ++i) {
 				if(i) dumpstream << ", ";
@@ -224,6 +231,7 @@ class WriteProperties : public EditProcessor {
 		}
 	private:
 		std::ofstream dumpstream;
+		boost::mutex mut;
 };
 
 class ProgressPrinter : public EditProcessor {
@@ -232,14 +240,18 @@ class ProgressPrinter : public EditProcessor {
 			interval = 3;
 			if(configuration.exists("interval")) interval = configuration["interval"];
 			count = 0;
+			last_percent = 0.0;
 			printing_progress = false;
 		}
 		void process(Edit & ed) {
+			boost::lock_guard<boost::mutex> lock(mut);
 			if((count++) % interval != 0) return;
 			if(ed.hasProp("input_xml_file_pos") && ed.hasProp("input_xml_file_size")) {
 				unsigned long long int siz = ed.getProp<unsigned long long int>("input_xml_file_size");
 				unsigned long long int pos = ed.getProp<unsigned long long int>("input_xml_file_pos");
 				float percent = (float)pos / (float)siz;
+				if(percent < last_percent) percent = last_percent;
+				last_percent = percent;
 				printProgressBar(count, percent);
 			} else {
 				printSimpleCount(count);
@@ -257,6 +269,9 @@ class ProgressPrinter : public EditProcessor {
 		int interval;
 		int count;
 		bool printing_progress;
+		boost::mutex mut;
+		
+		float last_percent;
 		
 		void printSimpleCount(int c) {
 			std::cout << "\x1B[20D" << c;
@@ -377,6 +392,7 @@ class CharsetConverter : public TextProcessor {
 		}
 		
 		void processText(Edit & ed, const std::string & text, const std::string & proppfx) {
+			boost::lock_guard<boost::mutex> lock(mut);
 			std::vector<char> intextvec(text.begin(), text.end());
 			char * intextchars = &intextvec.front();
 			size_t inbytes = intextvec.size();
@@ -395,6 +411,7 @@ class CharsetConverter : public TextProcessor {
 		
 	private:
 		iconv_t icnv;
+		boost::mutex mut;
 };
 
 class AllPropCharsetConverter : public EditProcessor {
@@ -411,6 +428,7 @@ class AllPropCharsetConverter : public EditProcessor {
 		}
 		
 		void process(Edit & ed) {
+			boost::lock_guard<boost::mutex> lock(mut);
 			for(std::map<std::string,boost::any>::iterator it = ed.properties.begin(); it != ed.properties.end(); ++it) {
 				if(it->second.type() != typeid(std::string)) continue;
 				std::string text = boost::any_cast<std::string>(it->second);
@@ -437,6 +455,7 @@ class AllPropCharsetConverter : public EditProcessor {
 		
 	private:
 		iconv_t icnv;
+		boost::mutex mut;
 };
 
 class WordSeparator : public TextProcessor {
@@ -940,6 +959,7 @@ class WordFinder : public WordSetProcessor {
 		std::vector<std::string> metricnames;
 };
 
+/////////////// NOTE: IS EVALUATOR THREAD-SAFE?  IF STUFF BREAKS TRY PUTTING THIS IN A MUTEX
 class ExpressionEval : public EditProcessor {
 	public:
 		ExpressionEval(libconfig::Setting & cfg) : EditProcessor(cfg) {

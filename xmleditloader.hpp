@@ -91,13 +91,14 @@ class ExpatPP {
 			char buf[1024];
 			if(incfile_finished) return false;
 			if(incfile_f.fail() || incfile_f.eof()) {
+				if(file_size) file_pos = file_size;
 				endParsing();
 				incfile_f.close();
 				incfile_finished = true;
 				return true;
 			}
-			incfile_f.read(buf, sizeof(buf));
 			if(file_size) file_pos = incfile_f.tellg();
+			incfile_f.read(buf, sizeof(buf));
 			submitData(buf, incfile_f.gcount());
 			return true;
 		}

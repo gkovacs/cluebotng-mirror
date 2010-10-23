@@ -3,6 +3,7 @@
 
 #include "standardprocessors.hpp"
 #include <floatfann.h>
+#include <boost/thread.hpp>
 
 namespace WPCluebot {
 
@@ -23,6 +24,7 @@ class RunAnn : public EditProcessor {
 		}
 		
 		void process(Edit & ed) {
+			boost::lock_guard<boost::mutex> lock(mut);
 			std::vector<float> iset = ed.getProp<std::vector<float> >(isetprop);
 			std::vector<fann_type> Fiset;
 			for(std::vector<float>::iterator it = iset.begin(); it != iset.end(); ++it) Fiset.push_back(*it);
@@ -40,6 +42,7 @@ class RunAnn : public EditProcessor {
 		struct fann * ann;
 		std::string isetprop;
 		std::string osetprop;
+		boost::mutex mut;
 };
 
 class WriteAnnTrainingData : public EditProcessor {
@@ -64,6 +67,7 @@ class WriteAnnTrainingData : public EditProcessor {
 		}
 	
 		void process(Edit & ed) {
+			boost::lock_guard<boost::mutex> lock(mut);
 			std::vector<float> iset = ed.getProp<std::vector<float> >(isetprop);
 			std::vector<float> oset = ed.getProp<std::vector<float> >(osetprop);
 			if(n_edits) {
@@ -103,6 +107,7 @@ class WriteAnnTrainingData : public EditProcessor {
 		int n_edits;
 		int n_inputs;
 		int n_outputs;
+		boost::mutex mut;
 		
 		void writeFloatSet(std::vector<float> & f) {
 			bool first = true;
