@@ -64,7 +64,7 @@ class StrTree {
 		NodeValueType * find(const std::string & str) {
 			return find(str.c_str());
 		}
-	private:
+	public:
 		struct Node {
 			struct Node * subnodes[numsubnodes];	// Each subnode represents a character, like a trie
 			NodeValueType * value;
@@ -90,6 +90,8 @@ class StrTree {
 		
 		friend class Traverser;
 	public:
+	
+		class Node;
 	
 		class Traverser {
 			public:
@@ -131,7 +133,7 @@ class StrTree {
 			private:
 				unsigned int depth;
 				StrTree<NodeValueType, numsubnodes, nodevaloffset> * tree;
-				StrTree<NodeValueType, numsubnodes, nodevaloffset>::Node * nod;
+				typename StrTree<NodeValueType, numsubnodes, nodevaloffset>::Node * nod;
 		};
 };
 
