@@ -12,6 +12,8 @@
 
 namespace WPCluebot {
 
+template <class NodeValueType, int numsubnodes, int nodevaloffset>
+class StrTree;
 
 /* This class implements a trie-like structure designed to store words.
  * It associates values with words and allows O(log n) lookups, where n is
@@ -88,6 +90,7 @@ class StrTree {
 		
 		friend class Traverser;
 	public:
+	
 		class Traverser {
 			public:
 				Traverser() {}
@@ -127,8 +130,8 @@ class StrTree {
 				}
 			private:
 				unsigned int depth;
-				StrTree * tree;
-				StrTree::Node * nod;
+				StrTree<NodeValueType, numsubnodes, nodevaloffset> * tree;
+				StrTree<NodeValueType, numsubnodes, nodevaloffset>::Node * nod;
 		};
 };
 
