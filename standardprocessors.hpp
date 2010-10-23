@@ -733,6 +733,43 @@ class PosixRegexReplace : public TextProcessor {
 		std::vector<boost::shared_ptr<PosixRegex> > regexes;
 };
 
+class WordSetCompare : public EditProcessor {
+	public:
+		WordSetCompare(libconfig::Setting & cfg) : EditProcessor(cfg) {
+			firstsetprop = (const char *)configuration["firstset"];
+			secondsetprop = (const char *)configuration["secondset"];
+			if(configuration.exists("num_common_words")) numcommonprop = (const char *)configuration["num_common_words"];
+		}
+		
+		void process(Edit & ed) {
+			WordSet set1 = ed.getProp<WordSet>(firstsetprop);
+			WordSet set2 = ed.getProp<WordSet>(secondsetprop);
+			if(numcommonprop.size()) {
+				WordSet * small;
+				WordSet * big;
+				if(set1.size() > set2.size()) {
+					small = &set2;
+					big = &set1;
+				} else {
+					small = &set1;
+					big = &set2;
+				}
+				int n = 0;
+				for(WordSet::iterator it = small->begin(); it != small->end(); ++it) {
+					if(big->count(it->first)) {
+						n += set2[it->first];
+					}
+				}
+				ed.setProp<int>(numcommonprop, n);
+			}
+		}
+	
+	private:
+		std::string firstsetprop;
+		std::string secondsetprop;
+		std::string numcommonprop;
+};
+
 class WordSetDiff : public EditProcessor {
 	public:
 		WordSetDiff(libconfig::Setting & cfg) : EditProcessor(cfg) {

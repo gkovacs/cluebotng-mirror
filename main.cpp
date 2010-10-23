@@ -40,6 +40,8 @@ void addChainLink(EditProcessChain & procchain, const string & modulename, Setti
 		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new WordSeparator(moduleconfig)));
 	} else if(modulename == "wordset_diff") {
 		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new WordSetDiff(moduleconfig)));
+	} else if(modulename == "wordset_compare") {
+		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new WordSetCompare(moduleconfig)));
 	} else if(modulename == "misc_raw_word_metrics") {
 		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new MiscRawWordMetrics(moduleconfig)));
 	} else if(modulename == "word_character_replace") {

@@ -31,7 +31,7 @@ bayes_db:
 
 ann_train_only:
 	@echo Training ANN
-	./create_ann ./data/main_ann.fann ./data/main_ann_train.dat 200 0.05 150 25
+	./create_ann ./data/main_ann.fann ./data/main_ann_train.dat 150 0.025 150 25
 
 ann_train_data:
 	@echo Creating ANN training set
