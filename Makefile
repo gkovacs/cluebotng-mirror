@@ -34,7 +34,7 @@ ann_train:
 	./cluebotng -f $(TRAINING_SET) -m create_ann_train
 	@echo Training ANN
 	# ANNFile TrainFile MaxEpochs DesiredError HiddenLayerSize
-	./create_ann ./data/main_ann.fann ./data/main_ann_train.dat 150 0.05 150
+	./create_ann ./data/main_ann.fann ./data/main_ann_train.dat 90 0.05 100
 
 trial:
 	@echo Performing trial

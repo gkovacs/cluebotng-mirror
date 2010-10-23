@@ -53,6 +53,10 @@ class TrialRunReport : public EditProcessor {
 			if(configuration.exists("report")) {
 				std::string rfn = (const char *)configuration["report"];
 				writeMainReport(rfn);
+				if(configuration.exists("misclassified_file_prefix")) {
+					std::string pfx = (const char *)configuration["misclassified_file_prefix"];
+					writeMisclassifiedLists(primary_threshold, pfx + "falsepositives.txt", pfx + "falsenegatives.txt");
+				}
 			}
 		}
 		
@@ -60,6 +64,8 @@ class TrialRunReport : public EditProcessor {
 		std::string prop_isvand;
 		std::string prop_score;
 		std::string prop_id;
+		
+		float primary_threshold;
 	
 		struct editinfo {
 			bool is_vandalism;
@@ -69,6 +75,25 @@ class TrialRunReport : public EditProcessor {
 		
 		std::vector<editinfo> edits;
 		
+		void writeMisclassifiedLists(float thresh, const std::string & false_pos_fname, const std::string & false_neg_fname) {
+			std::ofstream fpfile(false_pos_fname.c_str()), fnfile(false_neg_fname.c_str());
+			fpfile.setf(std::ofstream::fixed);
+			fnfile.setf(std::ofstream::fixed);
+			fpfile.precision(4);
+			fnfile.precision(4);
+			fpfile << "# False positives based on threshold " << thresh << "\n";
+			fnfile << "# False negatives based on threshold " << thresh << "\n";
+			for(std::vector<editinfo>::iterator it = edits.begin(); it != edits.end(); ++it) {
+				bool think_vandalism = (it->score >= thresh);
+				if(think_vandalism && !it->is_vandalism) {
+					fpfile << it->score << " " << it->id << "\n";
+				}
+				if(!think_vandalism && it->is_vandalism) {
+					fnfile << it->score << " " << it->id << "\n";
+				}
+			}
+		}
+		
 		void writeMainReport(const std::string & filename) {
 			std::ofstream file(filename.c_str());
 			file.setf(std::ofstream::fixed);
@@ -76,14 +101,17 @@ class TrialRunReport : public EditProcessor {
 			
 			file << "=== REPORT ===\n";
 			writeConstStats(file);
+			primary_threshold = 0.5;
 			if(configuration.exists("threshold")) {
 				float thresh = configuration["threshold"];
+				primary_threshold = thresh;
 				writeThresholdStats(file, thresh);
 			}
 			if(configuration.exists("false_positive_rate")) {
 				float fprate = configuration["false_positive_rate"];
 				float thresh = calcThresholdFromFalsePositiveRate(fprate);
 				file << "With maximum false positive rate " << (fprate * 100.0) << "%, Threshold=" << thresh << "\n";
+				primary_threshold = thresh;
 				writeThresholdStats(file, thresh);
 			}
 		}
