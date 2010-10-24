@@ -17,6 +17,10 @@ print_bayes_db: print_bayes_db.cpp bayesdb.hpp
 clean:
 	rm -f cluebotng create_bayes_db print_bayes_db create_ann
 
+svn: svnup clean all bayes_db ann_train_data
+
+svnup:
+	svn up
 
 
 
@@ -42,6 +46,10 @@ ann_train_only___auto:
 ann_train_data:
 	@echo Creating ANN training set
 	./cluebotng -f $(TRAINING_SET) -m create_ann_train
+
+ann_auto_train:
+	@echo AutoTraining ANN
+	php util/autotraintrial.php ${PARAMS}
 
 ann_train: ann_train_data ann_train_only
 
