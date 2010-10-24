@@ -4,7 +4,7 @@ Usage:
 python multi_dump.py <DATABASE> <Proportion 1> <Proportion 2> <Proportion 3> ...
 Proportions are (Floating Point, Output File).
 Example:
-	python multi_dump.py "(0.33,'alpha.xml')" "(0.67,'beta.xml')"
+	python multi_dump.py dataset.db "(0.33,'alpha.xml')" "(0.67,'beta.xml')"
 NOTE:
 	The SUMS of the proportions MUST add up to 1.
 '''
