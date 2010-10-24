@@ -38,6 +38,8 @@ void addChainLink(EditProcessChain & procchain, const string & modulename, Setti
 		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new CharacterReplace(moduleconfig)));
 	} else if(modulename == "word_separator") {
 		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new WordSeparator(moduleconfig)));
+	} else if(modulename == "multi_word_separator") {
+		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new MultiWordSeparator(moduleconfig)));
 	} else if(modulename == "wordset_diff") {
 		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new WordSetDiff(moduleconfig)));
 	} else if(modulename == "wordset_compare") {
@@ -214,10 +216,12 @@ int main(int argc, char **argv) {
 		if(!rootconfig.exists("xml_edit_parser")) throw std::runtime_error("No xml_edit_parser section of config.");
 		XMLEditParser editparser(rootconfig["xml_edit_parser"]);
 		editparser.parseFile_start(editfile);
-		
+	
+#ifndef SINGLETHREAD
 		int nthreads = 3;
 		if(rootconfig.exists("threads")) nthreads = rootconfig["threads"];
 		EditThreadPool tpool(chain, nthreads);
+#endif
 		
 		while(editparser.parseFile_more()) {
 			while(editparser.availableEdits()) {
@@ -226,13 +230,18 @@ int main(int argc, char **argv) {
 					ed.setProp<unsigned long long int>("input_xml_file_size", editparser.parseFile_size());
 					ed.setProp<unsigned long long int>("input_xml_file_pos", editparser.parseFile_pos());
 				}
-				//chain.process(ed);
+#ifdef SINGLETHREAD
+				chain.process(ed);
+#else
 				tpool.submitEdit(ed);
+#endif
 				++num_edits;
 			}
 		}
+#ifndef SINGLETHREAD
 		tpool.waitForAllDataProcessed();
 		tpool.stopThreads();
+#endif
 		chain.finished();
 		cout << "Processed " << num_edits << " edits.\n";
 	}

@@ -24,10 +24,12 @@ TRAINING_SET=./editsets/C/train.xml
 TRIAL_SET=./editsets/C/trial.xml
 
 bayes_db:
-	@echo Creating bayesian training set
+	@echo Creating Bayesian training sets
 	./cluebotng -f $(TRAINING_SET) -m create_bayes_train
-	@echo Creating bayesian database
+	@echo Creating main Bayesian database
 	./create_bayes_db ./data/bayes.db ./data/main_bayes_train.dat
+	@echo Creating 2-Bayesian database
+	./create_bayes_db ./data/two_bayes.db ./data/two_bayes_train.dat
 
 ann_train_only:
 	@echo Training ANN

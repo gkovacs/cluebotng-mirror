@@ -1,10 +1,28 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <stdlib.h>
 #include "bayesdb.hpp"
 
 using namespace std;
 using namespace WPCluebot;
+
+void getLineSegs(istream & strm, int & isvand, string & word) {
+	string line;
+	word.clear();
+	getline(strm, line);
+	if(line.size() < 3) {
+		return;
+	}
+	const char * str = line.c_str();
+	const char * num = str;
+	for(; *str; ++str) if(*str == ' ') break;
+	if(*str != ' ') return;
+	string numstr(num, str - num);
+	isvand = atoi(numstr.c_str());
+	str++;
+	word.assign(str);
+}
 
 int main(int argc, char **argv) {
 	if(argc != 3) {
@@ -22,8 +40,10 @@ int main(int argc, char **argv) {
 	while(!trainfile.eof() && !trainfile.bad() && !trainfile.fail()) {
 		int isvand;
 		string word;
-		trainfile >> isvand;
-		trainfile >> word;
+		//trainfile >> isvand;
+		//trainfile >> word;
+		getLineSegs(trainfile, isvand, word);
+		if(word.size() == 0) continue;
 		baydb.addWord(word, isvand);
 		if(word == "_EDIT_TOTALS") {
 			++i;

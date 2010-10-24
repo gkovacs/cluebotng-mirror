@@ -502,6 +502,71 @@ class WordSeparator : public TextProcessor {
 		bool ignorechars[256];
 };
 
+class MultiWordSeparator : public TextProcessor {
+	public:
+		MultiWordSeparator(libconfig::Setting & cfg) : TextProcessor(cfg) {
+			wordseries = configuration["num_words_together"];
+			standardseparator = ' ';
+			if(configuration.exists("standard_separator")) {
+				std::string sepstr = (const char *)configuration["standard_separator"];
+				if(sepstr.size()) standardseparator = sepstr[0];
+			}
+			for(int i = 0; i < 256; ++i) {
+				validchars[i] = false;
+				ignorechars[i] = false;
+			}
+			const char * wchars = configuration["valid_word_chars"];
+			for(; *wchars; ++wchars) validchars[*wchars] = true;
+			if(configuration.exists("ignore_chars")) {
+				const char * ichars = configuration["ignore_chars"];
+				for(; *ichars; ++ichars) ignorechars[*ichars] = true;
+			}
+		}
+		
+		void processText(Edit & ed, const std::string & text, const std::string & proppfx) {
+			std::vector<std::string> wordlist;
+			wordlist.reserve(text.size() / 4);
+			const char * word_start = NULL;
+			const char * pos = text.c_str();
+			for(; *pos; ++pos) {
+				char c = *pos;
+				if(ignorechars[c]) continue;
+				if(validchars[c]) {
+					if(!word_start) word_start = pos;
+				} else {
+					if(word_start) {
+						std::string word(word_start, pos - word_start);
+						wordlist.push_back(word);
+						word_start = NULL;
+					}
+				}
+			}
+			if(word_start) if(*word_start) {
+				std::string word(word_start);
+				wordlist.push_back(word);
+			}
+			
+			WordSet set;
+			if(wordlist.size() >= wordseries) {
+				for(std::vector<std::string>::iterator it = wordlist.begin() + wordseries - 1; it != wordlist.end(); ++it) {
+					std::string cstr;
+					for(int i = wordseries - 1; i >= 0; --i) {
+						cstr += *(it - i);
+						if(i) cstr += standardseparator;
+					}
+					set[cstr]++;
+				}
+			}
+			ed.setProp<WordSet>(proppfx, set);
+		}
+		
+	private:
+		bool validchars[256];
+		bool ignorechars[256];
+		int wordseries;
+		char standardseparator;
+};
+
 class CharacterReplace : public TextProcessor {
 	public:
 		CharacterReplace(libconfig::Setting & cfg) : TextProcessor(cfg) {
