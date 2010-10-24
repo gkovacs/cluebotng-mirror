@@ -47,9 +47,13 @@ int main(int argc, char **argv) {
 		baydb.addWord(word, isvand);
 		if(word == "_EDIT_TOTALS") {
 			++i;
-			if(i % 100 == 0) cout << i << "\n";
+			if(i % 27 == 0) {
+				cout << "\x1B[20D" << i;
+				cout.flush();
+			}
 		}
 	}
+	cout << "\x1B[20D" << i << "\n";
 	cout << "Pruning ...\n";
 	baydb.pruneDB(3, 0.25);
 }
