@@ -104,6 +104,19 @@ class PropertySet {
 			}
 		}
 		
+		void dumpProps(std::ostream & strm, std::vector<std::string> proplist, int maxlen = -1) {
+			for(std::vector<std::string>::iterator it = proplist.begin(); it != proplist.end(); ++it) {
+				if(!hasProp(*it)) continue;
+				std::string str = propToString(properties[*it]);
+				if(maxlen >= 0) {
+					if(str.size() > maxlen) {
+						str = str.substr(0, maxlen - 4) + " ...";
+					}
+				}
+				strm << "<" << *it << ">" << xmlEscapeString(str) << "</" << *it << ">\n";
+			}
+		}
+		
 		std::map<std::string,double> getDoubleMap() {
 			std::map<std::string, double> dvarmap;
 			for(std::map<std::string,boost::any>::iterator it = properties.begin(); it != properties.end(); ++it) {

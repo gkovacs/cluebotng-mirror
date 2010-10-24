@@ -173,6 +173,8 @@ class ExpatPP {
 
 class XMLEditParseHandler : public ExpatPPHandler {
 	public:
+		bool gotEndTag;
+	
 		Edit nextEdit() {
 			Edit ed = complete_edits.front();
 			complete_edits.pop_front();
@@ -188,7 +190,7 @@ class XMLEditParseHandler : public ExpatPPHandler {
 			complete_edits.clear();
 		}
 		
-		XMLEditParseHandler(libconfig::Setting & cfg) {
+		XMLEditParseHandler(libconfig::Setting & cfg) : gotEndTag(false) {
 			for(int i = 0; i < cfg["proptypes"].getLength(); ++i) {
 				std::string propname = cfg["proptypes"][i].getName();
 				std::string proptype = cfg["proptypes"][i];
@@ -212,7 +214,10 @@ class XMLEditParseHandler : public ExpatPPHandler {
 			tag_stack.push_back(name);
 		}
 		void elementEndHandler(const std::string & name) {
-			if(name == "wpeditset") return;
+			if(name == "wpeditset") {
+				gotEndTag = true;
+				return;
+			}
 			if(name == "wpedit") {
 				complete_edits.push_back(current_edit);
 				return;
@@ -300,6 +305,12 @@ class XMLEditParser {
 		}
 		unsigned long long int parseFile_size() { return parser.parseFile_size(); }
 		unsigned long long int parseFile_pos() { return parser.parseFile_pos(); }
+		
+		void startParsing() { parser.startParsing(); }
+		void submitData(const char * data, unsigned int len) { parser.submitData(data, len); }
+		void endParsing() { parser.endParsing(); }
+		
+		bool gotEndTag() { return handler.gotEndTag; }
 		
 	private:
 		XMLEditParseHandler handler;

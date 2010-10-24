@@ -106,6 +106,7 @@ word_prop acceptable_allcaps_words
 word_prop lcase_i_words
 word_prop improper_contractions
 word_prop first_names
+word_prop language_abbrev
 # basic_added_word_prop added_reused_words
 
 diff_charcount alpha_surrounded_digit_count

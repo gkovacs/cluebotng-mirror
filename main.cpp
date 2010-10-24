@@ -3,6 +3,7 @@
 #include <deque>
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/asio.hpp>
 #include <libconfig.h++>
 #include "framework.hpp"
 #include "standardprocessors.hpp"
@@ -150,6 +151,74 @@ class EditThreadPool {
 		std::vector<boost::shared_ptr<boost::thread> > threads;
 };
 
+class NetworkSource {
+	public:
+		NetworkSource(EditProcessChain & chainr, libconfig::Setting & cfg) : chain(chainr), rootconfig(cfg) {
+			for(int i = 0; i < rootconfig["network_output_properties"].getLength(); ++i) {
+				string s = (const char *)rootconfig["network_output_properties"][i];
+				outprops.push_back(s);
+			}
+		}
+		
+		void listen(int port) {
+			using boost::asio::ip::tcp;
+			boost::asio::io_service io_service;
+			tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), port));
+			for(;;) {
+				boost::shared_ptr<tcp::socket> socket(new tcp::socket(io_service));
+				acceptor.accept(*socket);
+				boost::thread thread(boost::ref(*this), socket);
+			}
+		}
+	
+		EditProcessChain & chain;
+		libconfig::Setting & rootconfig;
+		std::vector<std::string> outprops;
+		
+		void operator()(boost::shared_ptr<boost::asio::ip::tcp::socket> socket) {
+			try {
+				string cmsg;
+				XMLEditParser editparser(rootconfig["xml_edit_parser"]);
+				editparser.startParsing();
+				cmsg = "<WPEditSet>\n";
+				boost::asio::write(*socket, boost::asio::buffer(cmsg), boost::asio::transfer_all());
+				for(;;) {
+					std::vector<char> rd;
+					boost::system::error_code er;
+					char cbuf[512];
+					size_t len = socket->read_some(boost::asio::buffer(cbuf, 512), er);
+					rd.assign(cbuf, cbuf + len);
+					if(er == boost::asio::error::eof) break; else if(er) throw boost::system::system_error(er);
+					if(rd.size()) {
+						editparser.submitData(&rd.front(), rd.size());
+					}
+					while(editparser.availableEdits()) {
+						Edit ed = editparser.nextEdit();
+						if(rootconfig.exists("require_properties")) {
+							bool skipp = false;
+							for(int p = 0; p < rootconfig["require_properties"].getLength(); ++p) {
+								string pname = (const char *)rootconfig["require_properties"][p];
+								if(!ed.hasProp(pname)) {
+									skipp = true;
+									break;
+								}
+							}
+							if(skipp) continue;
+						}
+						chain.process(ed);
+						std::stringstream sstrm;
+						ed.dumpProps(sstrm, outprops);
+						string outstr = string("<WPEdit>\n") + string(sstrm.str()) + string("</WPEdit>\n");
+						boost::asio::write(*socket, boost::asio::buffer(outstr), boost::asio::transfer_all());
+					}
+					if(editparser.gotEndTag()) break;
+				}
+				cmsg = "</WPEditSet>\n";
+				boost::asio::write(*socket, boost::asio::buffer(cmsg), boost::asio::transfer_all());
+			} catch (...) {}
+		}
+};
+
 void addConfigChain(EditProcessChain & procchain, Setting & configchain, Setting & linkcfgs, Setting & chaincfgs) {
 	for(int i = 0; i < configchain.getLength(); ++i) {
 		string chainelname = configchain[i];
@@ -171,12 +240,14 @@ void addConfigChain(EditProcessChain & procchain, Setting & configchain, Setting
 int main(int argc, char **argv) {
 	string editfile;
 	bool editsfromfile = false;
+	bool editsfromnet = false;
+	int netport;
 	string chainname = "default";
 	string configdir = "./conf";
 	
 	if(argc < 2) printUsage(argv[0]);
 	int opt;
-	while((opt = getopt(argc, argv, "f:m:c:")) != -1) {
+	while((opt = getopt(argc, argv, "f:m:c:l")) != -1) {
 		switch(opt) {
 			case 'f':
 				editsfromfile = true;
@@ -187,6 +258,9 @@ int main(int argc, char **argv) {
 				break;
 			case 'c':
 				configdir.assign(optarg);
+				break;
+			case 'l':
+				editsfromnet = true;
 				break;
 			default:
 				printUsage(argv[0]);
@@ -210,6 +284,13 @@ int main(int argc, char **argv) {
 	Setting & rootchaincfg = configchains[chainname];
 	
 	addConfigChain(chain, rootchaincfg, rootconfig, configchains);
+	
+	if(editsfromnet) {
+		netport = rootconfig["listen_port"];
+		NetworkSource ns(chain, rootconfig);
+		ns.listen(netport);
+	}
+	
 	
 	int num_edits = 0;
 	if(editsfromfile) {
