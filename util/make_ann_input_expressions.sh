@@ -103,6 +103,9 @@ word_prop part_numeric_word_count
 word_prop sex_words
 word_prop swear_words
 word_prop acceptable_allcaps_words
+word_prop lcase_i_words
+word_prop improper_contractions
+word_prop first_names
 # basic_added_word_prop added_reused_words
 
 diff_charcount alpha_surrounded_digit_count
@@ -131,6 +134,7 @@ diff_linear_scale wikimarkup_formatting_count 0 64
 linear_scale added_longest_char_run 0 6
 linear_scale added_max_word_len 0 30
 linear_scale comment_size 0 100
+linear_scale user_edit_count 0 25
 
 log_scale added_word_count 0 1000
 log_scale current_num_recent_edits 0 100

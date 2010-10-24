@@ -1027,7 +1027,7 @@ class WordFinder : public WordSetProcessor {
 				std::string metricname = (const char *)metrics[i].getName();
 				libconfig::Setting & mwords = metrics[i];
 				for(int j = 0; j < mwords.getLength(); ++j) {
-					std::string word = (const char *)mwords[i];
+					std::string word = (const char *)mwords[j];
 					std::vector<int> * ilist = wordtree.find(word);
 					if(ilist) {
 						ilist->push_back(metricnames.size());
