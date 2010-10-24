@@ -116,6 +116,8 @@ class PropertySet {
 					dvarmap[it->first] = (double)boost::any_cast<unsigned long long int>(it->second);
 				} else if(ti == typeid(std::string)) {
 					dvarmap[it->first + "_size"] = (double)(boost::any_cast<std::string>(it->second)).size();
+				} else if(ti == typeid(std::map<std::string,int>)) {
+					dvarmap[it->first + "_size"] = (double)(boost::any_cast<std::map<std::string,int> >(it->second)).size();
 				} else if(ti == typeid(bool)) {
 					bool b = boost::any_cast<bool>(it->second);
 					dvarmap[it->first] = b ? 1.0 : 0.0;

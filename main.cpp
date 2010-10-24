@@ -226,6 +226,17 @@ int main(int argc, char **argv) {
 		while(editparser.parseFile_more()) {
 			while(editparser.availableEdits()) {
 				Edit ed = editparser.nextEdit();
+				if(rootconfig.exists("require_properties")) {
+					bool skipp = false;
+					for(int p = 0; p < rootconfig["require_properties"].getLength(); ++p) {
+						string pname = (const char *)rootconfig["require_properties"][p];
+						if(!ed.hasProp(pname)) {
+							skipp = true;
+							break;
+						}
+					}
+					if(skipp) continue;
+				}
 				if(editparser.parseFile_size()) {
 					ed.setProp<unsigned long long int>("input_xml_file_size", editparser.parseFile_size());
 					ed.setProp<unsigned long long int>("input_xml_file_pos", editparser.parseFile_pos());

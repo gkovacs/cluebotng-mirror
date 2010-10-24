@@ -358,7 +358,7 @@ class FastStringSearch : public TextProcessor {
 				std::string metricname = (const char *)metrics[i].getName();
 				libconfig::Setting & searches = metrics[i];
 				for(int j = 0; j < searches.getLength(); ++j) {
-					std::string searchtext = (const char *)searches[i];
+					std::string searchtext = (const char *)searches[j];
 					strfinder.addCategorySearch(searchtext, metricname);
 				}
 			}

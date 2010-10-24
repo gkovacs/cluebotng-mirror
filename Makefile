@@ -1,4 +1,5 @@
-CFLAGS=-g -O2 -march=native -msse4 -I/usr/include/db4.8
+# CFLAGS=-g -O2 -march=native -msse4 -I/usr/include/db4.8
+CFLAGS = -g
 
 all: cluebotng create_ann create_bayes_db print_bayes_db
 
@@ -24,8 +25,8 @@ svnup:
 
 
 
-TRAINING_SET=./editsets/C/train.xml
-TRIAL_SET=./editsets/C/trial.xml
+TRAINING_SET=./editsets/C3/train.xml
+TRIAL_SET=./editsets/C3/trial.xml
 
 bayes_db:
 	@echo Creating Bayesian training sets

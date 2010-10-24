@@ -49,8 +49,8 @@ function log_scale {
 	LOW=$2
 	J="`echo "scale=8;(0.1 * (${HIGH} - ${LOW}) - ${LOW} * 0.9) / (0.1 * (${HIGH} - ${LOW}))" | bc`"
 	K="`echo "scale=8;0.9 / (0.1 * (${HIGH} - ${LOW}))" | bc`"
-	echo "ann_${1} = \"1 - 1 / (${K} * ${1} + ${J})\";"
-	addallnames "ann_${1}"
+	echo "ann_${1}_log = \"1 - 1 / (${K} * ${1} + ${J})\";"
+	addallnames "ann_${1}_log"
 }
 
 function spec_log_scale {
@@ -147,6 +147,10 @@ age_scale current_page_made_time
 age_scale user_reg_time
 
 boolean current_minor
+boolean comment_typo
+boolean comment_auto
+boolean comment_revert
+boolean comment_common
 
 exact main_bayes_score
 exact two_bayes_score
