@@ -1,10 +1,17 @@
 #!/bin/bash
 
 ALLNAMES=""
+export LISTFILE=ann_input_list.conf
 
 function addallnames {
+	if [ "A$OUTFIRST" = "ATRUE" ]; then
+		echo ", " >> $LISTFILE
+	fi
+	export OUTFIRST="TRUE"
+	echo -n "\"${1}\"" >> $LISTFILE
+	
 	ALLNAMES="${ALLNAMES}\"${1}\","
-	ALLNAMES="${ALLNAMES} `echo`"
+	ALLNAMES="${ALLNAMES} `echo -e '\n'`"
 }
 
 function word_prop {
@@ -79,6 +86,10 @@ function exact {
 }
 
 
+(
+
+echo > $LISTFILE
+
 word_prop all_lcase_word_count
 word_prop all_ucase_word_count
 word_prop common_words
@@ -143,6 +154,8 @@ addallnames "ann_added_reused_words"
 
 
 echo
-echo
-echo
-echo "$ALLNAMES"
+echo >> $LISTFILE
+
+
+) >ann_input_expressions.conf
+
