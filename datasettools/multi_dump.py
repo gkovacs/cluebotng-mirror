@@ -6,7 +6,7 @@ Proportions are (Floating Point, Output File).
 Example:
 	python multi_dump.py dataset.db "(0.33,'alpha.xml')" "(0.67,'beta.xml')"
 NOTE:
-	The SUMS of the proportions MUST add up to 1.
+	The SUM of the proportions MUST be less than or equal to 1.
 '''
 from sqlite3 import connect
 from zlib import decompress

@@ -3,8 +3,11 @@ Adds edits to a databse given a file.
 Usage 
 db_put.py <datafile> <database> -threads=3
 
-m: Can use MySql (toolserver use only)
-t: Title included: (<IsVandalism> <EditID> <Source> <Title>)
+The Datafile should Be in the Following Format:
+<IsVandalism> <EditID> <Source>
+	IsVandalism - 1 if the edit is Vandalism, 2 if not
+	EditID - The Wikipedia revision_id of the Edit in question.
+	Source - Who/Where this information is comming from.
 '''
 from time import sleep
 from sys import argv
@@ -70,7 +73,10 @@ class urlgetThread(Thread):
 
 
 
-
+def db_dump():
+	print 'Stripping edits already in the dataset'
+	conn.execute('select EditID from dataset;')
+	return [str(p[0]) for p in conn]
 
 def main():
 	args = [p for p in argv][1:]
@@ -95,10 +101,17 @@ def main():
 	f = [p.strip() for p in f]
 	ts=[]
 	work_queue=Queue()
+	
 	if 1:
 		f = [p.split(' ')[:3] for p in f]
 		f = [p for p in f if len(p)==3]
-		
+		f= [p for p in f if p not in d]
+		if f:
+			d=db_dump()
+			f = [p for p in f if p not in d]
+			del d
+		if not f:
+			quit('No edits to be fetched!')
 	for p in f:
 		work_queue.put(p)
 	del f
