@@ -54,7 +54,7 @@ class urlgetThread(Thread):
 	def run(self):
 		while True:
 			(isvandalism,editid,source) = self.worklist.get()
-			xml = 'http://toolserver.org/~tim1357/cgi-bin/edit_details.py?id=%s&wrap=False&eval=%s'%(editid,str(isvandalism).title())
+			xml = 'http://toolserver.org/~tim1357/cgi-bin/edit_details.py?id=%s&wrap=False&eval=%s'%(editid,str(bool(isvandalism)).title())
 			xml = urlopen(xml).read()
 			self.dbgo.add(xml,editid,source,isvandalism)
 
