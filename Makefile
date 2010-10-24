@@ -1,4 +1,4 @@
-CFLAGS=-g -O2
+CFLAGS=-g -O2 -march=native -msse4 -I/usr/include/db4.8
 
 all: cluebotng create_ann create_bayes_db print_bayes_db
 
@@ -34,6 +34,10 @@ bayes_db:
 ann_train_only:
 	@echo Training ANN
 	./create_ann ./data/main_ann.fann ./data/main_ann_train.dat 100 0.037 300
+
+ann_train_only___auto:
+	@echo Training ANN with ${PARAMS}
+	./create_ann ./data/main_ann.fann ./data/main_ann_train.dat ${PARAMS}
 
 ann_train_data:
 	@echo Creating ANN training set
