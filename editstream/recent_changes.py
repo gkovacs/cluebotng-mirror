@@ -84,7 +84,7 @@ class bot:
                         
                     
                         
-                        stdout.write( msg['diff']+'\t\t'+msg['title'].encode('utf-8')+'\n')
+                        print( msg['diff'].encode('utf-8')+'\t\t'+msg['title'].encode('utf-8'))
 			stdout.flush()
        
 if __name__=='__main__':bot().run()
