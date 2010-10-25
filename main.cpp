@@ -71,6 +71,8 @@ void addChainLink(EditProcessChain & procchain, const string & modulename, Setti
 		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new CharsetConverter(moduleconfig)));
 	} else if(modulename == "all_prop_charset_conv") {
 		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new AllPropCharsetConverter(moduleconfig)));
+	} else if(modulename == "apply_threshold") {
+		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new ApplyThreshold(moduleconfig)));
 	} else {
 		throw std::runtime_error("Unknown module/chain link");
 	}
@@ -194,10 +196,10 @@ class NetworkSource {
 					}
 					while(editparser.availableEdits()) {
 						Edit ed = editparser.nextEdit();
-						if(rootconfig.exists("require_properties")) {
+						if(rootconfig.exists("net_require_properties")) {
 							bool skipp = false;
-							for(int p = 0; p < rootconfig["require_properties"].getLength(); ++p) {
-								string pname = (const char *)rootconfig["require_properties"][p];
+							for(int p = 0; p < rootconfig["net_require_properties"].getLength(); ++p) {
+								string pname = (const char *)rootconfig["net_require_properties"][p];
 								if(!ed.hasProp(pname)) {
 									skipp = true;
 									break;
@@ -307,10 +309,10 @@ int main(int argc, char **argv) {
 		while(editparser.parseFile_more()) {
 			while(editparser.availableEdits()) {
 				Edit ed = editparser.nextEdit();
-				if(rootconfig.exists("require_properties")) {
+				if(rootconfig.exists("file_require_properties")) {
 					bool skipp = false;
-					for(int p = 0; p < rootconfig["require_properties"].getLength(); ++p) {
-						string pname = (const char *)rootconfig["require_properties"][p];
+					for(int p = 0; p < rootconfig["file_require_properties"].getLength(); ++p) {
+						string pname = (const char *)rootconfig["file_require_properties"][p];
 						if(!ed.hasProp(pname)) {
 							skipp = true;
 							break;

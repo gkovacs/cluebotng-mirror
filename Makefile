@@ -25,8 +25,8 @@ svnup:
 
 
 
-TRAINING_SET=./editsets/C3/train.xml
-TRIAL_SET=./editsets/C3/trial.xml
+TRAINING_SET=./editsets/C4/train.xml
+TRIAL_SET=./editsets/C4/trial.xml
 
 bayes_db:
 	@echo Creating Bayesian training sets

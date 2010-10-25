@@ -228,6 +228,7 @@ class WriteProperties : public EditProcessor {
 				dumpstream << (const char *)proplist[i] << "=" << ed.propToString(ed.properties[(const char *)proplist[i]]);
 			}
 			dumpstream << "\n";
+			dumpstream.flush();
 		}
 	private:
 		std::ofstream dumpstream;
@@ -1206,6 +1207,26 @@ class FloatSetCreator : public EditProcessor {
 			}
 			return n;
 		}
+};
+
+class ApplyThreshold : public EditProcessor {
+	public:
+		ApplyThreshold(libconfig::Setting & cfg) : EditProcessor(cfg) {
+			inprop = (const char *)configuration["in"];
+			outprop = (const char *)configuration["out"];
+			threshold = configuration["threshold"];
+		}
+		
+		void process(Edit & ed) {
+			float f = ed.getProp<float>(inprop);
+			bool b = (f >= threshold);
+			ed.setProp<bool>(outprop, b);
+		}
+		
+	private:
+		std::string inprop;
+		std::string outprop;
+		float threshold;
 };
 
 

@@ -122,6 +122,7 @@ diff_charcount charcount_rawdigit
 diff_charcount charcount_rawlowercase
 diff_charcount charcount_space
 diff_charcount charcount_wikichar
+diff_charcount charcount_quote
 
 diff_linear_scale extlink_count 0 6
 diff_linear_scale html_count 0 16
