@@ -9,13 +9,21 @@ from urllib2 import urlopen
 from urllib import quote
 from time import time, mktime, sleep, strptime
 from simplejson import loads
-from socket import socket,AF_INET,SOCK_STREAM,timeout
-from sys import stdin
+
+		
+
+from sys import stdout,stderr
+
 from Queue import Queue
 from xml.sax.saxutils import escape
 
 is_ip = lambda username: set(list(username)).issubset(set(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9','.']))
 ns_translate={'100': 'Portal', '101': 'Portal talk', '1': 'Talk', '0': 'Main', '3': 'User talk', '2': 'User', '5': 'Wikipedia talk', '4': 'Wikipedia', '7': 'File talk', '6': 'File', '9': 'MediaWiki talk', '8': 'MediaWiki', '108': 'Book', '109': 'Book talk', '91': 'Thread talk', '90': 'Thread', '93': 'Summary talk', '92': 'Summary', '11': 'Template talk', '10': 'Template', '13': 'Help talk', '12': 'Help', '15': 'Category talk', '14': 'Category'}
+
+
+def o(m):
+	stderr.write(m+'\n')
+	
 
 def tounix(date,apifmt=False):
 	if not apifmt:
@@ -106,9 +114,9 @@ class editpuller(Thread):
 				
 				r['user_top_edits']=te if te else 0
 				r=iter(r.items())
+				self.relay.add((id,out(r)))
 			except Exception,e:
-				print 'Error: '+str(e)
-			self.relay.add(out(r))
+				o(str(e)+' : '+repr((id,title)))
 			self.work.task_done()
 		
 	def gen(self,id,title):
@@ -166,7 +174,7 @@ class editpuller(Thread):
 		return r
 	
 	def query_user(self,uname,ts):
-		if not is_ip(uname): query=('''select  user_editcount, user_registration, count(distinct rev_page) from user join revision on rev_user=user_id and rev_timestamp<='''+str(ts)+''' where user_name = %s;''',uname)
+		if not is_ip(uname): query=('''select  user_editcount, user_registration, count(distinct rev_page) from user join revision on rev_user=user_id and rev_timestamp<='''+str(ts)+''' where user_name = %s;''',uname.encode('utf-8'))
 		else: query=('''select count(*), min(rev_timestamp), count(distinct rev_page) from revision where rev_timestamp<='''+str(ts)+''' and rev_user_text=%s ;''',uname)
 		self.c.execute(query[0],(query[1],))
 		a,b,d=self.c.fetchall()[0]
@@ -177,32 +185,35 @@ OR
 ( rev_comment LIKE 'General note: Nonconstructive%%;')
 OR
 (rev_comment LIKE '%%Warning%%')
-) and rev_timestamp<=%s;''',(uname.replace(' ','_'),ts))
+) and rev_timestamp<=%s;''',(uname.replace(' ','_').encode('utf-8'),ts))
 		e=self.c.fetchall()[0][0]
 	
-		a=int(a)
+		try:a=int(a)
+		except:a=''
 		try:b=tounix(str(b))
 		except:b=''
-		d=int(d)
-		e=int(e)
+		try:d=int(d)
+		except:d=''
+		try:e=int(e)
+		except:e=''
 		return (a,b,d,e)
 		
 
-class botfeeder(Thread):
-	def __init__(self,connection):
-		Thread.__init__(self)
+class botfeeder():
+	def __init__(self):
 		self.q = Queue()
-		self.rc = connection
 	
 	def add(self,i):
 		self.q.put(i)
 	
 	def run(self):
-		self.rc.send('<WPEditSet>\r\n')
+		print('<WPEditSet>\r\n')
 		while True:
-			xml = self.q.get()
-			#print xml
-			self.rc.send(xml+'\n')
+			id,xml = self.q.get()
+			print xml
+			stdout.flush()
+
+			
 
 class reader(Thread):
 	def __init__(self,q):
@@ -219,29 +230,24 @@ class reader(Thread):
 	
 def main():
 	now = time()
+	
+	
 	difflist = Queue()
-	rc = socket(AF_INET, SOCK_STREAM)
-	rc.connect((str(backend_server), int(backend_port)))
-	rc.settimeout(.5)
-	bf = botfeeder(rc)
-	bf.start()
 	workers = []
+	
+	bf = botfeeder()
+	
 	for i in range(4):
 		workers.append(editpuller(bf,difflist))
 	for i in workers:
 		i.start()
 
-	io=reader(difflist).start()
-	while True:
-		try:
-			d = rc.recv(4096)
-		except timeout:
-			continue
-		d = d.decode('utf-8', 'replace')
-		if '<think_vandalism>t' in d:
-			print d
-								
+	io=reader(difflist)
+	io.start()
 
+	bf.run()
+			
+			
 		
 if __name__=='''__main__''':
 	main()
