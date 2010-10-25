@@ -179,7 +179,8 @@ OR
 		e=self.c.fetchall()[0][0]
 	
 		a=int(a)
-		b=tounix(str(b))
+		try:b=tounix(str(b))
+		except:b=''
 		d=int(d)
 		e=int(e)
 		return (a,b,d,e)
