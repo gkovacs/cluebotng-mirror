@@ -1,3 +1,5 @@
+#!/usr/bin/env python -u
+
 from socket import socket,AF_INET,SOCK_STREAM
 from urllib2 import urlopen
 from re import compile
@@ -81,6 +83,6 @@ class bot:
                         
                     
                         
-                        print msg['diff']+'\t\t'+msg['title']
+                        print msg['diff']+'\t\t'+msg['title'].encode('utf-8')
        
 if __name__=='__main__':bot().run()

@@ -222,7 +222,7 @@ def main():
 	bf = botfeeder(rc)
 	bf.start()
 	workers = []
-	for i in range(3):
+	for i in range(4):
 		workers.append(editpuller(bf,difflist))
 	for i in workers:
 		i.start()
