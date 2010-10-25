@@ -112,7 +112,7 @@ class editpuller(Thread):
 	def gen(self,id,title):
 		r={}
 		url="""http://en.wikipedia.org/w/api.php?action=query&format=json&rvlimit=2&prop=revisions&titles=%s&rvprop=timestamp|user|comment|flags|content|ids&rvstartid=%d"""%(quote(title),int(id))
-		print url
+		#print url
 		url = urlopen(url).read()
 		
 		url = loads(url)[u'query'][u'pages']
@@ -198,8 +198,8 @@ class botfeeder(Thread):
 		self.rc.send('<WPEditSet>\r\n')
 		while True:
 			xml = self.q.get()
-			print xml
-			self.rc.send(xml+'\r\n')
+			#print xml
+			self.rc.send(xml+'\n')
 
 class reader(Thread):
 	def __init__(self,q):
