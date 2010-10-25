@@ -2,7 +2,7 @@
 backend_server='98.222.57.24'
 backend_port='3565'
 threads = 3
-
+from re import search
 from threading import Thread
 from MySQLdb import connect
 from urllib2 import urlopen
@@ -96,7 +96,7 @@ class editpuller(Thread):
 		while True:
 			id,title = self.work.get()
 			title=title.strip()
-			print 'Got assignment! Id= '+id+' ; title = '+title
+				#print 'Got assignment! Id= '+id+' ; title = '+title
 			ts,pid,r = self.gen(id,title)
 			ts=fmt(ts)
 			(r['edits_to_page_in_last_two_weeks'],r['reversions_to_page_in_last_two_weeks'],r['page_creator'],r['page_start_time']
@@ -179,7 +179,7 @@ OR
 		e=self.c.fetchall()[0][0]
 	
 		a=int(a)
-		b=tounix(b)
+		b=tounix(str(b))
 		d=int(d)
 		e=int(e)
 		return (a,b,d,e)
@@ -235,7 +235,11 @@ def main():
 		except timeout:
 			continue
 		d = d.decode('utf-8', 'replace')
-		print d
+		if '<think_vandalism>t' in d:
+			print d
+								
+
+		
 if __name__=='''__main__''':
 	main()
 	#except Exception,e: 
