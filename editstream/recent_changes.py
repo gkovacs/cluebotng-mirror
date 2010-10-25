@@ -2,6 +2,7 @@
 
 from socket import socket,AF_INET,SOCK_STREAM
 from urllib2 import urlopen
+from sys import stdout
 from re import compile
 def get_whitelist():
        
@@ -83,6 +84,7 @@ class bot:
                         
                     
                         
-                        print msg['diff']+'\t\t'+msg['title'].encode('utf-8')
+                        stdout.write( msg['diff']+'\t\t'+msg['title'].encode('utf-8')+'\n')
+			stdout.flush()
        
 if __name__=='__main__':bot().run()

@@ -207,9 +207,9 @@ class reader(Thread):
 		self.q=q
 	def run(self):
 		for line in stdin.readlines():
-			if line =='>>>>> QUIT <<<<<':
+			if line.strip() =='>>>>> QUIT <<<<<':
 				quit()
-			line = line.split('\t\t')
+			line = line.strip().split('\t\t')
 			self.q.put(line)
 		
 	
