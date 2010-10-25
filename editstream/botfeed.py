@@ -96,16 +96,18 @@ class editpuller(Thread):
 		while True:
 			id,title = self.work.get()
 			title=title.strip()
-				#print 'Got assignment! Id= '+id+' ; title = '+title
-			ts,pid,r = self.gen(id,title)
-			ts=fmt(ts)
-			(r['edits_to_page_in_last_two_weeks'],r['reversions_to_page_in_last_two_weeks'],r['page_creator'],r['page_start_time']
-			) = self.query_page(pid,ts)
-			ts=fmt(ts,False)
-			(r['user_edit_count'],r['user_registration_date'],te,r['user_warnings'])=self.query_user(r['user_name'],ts)
-			
-			r['user_top_edits']=te if te else 0
-			r=iter(r.items())
+			try:	#print 'Got assignment! Id= '+id+' ; title = '+title
+				ts,pid,r = self.gen(id,title)
+				ts=fmt(ts)
+				(r['edits_to_page_in_last_two_weeks'],r['reversions_to_page_in_last_two_weeks'],r['page_creator'],r['page_start_time']
+				) = self.query_page(pid,ts)
+				ts=fmt(ts,False)
+				(r['user_edit_count'],r['user_registration_date'],te,r['user_warnings'])=self.query_user(r['user_name'],ts)
+				
+				r['user_top_edits']=te if te else 0
+				r=iter(r.items())
+			except Exception,e:
+				print 'Error: '+str(e)
 			self.relay.add(out(r))
 			self.work.task_done()
 		
