@@ -156,6 +156,7 @@ boolean comment_common
 
 exact main_bayes_score
 exact two_bayes_score
+exact previous_bayes_score
 
 echo "ann_user_warns = \"user_warns * 2 / user_edit_count\";"
 addallnames "ann_user_warns"

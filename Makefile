@@ -1,10 +1,10 @@
-CFLAGS=-g -O2 -march=native -msse4 -I/usr/include/db4.8
+CFLAGS=-g -march=native -msse4 -I/usr/include/db4.8
 #CFLAGS = -g
 
 all: cluebotng create_ann create_bayes_db print_bayes_db
 
 cluebotng: bayesdb.hpp framework.hpp xmleditloader.hpp bayesprocessors.hpp faststringops.hpp neuralnet.hpp standardprocessors.hpp main.cpp
-	g++ $(CFLAGS) main.cpp -lexpat -lmatheval -ldb_cxx -liconv -lfann -lconfig++ -lboost_thread -lboost_system -lm -ocluebotng
+	g++ $(CFLAGS) main.cpp -ltcmalloc_minimal -lexpat -lmatheval -ldb_cxx -liconv -lfann -lconfig++ -lboost_thread -lboost_system -lm -ocluebotng
 
 create_ann: create_ann.cpp
 	g++ ${CFLAGS} create_ann.cpp -lfann -ocreate_ann
@@ -25,8 +25,8 @@ svnup:
 
 
 
-TRAINING_SET=./editsets/C4/train.xml
-TRIAL_SET=./editsets/C4/trial.xml
+TRAINING_SET=./editsets/C/train.xml
+TRIAL_SET=./editsets/C/trial.xml
 
 bayes_db:
 	@echo Creating Bayesian training sets

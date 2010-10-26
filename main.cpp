@@ -182,19 +182,24 @@ class NetworkSource {
 				string cmsg;
 				XMLEditParser editparser(rootconfig["xml_edit_parser"]);
 				editparser.startParsing();
+				cout << "Sending wpeditset\n";
 				cmsg = "<WPEditSet>\n";
 				boost::asio::write(*socket, boost::asio::buffer(cmsg), boost::asio::transfer_all());
 				for(;;) {
 					std::vector<char> rd;
 					boost::system::error_code er;
 					char cbuf[512];
+					cout << "reading\n";
 					size_t len = socket->read_some(boost::asio::buffer(cbuf, 512), er);
+					cout << "read\n";
 					rd.assign(cbuf, cbuf + len);
 					if(er == boost::asio::error::eof) break; else if(er) throw boost::system::system_error(er);
 					if(rd.size()) {
 						editparser.submitData(&rd.front(), rd.size());
 					}
+					cout << "looping available\n";
 					while(editparser.availableEdits()) {
+						cout << "got edit\n";
 						Edit ed = editparser.nextEdit();
 						if(rootconfig.exists("net_require_properties")) {
 							bool skipp = false;
@@ -207,10 +212,12 @@ class NetworkSource {
 							}
 							if(skipp) continue;
 						}
+						cout << "processing edit\n";
 						chain.process(ed);
 						std::stringstream sstrm;
 						ed.dumpProps(sstrm, outprops);
 						string outstr = string("<WPEdit>\n") + string(sstrm.str()) + string("</WPEdit>\n");
+						cout << "sending response\n";
 						boost::asio::write(*socket, boost::asio::buffer(outstr), boost::asio::transfer_all());
 					}
 					if(editparser.gotEndTag()) break;

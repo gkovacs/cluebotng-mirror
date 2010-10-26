@@ -26,8 +26,6 @@ inline bool is_vowel(char c) {
 
 namespace WPCluebot {
 
-typedef std::map<std::string,int> WordSet;
-
 class TrialRunReport : public EditProcessor {
 	public:
 		TrialRunReport(libconfig::Setting & cfg) : EditProcessor(cfg) {

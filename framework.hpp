@@ -13,8 +13,15 @@
 #include <typeinfo>
 #include <sstream>
 #include <stdio.h>
+#include <tr1/unordered_map>
+#include <boost/pool/pool_alloc.hpp>
+#include <utility>
 
 namespace WPCluebot {
+
+typedef std::map<std::string,int> WordSet;
+//typedef std::map<std::string,int,std::less<std::string>, boost::fast_pool_allocator<std::pair<std::string,int> > > WordSet;
+// typedef std::tr1::unordered_map<std::string,int> WordSet;
 
 class PropertySet {
 	public:
@@ -75,10 +82,10 @@ class PropertySet {
 			if(ti == typeid(bool)) {
 				if(boost::any_cast<bool>(a)) return "true"; else return "false";
 			}
-			if(ti == typeid(std::map<std::string,int>)) {
+			if(ti == typeid(WordSet)) {
 				sstrm << "WordSet:\n";
-				std::map<std::string,int> wset = boost::any_cast<std::map<std::string,int> >(a);
-				for(std::map<std::string,int>::iterator it = wset.begin(); it != wset.end(); ++it) {
+				WordSet wset = boost::any_cast<WordSet>(a);
+				for(WordSet::iterator it = wset.begin(); it != wset.end(); ++it) {
 					sstrm << it->first << ": " << it->second << "\n";
 				}
 				return sstrm.str();
@@ -129,8 +136,8 @@ class PropertySet {
 					dvarmap[it->first] = (double)boost::any_cast<unsigned long long int>(it->second);
 				} else if(ti == typeid(std::string)) {
 					dvarmap[it->first + "_size"] = (double)(boost::any_cast<std::string>(it->second)).size();
-				} else if(ti == typeid(std::map<std::string,int>)) {
-					dvarmap[it->first + "_size"] = (double)(boost::any_cast<std::map<std::string,int> >(it->second)).size();
+				} else if(ti == typeid(WordSet)) {
+					dvarmap[it->first + "_size"] = (double)(boost::any_cast<WordSet>(it->second)).size();
 				} else if(ti == typeid(bool)) {
 					bool b = boost::any_cast<bool>(it->second);
 					dvarmap[it->first] = b ? 1.0 : 0.0;
@@ -192,11 +199,11 @@ class WordSetProcessor : public EditProcessor {
 			for(int i = 0; i < io.getLength(); ++i) {
 				std::string propname = io[i].getName();
 				std::string outpfx = io[i];
-				processWordSet(ed, ed.getProp<std::map<std::string, int> >(propname), outpfx);
+				processWordSet(ed, ed.getProp<WordSet>(propname), outpfx);
 			}
 		}
 		
-		virtual void processWordSet(Edit & ed, const std::map<std::string,int> & wordset, const std::string & proppfx) = 0;
+		virtual void processWordSet(Edit & ed, const WordSet & wordset, const std::string & proppfx) = 0;
 };
 
 class EditProcessChain {
