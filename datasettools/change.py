@@ -12,7 +12,7 @@ Accepted actions are:
 from sqlite3 import connect
 from zlib import compress,decompress
 from sys import argv
-
+from re import findall
 
 
 
@@ -33,10 +33,10 @@ def main():
 '-delete'):
 		raise 'Improper action!'
 	try:
-		f = file(f).readlines()
+		f = file(f).read()
 	except:
 		raise 'Input file does not exist!'
-	f = [p.strip() for p in f]
+	f = findall('\d\d\d\d\d+',f)
 	try:
 		f=[int(p) for p in f if p]
 	except:
