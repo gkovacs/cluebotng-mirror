@@ -143,7 +143,7 @@ class editpuller(Thread):
 		r['user_name']=url[0][u'user']
 		parent_id=url[0][u'parentid']
 		r['old_id']=parent_id
-		r['new_id']=id
+		r['new_id']=url[0][u'revid']
 		r['new_text']=url[0]['*']
 		try:
 			r['old_user']=url[1]['user']
