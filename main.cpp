@@ -16,9 +16,35 @@ using namespace std;
 using namespace libconfig;
 
 void printUsage(const char * name) {
-	cout << "Usage: " << name << " -f <EditFile> [-m <ChainName>] [-c <ConfigDirectory>]\n";
+	cout << "Usage: " << name << " <-f <EditFile> | -l> [-m <ChainName>] [-c <ConfigDirectory>]\n";
 	exit(1);
 }
+
+
+libconfig::Setting * globcfg_root = NULL;
+libconfig::Setting * globcfg_chains = NULL;
+
+void addConfigChain(EditProcessChain & procchain, Setting & configchain, Setting & linkcfgs, Setting & chaincfgs);
+
+class SubchainModule : public EditProcessor {
+	public:
+		SubchainModule(libconfig::Setting & cfg) : EditProcessor(cfg) {
+			libconfig::Setting & chainspec = configuration["chain"];
+			addConfigChain(chain, chainspec, *globcfg_root, *globcfg_chains);
+		}
+		
+		void process(Edit & ed) {
+			chain.process(ed);
+		}
+		
+		void finished() {
+			chain.finished();
+		}
+		
+	private:
+		EditProcessChain chain;
+};
+
 
 void addChainLink(EditProcessChain & procchain, const string & modulename, Setting & moduleconfig) {
 	if(modulename == "character_counts") {
@@ -73,6 +99,8 @@ void addChainLink(EditProcessChain & procchain, const string & modulename, Setti
 		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new AllPropCharsetConverter(moduleconfig)));
 	} else if(modulename == "apply_threshold") {
 		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new ApplyThreshold(moduleconfig)));
+	} else if(modulename == "chain") {
+		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new SubchainModule(moduleconfig)));
 	} else {
 		throw std::runtime_error("Unknown module/chain link");
 	}
@@ -182,24 +210,24 @@ class NetworkSource {
 				string cmsg;
 				XMLEditParser editparser(rootconfig["xml_edit_parser"]);
 				editparser.startParsing();
-				cout << "Sending wpeditset\n";
+				//cout << "Sending wpeditset\n";
 				cmsg = "<WPEditSet>\n";
 				boost::asio::write(*socket, boost::asio::buffer(cmsg), boost::asio::transfer_all());
 				for(;;) {
 					std::vector<char> rd;
 					boost::system::error_code er;
-					char cbuf[512];
-					cout << "reading\n";
-					size_t len = socket->read_some(boost::asio::buffer(cbuf, 512), er);
-					cout << "read\n";
+					char cbuf[4192];
+					//cout << "reading\n";
+					size_t len = socket->read_some(boost::asio::buffer(cbuf, 4192), er);
+					//cout << "read\n";
 					rd.assign(cbuf, cbuf + len);
 					if(er == boost::asio::error::eof) break; else if(er) throw boost::system::system_error(er);
 					if(rd.size()) {
 						editparser.submitData(&rd.front(), rd.size());
 					}
-					cout << "looping available\n";
+					//cout << "looping available\n";
 					while(editparser.availableEdits()) {
-						cout << "got edit\n";
+						//cout << "got edit\n";
 						Edit ed = editparser.nextEdit();
 						if(rootconfig.exists("net_require_properties")) {
 							bool skipp = false;
@@ -212,19 +240,23 @@ class NetworkSource {
 							}
 							if(skipp) continue;
 						}
-						cout << "processing edit\n";
+						//cout << "processing edit\n";
 						chain.process(ed);
 						std::stringstream sstrm;
 						ed.dumpProps(sstrm, outprops);
 						string outstr = string("<WPEdit>\n") + string(sstrm.str()) + string("</WPEdit>\n");
-						cout << "sending response\n";
+						//cout << "sending response\n";
 						boost::asio::write(*socket, boost::asio::buffer(outstr), boost::asio::transfer_all());
 					}
 					if(editparser.gotEndTag()) break;
 				}
 				cmsg = "</WPEditSet>\n";
 				boost::asio::write(*socket, boost::asio::buffer(cmsg), boost::asio::transfer_all());
-			} catch (...) {}
+			} catch (const std::exception & e) {
+				cout << "Error: " << e.what() << "\n";
+			} catch (...) {
+				cout << "Error.\n";
+			}
 		}
 };
 
@@ -284,11 +316,13 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 	Setting & rootconfig = config.getRoot();
+	globcfg_root = &rootconfig;
 	
 	EditProcessChain chain;
 	
 	if(!rootconfig.exists("chains")) throw std::runtime_error("Config file has no chains group.");
 	Setting & configchains = rootconfig["chains"];
+	globcfg_chains = &configchains;
 	if(!configchains.exists(chainname)) throw std::runtime_error("No such chain.");
 	Setting & rootchaincfg = configchains[chainname];
 	

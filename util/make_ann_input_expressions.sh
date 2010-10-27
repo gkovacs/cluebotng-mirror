@@ -100,8 +100,8 @@ word_prop middle_ucase_word_count
 word_prop novowels_word_count
 word_prop numeric_word_count
 word_prop part_numeric_word_count
-word_prop sex_words
-word_prop swear_words
+# word_prop sex_words
+# word_prop swear_words
 word_prop acceptable_allcaps_words
 word_prop lcase_i_words
 word_prop improper_contractions
