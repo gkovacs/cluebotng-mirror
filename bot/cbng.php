@@ -1,20 +1,28 @@
 <?PHP
 	/* cbng.php, GPL'd, by Jacobi Carter. */
+	
+	$convert = Array
+		(
+			'main'		=> 0,	'talk'		=> 1,
+			'user'		=> 2,	'user talk'	=> 3,
+			'wikipedia'	=> 4,	'wikipedia talk'=> 5,
+			'file'		=> 6,	'file talk'	=> 7,
+			'mediawiki'	=> 8,	'mediawiki talk'=> 9,
+			'template'	=> 10,	'template talk'	=> 11,
+			'help'		=> 12,	'help talk'	=> 13,
+			'category'	=> 14,	'category talk'	=> 15,
+			'portal'	=> 100,	'portal talk'	=> 101
+		);
+	
 	function namespace2id( $ns ) {
-		$convert = Array
-			(
-				'main'		=> 0,	'talk'		=> 1,
-				'user'		=> 2,	'user talk'	=> 3,
-				'wikipedia'	=> 4,	'wikipedia talk'=> 5,
-				'file'		=> 6,	'file talk'	=> 7,
-				'mediawiki'	=> 8,	'mediawiki talk'=> 9,
-				'template'	=> 10,	'template talk'	=> 11,
-				'help'		=> 12,	'help talk'	=> 13,
-				'category'	=> 14,	'category talk'	=> 15,
-				'portal'	=> 100,	'portal talk'	=> 101
-			);
-		
+		global $convert;
 		return $convert[ strtolower( str_replace( '_', ' ', $ns ) ) ];
+	}
+	
+	function namespace2name( $nsid ) {
+		global $convert;
+		$convertFlipped = array_flip( $convert );
+		return ucfirst( $convertFlipped[ $nsid ] );
 	}
 	
 	function parseFeed( $feed ) {
@@ -35,7 +43,8 @@
 				'old_revid' => $m[ 9 ],
 				'user' => $m[ 10 ],
 				'length' => $m[ 12 ],
-				'comment' => $m[ 13 ]
+				'comment' => $m[ 13 ],
+				'timestamp' => time()
 			);
 			
 			return $change;
@@ -104,7 +113,12 @@
 		
 		$root = $doc->createElement( 'WPEditSet' );
 		$doc->appendChild( $root );
-		$root->appendChild( xmlizePart( $doc, 'WPEdit', $data ) );
+		
+		if( isset( $data[ 0 ] ) )
+			foreach( $data as $entry )
+				$root->appendChild( xmlizePart( $doc, 'WPEdit', $entry ) );
+		else
+			$root->appendChild( xmlizePart( $doc, 'WPEdit', $data ) );
 		return $doc->saveXML();
 	}
 	
@@ -113,18 +127,37 @@
 		return parseFeedData( $feedData );
 	}
 	
-	function parseFeedData( $feedData ) {
+	function genOldFeedData( $id ) {
+		/* namespace, namespaceid, title, flags, url, revid, old_revid, user, length, comment, timestamp */
+		$data = unserialize( file_get_contents( 'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=timestamp|user|comment&format=php&revids=' . urlencode( $id ) ) );
+		$data = current( $data[ 'query' ][ 'pages' ] );
+		$change = Array(
+			'namespace' => namespace2name( $data[ 'ns' ] ),
+			'namespaceid' => $data[ 'ns' ],
+			'title' => $data[ 'title' ],
+			'flags' => '',
+			'url' => '',
+			'revid' => $id,
+			'old_revid' => '',
+			'user' => $data[ 'revisions' ][ 0 ][ 'user' ],
+			'length' => '',
+			'comment' => $data[ 'revisions' ][ 0 ][ 'comment' ],
+			'timestamp' => strtotime( $data[ 'revisions' ][ 0 ][ 'timestamp' ] )
+		);
+		return $change;
+	}
+	
+	function parseFeedData( $feedData, $useOld = false ) {
 		$startTime = microtime( true );
 		
 		$urls = Array(
-			'http://toolserver.org/~cobi/cb.php?user=' . urlencode( $feedData[ 'user' ] ) . '&ns=' . $feedData[ 'namespaceid' ] . '&title=' . urlencode( $feedData[ 'title' ] ),
+			'http://toolserver.org/~cobi/cb' . ( $useOld ? 'old' : '' ) . '.php?user=' . urlencode( $feedData[ 'user' ] ) . '&ns=' . $feedData[ 'namespaceid' ] . '&title=' . urlencode( $feedData[ 'title' ] ) . '&timestamp=' . urlencode( $feedData[ 'timestamp' ] ),
 			'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=' . urlencode( ( $feedData[ 'namespaceid' ] == 0 ? '' : $feedData[ 'namespace' ] . ':' ) . $feedData[ 'title' ] ) . '&rvstartid=' . $feedData[ 'revid' ] . '&rvlimit=2&rvprop=timestamp|user|content&format=php'
 		);
 		
 		list( $cb, $api ) = getUrlsInParallel( $urls );
 		
-		$api = array_values( $api[ 'query' ][ 'pages' ] );
-		$api = $api[ 0 ];
+		$api = current( $api[ 'query' ][ 'pages' ] );
 		
 		$data = Array(
 			'EditType' => 'change',
@@ -189,5 +222,21 @@
 		$score = (string) $data->WPEdit->score;
 		$isVand = ( (string) $data->WPEdit->think_vandalism ) == 'true';
 		return $isVand;
+	}
+	
+	function oldData( $id ) {
+		$feedData = genOldFeedData( $id );
+		$feedData = parseFeedData( $feedData, true );
+		$feedData = $feedData[ 'all' ];
+		return $feedData;
+	}
+	
+	function oldXML( $ids ) {
+		if( !is_array( $ids ) )
+			$ids = Array( $ids );
+		$feedData = Array();
+		foreach( $ids as $id ) 
+			$feedData[] = oldData( $id );
+		return toXML( $feedData );
 	}
 ?>
