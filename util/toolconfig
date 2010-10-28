@@ -1,6 +1,6 @@
 # Put any local configuration in a file called localtoolconfig
 
-ANN_SIZE=300
+ANN_SIZE=100
 ANN_MAX_EPOCHS=150
 ANN_TARGET_ERROR=0.037
 

@@ -15,10 +15,14 @@ function addallnames {
 }
 
 function word_prop {
+	echo "ann_basic_${1} = \"added_${1} / added_word_count\";"
+	echo "ann_prev_${1} = \"previous_${1} / previous_word_count\";"
 	echo "ann_${1} = \"added_${1} / added_word_count / (previous_${1} / previous_word_count + 1.0)\";"
 	echo "ann_removed_${1} = \"removed_${1} / removed_word_count / (previous_${1} / previous_word_count + 1.0)\";"
 	addallnames "ann_${1}"
 	addallnames "ann_removed_${1}"
+	#addallnames "ann_basic_${1}"
+	#addallnames "ann_prev_${1}"
 }
 
 function basic_added_word_prop {
@@ -70,9 +74,11 @@ function diff_charcount {
 	echo "ann_${1}_add = \"(current_${1} - previous_${1}) / current_text_size\";"
 	echo "ann_${1}_rem = \"(previous_${1} - current_${1}) / previous_text_size\";"
 	echo "ann_${1}_cnt = \"(current_${1} - previous_${1}) / 10\";"
+	echo "ann_${1}_prev = \"previous_${1} / previous_text_size\";"
 	addallnames "ann_${1}_add"
 	addallnames "ann_${1}_rem"
 	addallnames "ann_${1}_cnt"
+	#addallnames "ann_${1}_prev"
 }
 
 function boolean {
@@ -136,13 +142,13 @@ diff_linear_scale wikimarkup_formatting_count 0 64
 linear_scale added_longest_char_run 0 6
 linear_scale added_max_word_len 0 30
 linear_scale comment_size 0 100
-linear_scale user_edit_count 0 25
+linear_scale user_edit_count 0 300
 
 log_scale added_word_count 0 1000
 log_scale current_num_recent_edits 0 100
 log_scale current_num_recent_reversions 0 20
 log_scale current_word_count 0 1000
-log_scale user_distinct_pages 0 1024
+#log_scale user_distinct_pages 0 1024
 log_scale user_edit_count 0 1024
 
 age_scale current_page_made_time
@@ -158,6 +164,8 @@ exact main_bayes_score
 exact two_bayes_score
 exact previous_bayes_score
 
+echo 'ann_distinct_pages = "user_distinct_pages / user_edit_count";'
+addallnames "ann_distinct_pages"
 echo "ann_user_warns = \"user_warns * 2 / user_edit_count\";"
 addallnames "ann_user_warns"
 echo "ann_added_reused_words = \"(added_reused_words - added_common_words) / (added_word_count - added_common_words)\";"
