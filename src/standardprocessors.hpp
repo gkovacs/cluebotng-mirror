@@ -377,6 +377,54 @@ class FastStringSearch : public TextProcessor {
 		MultiStrFind<256,0> strfinder;
 };
 
+class StandardQuoteSeparator : public EditProcessor {
+	public:
+		StandardQuoteSeparator(libconfig::Setting & cfg) : EditProcessor(cfg) {
+			inprop = (const char *)configuration["input"];
+			if(configuration.exists("output_quotes")) outquoteprop = (const char *)configuration["output_quotes"];
+			if(configuration.exists("output_noquotes")) outnoquoteprop = (const char *)configuration["output_noquotes"];
+		}
+		
+		void process(Edit & ed) {
+			std::string origstr = ed.getProp<std::string>(inprop);
+			const char * orig = origstr.c_str();
+			char * withquotes = new char[origstr.size() + 1];
+			char * withoutquotes = new char[origstr.size() + 1];
+			char * withquotes_pos = withquotes;
+			char * withoutquotes_pos = withoutquotes;
+			bool quoted = false;
+			for(; *orig; ++orig) {
+				char c = *orig;
+				if(c == '"') {
+					quoted = (!quoted);
+					continue;
+				}
+				if(c == '\n') {
+					if(quoted) *(withquotes_pos++) = c;
+					quoted = false;
+				}
+				if(quoted) {
+					*(withquotes_pos++) = c;
+				} else {
+					*(withoutquotes_pos++) = c;
+				}
+			}
+			*withquotes_pos = 0;
+			*withoutquotes_pos = 0;
+			std::string withquotes_str(withquotes);
+			std::string withoutquotes_str(withoutquotes);
+			delete[] withquotes;
+			delete[] withoutquotes;
+			if(outquoteprop.size()) ed.setProp<std::string>(outquoteprop, withquotes_str);
+			if(outnoquoteprop.size()) ed.setProp<std::string>(outnoquoteprop, withoutquotes_str);
+		}
+		
+	private:
+		std::string inprop;
+		std::string outquoteprop;
+		std::string outnoquoteprop;
+};
+
 class CharsetConverter : public TextProcessor {
 	public:
 		CharsetConverter(libconfig::Setting & cfg) : TextProcessor(cfg) {
@@ -1081,6 +1129,7 @@ class ExpressionEval : public EditProcessor {
 		
 		void process(Edit & ed) {
 			std::map<std::string, double> dvarmap = ed.getDoubleMap();
+			ed.setProp<std::map<std::string,double> >("expr_dmap_dbg", dvarmap);
 			for(std::map<std::string,Expression>::iterator it = expressions.begin(); it != expressions.end(); ++it) {
 				double dres = it->second.evaluate(dvarmap);
 				std::string pname = it->first;
@@ -1197,7 +1246,7 @@ class FloatSetCreator : public EditProcessor {
 			if(clip_low) {
 				if(n < clip_low_num) n = clip_low_num;
 				if(isinf(n) < 0) n = clip_low_num;
-				if(isnan(n)) n = clip_low_num;
+				if(isnan(n) || isnan(0.0 - n)) n = clip_low_num;
 			}
 			if(clip_high) {
 				if(n > clip_high_num) n = clip_high_num;

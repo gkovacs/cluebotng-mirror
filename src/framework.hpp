@@ -90,6 +90,14 @@ class PropertySet {
 				}
 				return sstrm.str();
 			}
+			if(ti == typeid(std::map<std::string,double>)) {
+				sstrm << "DoubleMap:\n";
+				std::map<std::string,double> dmap = boost::any_cast<std::map<std::string,double> >(a);
+				for(std::map<std::string,double>::iterator it = dmap.begin(); it != dmap.end(); ++it) {
+					sstrm << it->first << ": " << it->second << "\n";
+				}
+				return sstrm.str();
+			}
 			if(ti == typeid(std::vector<float>)) {
 				sstrm << "FloatSet:\n";
 				std::vector<float> fset = boost::any_cast<std::vector<float> >(a);
@@ -135,9 +143,9 @@ class PropertySet {
 				} else if(ti == typeid(unsigned long long int)) {
 					dvarmap[it->first] = (double)boost::any_cast<unsigned long long int>(it->second);
 				} else if(ti == typeid(std::string)) {
-					dvarmap[it->first + "_size"] = (double)(boost::any_cast<std::string>(it->second)).size();
+					dvarmap[it->first + "_size"] = (double)((boost::any_cast<std::string>(it->second)).size());
 				} else if(ti == typeid(WordSet)) {
-					dvarmap[it->first + "_size"] = (double)(boost::any_cast<WordSet>(it->second)).size();
+					dvarmap[it->first + "_size"] = (double)((boost::any_cast<WordSet>(it->second)).size());
 				} else if(ti == typeid(bool)) {
 					bool b = boost::any_cast<bool>(it->second);
 					dvarmap[it->first] = b ? 1.0 : 0.0;

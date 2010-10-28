@@ -101,6 +101,8 @@ void addChainLink(EditProcessChain & procchain, const string & modulename, Setti
 		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new ApplyThreshold(moduleconfig)));
 	} else if(modulename == "chain") {
 		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new SubchainModule(moduleconfig)));
+	} else if(modulename == "quote_separator") {
+		procchain.appendProcessor(boost::shared_ptr<EditProcessor>(new StandardQuoteSeparator(moduleconfig)));
 	} else {
 		throw std::runtime_error("Unknown module/chain link");
 	}

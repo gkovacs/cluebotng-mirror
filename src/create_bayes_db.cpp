@@ -55,6 +55,6 @@ int main(int argc, char **argv) {
 	}
 	cout << "\x1B[20D" << i << "\n";
 	cout << "Pruning ...\n";
-	baydb.pruneDB(3, 0.25);
+	baydb.pruneDB(3, 0.15);
 }
 
