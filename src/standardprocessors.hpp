@@ -1130,6 +1130,7 @@ class ExpressionEval : public EditProcessor {
 		void process(Edit & ed) {
 			std::map<std::string, double> dvarmap = ed.getDoubleMap();
 			ed.setProp<std::map<std::string,double> >("expr_dmap_dbg", dvarmap);
+			boost::lock_guard<boost::mutex> lock(mut);
 			for(std::map<std::string,Expression>::iterator it = expressions.begin(); it != expressions.end(); ++it) {
 				double dres = it->second.evaluate(dvarmap);
 				std::string pname = it->first;
@@ -1141,6 +1142,7 @@ class ExpressionEval : public EditProcessor {
 		}
 		
 	private:
+		boost::mutex mut;
 		struct Expression {
 			std::string expression_string;
 			char **variable_names;
