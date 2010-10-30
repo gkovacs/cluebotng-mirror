@@ -111,7 +111,7 @@ class TrialRunReport : public EditProcessor {
 			}
 			if(configuration.exists("false_positive_rate")) {
 				float fprate = configuration["false_positive_rate"];
-				float thresh = calcThresholdFromFalsePositiveRate(fprate);
+				float thresh = calcThresholdFromFalsePositiveRate(fprate, 0.0001);
 				file << "With maximum false positive rate " << (fprate * 100.0) << "%, Threshold=" << thresh << "\n";
 				primary_threshold = thresh;
 				writeThresholdStats(file, thresh);
