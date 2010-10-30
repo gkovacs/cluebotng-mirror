@@ -46,6 +46,20 @@ class BayesScorer : public EditProcessor {
 			if(configuration.exists("num_words")) num_words = configuration["num_words"];
 			default_score = 0.0;
 			if(configuration.exists("default_score")) default_score = configuration["default_score"];
+			if(configuration.exists("numwords_out")) nwordprop = (const char *)configuration["numwords_out"];
+			min_word_high_score = 0.5;
+			max_word_low_score = 0.5;
+			if(configuration.exists("min_word_high_score")) min_word_high_score = configuration["min_word_high_score"];
+			if(configuration.exists("max_word_low_score")) max_word_low_score = configuration["max_word_low_score"];
+			if(configuration.exists("probability_ranges")) {
+				libconfig::Setting & prcfg = configuration["probability_ranges"];
+				for(int i = 0; i < prcfg.getLength(); ++i) {
+					std::string propname = prcfg[i].getName();
+					float low = prcfg[i][0];
+					float high = prcfg[i][1];
+					prob_ranges.push_back(std::pair<std::string,std::pair<float,float> >(propname, std::pair<float,float>(low, high)));
+				}
+			}
 			baydb.openDBForReading(dbfilename);
 		}
 		
@@ -57,18 +71,33 @@ class BayesScorer : public EditProcessor {
 			// Pair is Magnitude of Weight, Probability
 			WordSet words = ed.getProp<WordSet>(inprop);
 			std::vector<std::pair<float, float> > probs;
+			std::vector<int> probrangecnts(prob_ranges.size(), 0);
 			for(WordSet::const_iterator it = words.begin(); it != words.end(); ++it) {
 				unsigned int good_cnt, bad_cnt;
 				baydb.getWord(it->first, good_cnt, bad_cnt);
 				if((good_cnt + bad_cnt) < min_edits) continue;
 				float p = baydb.getWordVandalProb(good_cnt, bad_cnt, true);
 				if(p < 0.0) continue;
+				if(prob_ranges.size()) {
+					int priti = 0;
+					for(std::vector<std::pair<std::string,std::pair<float,float> > >::iterator prit = prob_ranges.begin(); prit != prob_ranges.end(); ++prit) {
+						if(p >= (*prit).second.first && p <= (*prit).second.second) probrangecnts[priti]++;
+						++priti;
+					}
+				}
+				if(p >= max_word_low_score && p <= min_word_high_score) continue;
 				float m = 0.5 - p;
 				if(m < 0.0) m = 0.0 - m;
 				probs.push_back(std::pair<float,float>(m, p));
 			}
+			if(prob_ranges.size()) {
+				for(int priti = 0; priti < probrangecnts.size(); ++priti) {
+					ed.setProp<int>(prob_ranges[priti].first, probrangecnts[priti]);
+				}
+			}
 			if(probs.size() < 1) {
 				ed.setProp<float>(outprop, default_score);
+				if(nwordprop.size()) ed.setProp<int>(nwordprop, 0);
 				return;
 			}
 			// Sort
@@ -87,15 +116,20 @@ class BayesScorer : public EditProcessor {
 			}
 			double set_prob = v_prob / (v_prob + l_prob);
 			ed.setProp<float>(outprop, (float)set_prob);
+			if(nwordprop.size()) ed.setProp<int>(nwordprop, probs.size());
 		}
 		
 	private:
 		BayesDB baydb;
 		std::string inprop;
 		std::string outprop;
+		std::string nwordprop;
 		int min_edits;
 		int num_words;
+		std::vector<std::pair<std::string,std::pair<float,float> > > prob_ranges;
 		float default_score;
+		float min_word_high_score;
+		float max_word_low_score;
 		boost::mutex mut;
 };
 

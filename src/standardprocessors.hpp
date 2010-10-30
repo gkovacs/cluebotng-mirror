@@ -935,6 +935,7 @@ class MiscRawWordMetrics : public WordSetProcessor {
 			int max_word_len = 0;						// Length of the longest word
 			int max_word_repeats = 0;					// Maximum number of times a single word was used
 			int max_char_repeat = 0;					// Maximum number of consecutive single character repeats
+			int max_ucase_word_len = 0;
 			
 			for(WordSet::const_iterator it = wordset.begin(); it != wordset.end(); ++it) {
 				int word_occurrences = it->second;
@@ -976,7 +977,10 @@ class MiscRawWordMetrics : public WordSetProcessor {
 				
 				total_num_words += word_occurrences;
 				if(has_lcase_char && !has_ucase_char) num_lcase_words += word_occurrences;
-				if(num_ucase_chars == word_len && word_len > 1) num_ucase_words += word_occurrences;
+				if(num_ucase_chars == word_len && word_len > 1) {
+					num_ucase_words += word_occurrences;
+					if(word_len > max_ucase_word_len) max_ucase_word_len = word_len;
+				}
 				if(has_first_ucase_char && num_ucase_chars != word_len && word_len > 1) num_firstucase_words += word_occurrences;
 				if(!has_first_ucase_char && has_ucase_char) num_middleucase_words += word_occurrences;
 				if(has_digit_char && !has_lcase_char && !has_ucase_char) num_alldigits_words += word_occurrences; else
@@ -992,6 +996,7 @@ class MiscRawWordMetrics : public WordSetProcessor {
 			ed.setProp<int>(proppfx + "distinct_word_count", total_distinct_words);
 			ed.setProp<int>(proppfx + "all_lcase_word_count", num_lcase_words);
 			ed.setProp<int>(proppfx + "all_ucase_word_count", num_ucase_words);
+			ed.setProp<int>(proppfx + "max_all_ucase_word_len", max_ucase_word_len);
 			ed.setProp<int>(proppfx + "first_ucase_word_count", num_firstucase_words);
 			ed.setProp<int>(proppfx + "middle_ucase_word_count", num_middleucase_words);
 			ed.setProp<int>(proppfx + "numeric_word_count", num_alldigits_words);
