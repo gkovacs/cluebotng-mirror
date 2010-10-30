@@ -157,7 +157,8 @@ class BayesDB {
 		}
 		
 		void printSortedDB() {
-			std::vector<std::pair<float,std::string> > dbvec;
+			//std::vector<std::pair<float,std::string> > dbvec;
+			std::vector<dbvecinf> dbvec;
 			using std::cout;
 			unsigned int total_good;
 			unsigned int total_bad;
@@ -178,13 +179,22 @@ class BayesDB {
 					float vandalness = vand_prob / (vand_prob + good_prob);
 					
 					std::string word((char *)key.get_data(), key.get_size());
-					dbvec.push_back(std::pair<float,std::string>(vandalness, word));
+					//dbvec.push_back(std::pair<float,std::string>(vandalness, word));
+					dbvecinf dbvi;
+					dbvi.score = vandalness;
+					dbvi.word = word;
+					dbvi.good_edits = bdata.good_edits;
+					dbvi.bad_edits = bdata.bad_edits;
+					dbvec.push_back(dbvi);
 				}
 				cur->close();
 			}
 			std::sort(dbvec.begin(), dbvec.end());
-			for(std::vector<std::pair<float,std::string> >::iterator it = dbvec.begin(); it != dbvec.end(); ++it) {
+			/*for(std::vector<std::pair<float,std::string> >::iterator it = dbvec.begin(); it != dbvec.end(); ++it) {
 				if((*it).second != "_EDIT_TOTALS") cout << (*it).second << " " << (*it).first << "\n";
+			}*/
+			for(std::vector<dbvecinf>::iterator it = dbvec.begin(); it != dbvec.end(); ++it) {
+				if(it->word != "_EDIT_TOTALS") cout << it->word << " " << it->score << " " << it->good_edits << " " << it->bad_edits << "\n";
 			}
 		}
 		
@@ -223,6 +233,20 @@ class BayesDB {
 		unsigned int cached_total_good;
 		unsigned int cached_total_bad;
 		bool have_cached_total;
+		
+		struct dbvecinf {
+			float score;
+			std::string word;
+			int good_edits;
+			int bad_edits;
+			bool operator<(const dbvecinf & comp) const {
+				if(score < comp.score) return true;
+				if(score > comp.score) return false;
+				if(word < comp.word) return true;
+				if(word > comp.word) return false;
+				return false;
+			}
+		};
 };
 
 
