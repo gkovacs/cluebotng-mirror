@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+  
+  <!-- Servlets -->
+  <servlet>
+    <servlet-name>reviewServlet</servlet-name>
+    <servlet-class>org.cluenet.cluebot.reviewinterface.server.ReviewServiceImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>reviewServlet</servlet-name>
+    <url-pattern>/cluebotreviewinterface/review</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>adminServlet</servlet-name>
+    <servlet-class>org.cluenet.cluebot.reviewinterface.server.AdminServiceImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>adminServlet</servlet-name>
+    <url-pattern>/cluebotreviewadmininterface/admin</url-pattern>
+  </servlet-mapping>
+  
+  <filter>
+    <filter-name>requireAdmin</filter-name>
+    <filter-class>org.cluenet.cluebot.reviewinterface.server.Authentication</filter-class>
+    <init-param>
+      <param-name>authType</param-name>
+      <param-value>requireAdmin</param-value>
+    </init-param>
+  </filter>
+  
+  <filter>
+    <filter-name>requirePrivileged</filter-name>
+    <filter-class>org.cluenet.cluebot.reviewinterface.server.Authentication</filter-class>
+    <init-param>
+      <param-name>authType</param-name>
+      <param-value>requirePrivileged</param-value>
+    </init-param>
+  </filter>
+  
+  <filter-mapping>
+    <filter-name>requirePrivileged</filter-name>
+    <servlet-name>reviewServlet</servlet-name>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>requirePrivileged</filter-name>
+    <url-pattern>*review.jsp</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>requireAdmin</filter-name>
+    <servlet-name>adminServlet</servlet-name>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>requireAdmin</filter-name>
+    <url-pattern>*admin.jsp</url-pattern>
+  </filter-mapping>
+  
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>review.jsp</welcome-file>
+  </welcome-file-list>
+
+</web-app>
