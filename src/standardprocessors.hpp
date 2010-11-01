@@ -1109,11 +1109,11 @@ class WordFinder : public WordSetProcessor {
 		}
 		
 	private:
-		StrTree<std::vector<int>, 256, 0> wordtree;
+		//StrTree<std::vector<int>, 256, 0> wordtree;
+		StrTree<std::vector<int>, 96, 32> wordtree;	// Printable ascii
 		std::vector<std::string> metricnames;
 };
 
-/////////////// NOTE: IS EVALUATOR THREAD-SAFE?  IF STUFF BREAKS TRY PUTTING THIS IN A MUTEX
 class ExpressionEval : public EditProcessor {
 	public:
 		ExpressionEval(libconfig::Setting & cfg) : EditProcessor(cfg) {

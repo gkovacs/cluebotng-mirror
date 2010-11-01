@@ -144,6 +144,7 @@ diff_linear_scale unterminated_sentence_count 0 16
 diff_linear_scale wikilink_count 0 20
 diff_linear_scale wikimarkup_formatting_count 0 64
 diff_linear_scale template_count 0 8
+#diff_linear_scale template_argument_count 0 16
 diff_linear_scale wikimarkup_listitem_count 0 10
 diff_linear_scale wikimarkup_indent_count 0 10
 diff_linear_scale proper_pluralities 0 16
@@ -180,9 +181,11 @@ linear_scale previous_bayes_nwords 0 20
 #exact raw_bayes_score
 #linear_scale raw_bayes_nwords 0 20
 
+echo 'ann_bayes_range_top = "bayes_prob_range_top / 4";'
 echo 'ann_bayes_range_high = "bayes_prob_range_high / added_distinct_word_count";'
 echo 'ann_bayes_range_mid = "bayes_prob_range_mid / added_distinct_word_count";'
 echo 'ann_bayes_range_low = "bayes_prob_range_low / added_distinct_word_count";'
+#addallnames "ann_bayes_range_top"
 addallnames "ann_bayes_range_high"
 addallnames "ann_bayes_range_mid"
 addallnames "ann_bayes_range_low"

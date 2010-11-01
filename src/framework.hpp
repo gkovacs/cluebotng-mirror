@@ -14,11 +14,90 @@
 #include <sstream>
 #include <stdio.h>
 #include <tr1/unordered_map>
-#include <boost/pool/pool_alloc.hpp>
+#include <boost/pool/pool.hpp>
 #include <utility>
 
 namespace WPCluebot {
 
+class TriePoolWordSet {
+	public:
+		TriePoolWordSet() : poolalloc(sizeof(Node)) {
+			newnode(root);
+			max_depth = 0;
+			num_values = 0;
+		}
+		
+		int & operator[](const char * str) {
+			Node * nod = root;
+			const char * ostr = str;
+			for(; *str; ++str) {
+				unsigned char c = (unsigned char)*str;
+				for(int s = 8; s; --s) {
+					if(c & 0x80) {
+						if(!nod->second) newnode(nod->second);
+						nod = nod->second;
+					} else {
+						if(!nod->first) newnode(nod->first);
+						nod = nod->first;
+					}
+					c <<= 1;
+				}
+			}
+			if(str - ostr > max_depth) max_depth = str - ostr;
+			nod->value = 0;
+			return nod->value;
+		}
+		
+		int & operator[](const std::string & str) {
+			return (*this)[str.c_str()];
+		}
+		
+		size_t size() const {
+			return num_values;
+		}
+		
+		bool exists(const char * str) const {
+			Node * nod = root;
+			const char * ostr = str;
+			for(; *str; ++str) {
+				unsigned char c = (unsigned char)*str;
+				for(int s = 8; s; --s) {
+					if(c & 0x80) {
+						if(!nod->second) return false;
+						nod = nod->second;
+					} else {
+						if(!nod->first) return false;
+						nod = nod->first;
+					}
+					c <<= 1;
+				}
+			}
+			return (nod->value != -1);
+		}
+		
+		bool exists(const std::string & str) const {
+			return exists(str.c_str());
+		}
+		
+	private:
+		struct Node {
+			Node * first;
+			Node * second;
+			int value;
+		};
+		Node * root;
+		boost::pool<> poolalloc;
+		int max_depth;
+		int num_values;
+		inline void newnode(Node * & np) {
+			np = (Node *)poolalloc.malloc();
+			np->first = NULL;
+			np->second = NULL;
+			np->value = -1;
+		}
+};
+
+//typedef StringTrieMap<int,256,0> WordSet;
 typedef std::map<std::string,int> WordSet;
 //typedef std::map<std::string,int,std::less<std::string>, boost::fast_pool_allocator<std::pair<std::string,int> > > WordSet;
 // typedef std::tr1::unordered_map<std::string,int> WordSet;
