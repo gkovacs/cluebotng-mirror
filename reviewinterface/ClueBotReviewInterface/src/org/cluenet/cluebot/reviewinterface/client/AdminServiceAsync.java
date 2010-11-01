@@ -60,5 +60,7 @@ public interface AdminServiceAsync {
 	void getUsers( AsyncCallback< List< User >> callback );
 
 	void setAdmin( String key, Boolean isAdmin, AsyncCallback< Void > callback );
+
+	void addEditsToEditGroup( String key, Integer required, List< Edit > edits, AsyncCallback< Void > callback );
 	
 }

@@ -17,7 +17,7 @@ public class ReviewServiceImpl extends RemoteServiceServlet implements
 		ReviewService {
 
 	@Override
-	public ReturnData reviewId( Integer id, Classification type, String comment ) throws IllegalArgumentException {
+	public ReturnData reviewId( Integer id, Classification type, String comment ) throws Exception {
 		User user = User.findByEmail( new Email( UserServiceFactory.getUserService().getCurrentUser().getEmail() ) );
 		Edit edit = Edit.findById( id );
 		edit.newClassification( user, type, comment );
@@ -26,8 +26,11 @@ public class ReviewServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public ReturnData getId() throws IllegalArgumentException {
+	public ReturnData getId() throws Exception {
 		User user = User.findByEmail( new Email( UserServiceFactory.getUserService().getCurrentUser().getEmail() ) );
+		Edit randomEdit = EditGroup.getRandomEditGroup().getRandomEdit( user );
+		if( randomEdit == null )
+			throw new Exception( "No more edits available." );
 		return new ReturnData(
 				EditGroup.getRandomEditGroup().getRandomEdit( user ).getClientClass(),
 				user.getClientClass()

@@ -4,6 +4,7 @@
 package org.cluenet.cluebot.reviewinterface.server;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -46,11 +47,19 @@ public class EditGroup extends Persist {
 	public EditGroup( String name, List< Edit > edits, Integer weight ) {
 		this.name = name;
 		this.edits = new ArrayList< Key >();
-		for( Edit edit : edits )
-			if( !edits.contains( edit.getKey() ) )
-				this.edits.add( edit.getKey() );
 		this.weight = weight;
 		this.done = new ArrayList< Key >();
+		addEdits( edits );
+		this.persist();
+	}
+	
+	public void addEdits( List< Edit > edits ) {
+		for( Edit edit : edits )
+			if( !this.edits.contains( edit.getKey() ) && !this.done.contains( edit.getKey() ) )
+				if( edit.getVandalism() >= edit.getRequired() || edit.getConstructive() >= edit.getRequired() || edit.getSkipped() >= edit.getRequired() )
+					this.done.add( edit.getKey() );
+				else
+					this.edits.add( edit.getKey() );
 		this.persist();
 	}
 
@@ -80,24 +89,16 @@ public class EditGroup extends Persist {
 	}
 	
 	public Edit getRandomEdit( User user ) {
+		List< Key > edits = new ArrayList< Key >( this.edits );
+		
 		if( edits.size() == 0 )
 			return null;
 		
-		List< Edit > editObjects = new ArrayList< Edit >();
+		Collections.shuffle( edits );
+		
 		for( Key key : edits ) {
 			Edit edit = Edit.findByKey( key );
 			if( !edit.getUsers().contains( user.getKey() ) )
-				editObjects.add( edit );
-		}
-		
-		Integer sum = 0;
-		for( Edit edit : editObjects )
-			sum += edit.getWeight();
-		
-		Integer num = new Random().nextInt( sum );
-		for( Edit edit : editObjects ) {
-			num -= edit.getWeight();
-			if( num <= 0 )
 				return edit;
 		}
 		
@@ -120,6 +121,15 @@ public class EditGroup extends Persist {
 		for( Key key : this.done )
 			done.add( Edit.findByKey( key ).getAdminClass() );
 			
+		
+		return new org.cluenet.cluebot.reviewinterface.shared.EditGroup(
+				KeyFactory.keyToString( key ), name, edits, done, weight
+		);
+	}
+	
+	public org.cluenet.cluebot.reviewinterface.shared.EditGroup getLightClientClass() {
+		List< AdminEdit > edits = new ArrayList< AdminEdit >();
+		List< AdminEdit > done = new ArrayList< AdminEdit >();
 		
 		return new org.cluenet.cluebot.reviewinterface.shared.EditGroup(
 				KeyFactory.keyToString( key ), name, edits, done, weight

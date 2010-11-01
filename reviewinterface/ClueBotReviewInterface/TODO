@@ -1,6 +1,3 @@
 TODO:
 	Support editgroup names from download.
 	Handle old formats in createEditGroup.
-	Add edits to edit group.
-	Fix no more edits error.
-	Fix scrolling.

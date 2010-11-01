@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 
-public class EditGroupListWindow {
+public class EditGroupListWindow implements Refreshable {
 	private DialogBox popup = null;
 	private List< EditGroup > editGroups;
 	private final AdminServiceAsync admin = GWT.create( AdminService.class );

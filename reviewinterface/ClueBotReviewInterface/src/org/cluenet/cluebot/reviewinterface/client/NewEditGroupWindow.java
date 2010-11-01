@@ -21,7 +21,11 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class NewEditGroupWindow {
 	private DialogBox popup = null;
-	private EditGroupListWindow parent;
+	private Refreshable parent;
+	private Boolean create = true;
+	private String key = null;
+	private String name = null;
+	private Integer weight = null;
 	private final AdminServiceAsync admin = GWT.create( AdminService.class );
 
 	private void processSave( String name, String strWeight, String strRequired, String data ) {
@@ -32,6 +36,30 @@ public class NewEditGroupWindow {
 		edits = processData( data );
 		
 		admin.createEditGroup( name, weight, required, edits, new AsyncCallback< Void >() {
+
+			@Override
+			public void onFailure( Throwable caught ) {
+				ClueBotReviewAdminInterface.error();
+			}
+
+			@Override
+			public void onSuccess( Void result ) {
+				popup.hide();
+				popup.clear();
+				parent.refresh();
+			}
+			
+		});
+
+	}
+	
+	private void processSave( String strRequired, String data ) {
+		List< Edit > edits;
+		Integer required = new Integer( strRequired );
+		
+		edits = processData( data );
+		
+		admin.addEditsToEditGroup( key, required, edits, new AsyncCallback< Void >() {
 
 			@Override
 			public void onFailure( Throwable caught ) {
@@ -77,7 +105,10 @@ public class NewEditGroupWindow {
 	private void display() {
 		if( popup == null )
 			popup = new DialogBox();
-		popup.setText( "Add Edit Group" );
+		if( create )
+			popup.setText( "Add Edit Group" );
+		else
+			popup.setText( "Add Edits to Edit Group " + this.name );
 		popup.setAnimationEnabled( true );
 		popup.setModal( false );
 		
@@ -90,9 +121,15 @@ public class NewEditGroupWindow {
 		final TextArea data = new TextArea();
 		
 		properties.setText( 0, 0, "Name:" );
-		properties.setWidget( 0, 1, name );
+		if( create )
+			properties.setWidget( 0, 1, name );
+		else
+			properties.setText( 0, 1, this.name );
 		properties.setText( 1, 0, "Weight:" );
-		properties.setWidget( 1, 1, weight );
+		if( create )
+			properties.setWidget( 1, 1, weight );
+		else
+			properties.setText( 1, 1, this.weight.toString() );
 		properties.setText( 2, 0, "Required scores:" );
 		properties.setWidget( 2, 1, required );
 		properties.setText( 3, 0, "Data:" );
@@ -105,7 +142,10 @@ public class NewEditGroupWindow {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				processSave( name.getText(), weight.getText(), required.getText(), data.getText() );
+				if( create )
+					processSave( name.getText(), weight.getText(), required.getText(), data.getText() );
+				else
+					processSave( required.getText(), data.getText() );
 			}
 
 		});
@@ -133,9 +173,21 @@ public class NewEditGroupWindow {
 			popup.show();
 	}
 	
-	public NewEditGroupWindow( EditGroupListWindow parent ) {
+	public NewEditGroupWindow( Refreshable parent ) {
 		this.parent = parent;
+		create = true;
+		key = null;
+		name = null;
+		weight = null;
 		display();
 	}
 	
+	public NewEditGroupWindow( Refreshable parent, String key, String name, Integer weight ) {
+		this.parent = parent;
+		create = false;
+		this.key = key;
+		this.name = name;
+		this.weight = weight;
+		display();
+	}
 }

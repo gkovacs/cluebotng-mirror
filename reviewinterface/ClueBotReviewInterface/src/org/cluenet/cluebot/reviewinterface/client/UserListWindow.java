@@ -15,7 +15,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 
-public class UserListWindow {
+public class UserListWindow implements Refreshable {
 	private DialogBox popup = null;
 	private List< User > users;
 	private final AdminServiceAsync admin = GWT.create( AdminService.class );

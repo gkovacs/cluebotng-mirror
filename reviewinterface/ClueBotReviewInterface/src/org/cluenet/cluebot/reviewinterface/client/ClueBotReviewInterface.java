@@ -174,7 +174,7 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 		DialogBox errorBox = new DialogBox();
 		errorBox.setText( "Error" );
 		errorBox.setAnimationEnabled( true );
-		errorBox.add( new Label( "An error occurred.  Please refresh the page." ) );
+		errorBox.add( new Label( "An error occurred:  " + caught.getMessage() + "  Please refresh the page." ) );
 		errorBox.center();
 		errorBox.setModal( true );
 		errorBox.show();

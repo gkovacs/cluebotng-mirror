@@ -19,10 +19,8 @@ public class AdminServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public void createEditGroup( String name, Integer weight, Integer required, List< org.cluenet.cluebot.reviewinterface.shared.Edit > edits ) throws IllegalArgumentException {
 		List< Edit > list = new ArrayList< Edit >();
-		for( org.cluenet.cluebot.reviewinterface.shared.Edit edit : edits ) {
+		for( org.cluenet.cluebot.reviewinterface.shared.Edit edit : edits )
 			list.add( Edit.newFromId( edit.id, edit.classification, required, edit.weight ) );
-			//System.err.println( "Edit: id=" + edit.id + " class=" + edit.classification + " required=" + required + " weight=" + edit.weight);
-		}
 		new EditGroup( name, list, weight );
 	}
 
@@ -50,7 +48,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements
 	public List< org.cluenet.cluebot.reviewinterface.shared.EditGroup > getEditGroups() throws IllegalArgumentException {
 		List< org.cluenet.cluebot.reviewinterface.shared.EditGroup > list = new ArrayList< org.cluenet.cluebot.reviewinterface.shared.EditGroup >();
 		for( EditGroup eg : EditGroup.list() )
-			list.add( eg.getClientClass() );
+			list.add( eg.getLightClientClass() );
 		return list;
 	}
 
@@ -65,6 +63,15 @@ public class AdminServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public void setAdmin( String key, Boolean isAdmin ) throws IllegalArgumentException {
 		User.findByKey( key ).setAdmin( isAdmin );
+	}
+
+	@Override
+	public void addEditsToEditGroup( String key, Integer required, List< org.cluenet.cluebot.reviewinterface.shared.Edit > edits ) throws IllegalArgumentException {
+		List< Edit > list = new ArrayList< Edit >();
+		for( org.cluenet.cluebot.reviewinterface.shared.Edit edit : edits )
+			list.add( Edit.newFromId( edit.id, edit.classification, required, edit.weight ) );
+		EditGroup eg = EditGroup.findByKey( key );
+		eg.addEdits( list );
 	}
 
 }

@@ -15,7 +15,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class NewUserWindow {
 	private DialogBox popup = null;
-	private UserListWindow parent;
+	private Refreshable parent;
 	private final AdminServiceAsync admin = GWT.create( AdminService.class );
 
 	
@@ -86,7 +86,7 @@ public class NewUserWindow {
 			popup.show();
 	}
 	
-	public NewUserWindow( UserListWindow parent ) {
+	public NewUserWindow( Refreshable parent ) {
 		this.parent = parent;
 		display();
 	}

@@ -18,6 +18,7 @@ public interface AdminService extends RemoteService {
 	EditGroup getEditGroup( String key ) throws IllegalArgumentException;
 	void createEditGroup( String name, Integer weight, Integer required, List< Edit > edits ) throws IllegalArgumentException;
 	void deleteEditGroup( String key ) throws IllegalArgumentException;
+	void addEditsToEditGroup( String key, Integer required, List< Edit > edits ) throws IllegalArgumentException;
 	
 	List< User > getUsers() throws IllegalArgumentException;
 	void createUser( String email, Boolean isAdmin ) throws IllegalArgumentException;

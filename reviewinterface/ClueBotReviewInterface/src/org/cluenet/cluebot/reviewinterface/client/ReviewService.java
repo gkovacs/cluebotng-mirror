@@ -12,6 +12,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  */
 @RemoteServiceRelativePath( "review" )
 public interface ReviewService extends RemoteService {
-	ReturnData reviewId( Integer id, Classification type, String comment ) throws IllegalArgumentException;
-	ReturnData getId() throws IllegalArgumentException;
+	ReturnData reviewId( Integer id, Classification type, String comment ) throws Exception;
+	ReturnData getId() throws Exception;
 }

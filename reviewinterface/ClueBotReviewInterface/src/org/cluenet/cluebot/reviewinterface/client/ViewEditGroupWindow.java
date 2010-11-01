@@ -16,7 +16,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 
-public class ViewEditGroupWindow {
+public class ViewEditGroupWindow implements Refreshable {
 	private DialogBox popup = null;
 	private EditGroup editGroup;
 	private String key;
@@ -115,6 +115,16 @@ public class ViewEditGroupWindow {
 			i++;
 		}
 		
+		Button newButton = new Button("New");
+		newButton.addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				addEdits();
+			}
+			
+		});
+		
 		Button refreshButton = new Button("Refresh");
 		refreshButton.addClickHandler(new ClickHandler(){
 
@@ -137,6 +147,7 @@ public class ViewEditGroupWindow {
 		});
 		
 		HorizontalPanel buttons = new HorizontalPanel();
+		buttons.add( newButton );
 		buttons.add( refreshButton );
 		buttons.add( closeButton );
 		
@@ -146,6 +157,10 @@ public class ViewEditGroupWindow {
 		popup.setWidget( vpanel );
 		if( !popup.isShowing() )
 			popup.show();
+	}
+	
+	private void addEdits() {
+		new NewEditGroupWindow( this, editGroup.key, editGroup.name, editGroup.weight );
 	}
 	
 	public void refresh() {
