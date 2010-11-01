@@ -7,6 +7,16 @@
   
   <!-- Servlets -->
   <servlet>
+    <servlet-name>downloadServlet</servlet-name>
+    <servlet-class>org.cluenet.cluebot.reviewinterface.server.DownloadImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>downloadServlet</servlet-name>
+    <url-pattern>/download</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>reviewServlet</servlet-name>
     <servlet-class>org.cluenet.cluebot.reviewinterface.server.ReviewServiceImpl</servlet-class>
   </servlet>
