@@ -55,13 +55,56 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 		pleaseWait = null;
 	}
 	
-	private void classify( Classification type, String comment ) {
+	private void classify( Classification type, String comment, Boolean sure ) {
+		if( currentEdit.classification != Classification.UNKNOWN && !currentEdit.classification.equals( type ) && !sure ) {
+			getSure( type, comment );
+			return;
+		}
+		
 		doWait();
 		if( comment.equals("") )
 			comment = null;
 		review.reviewId( currentEdit.id, type, comment, this );
 	}
 	
+	private void getSure( final Classification type, final String comment ) {
+		final DialogBox sure = new DialogBox();
+		VerticalPanel vpanel = new VerticalPanel();
+		vpanel.add( new Label( "Are you very sure?" ) );
+		
+		HorizontalPanel buttons = new HorizontalPanel();
+		vpanel.add( buttons );
+		
+		Button yes = new Button( "Yes" );
+		yes.addClickHandler( new ClickHandler(){
+
+			@Override
+			public void onClick( ClickEvent event ) {
+				sure.hide();
+				classify( type, comment, true );
+			}
+			
+		});
+		buttons.add( yes );
+		
+		Button no = new Button( "No" );
+		no.addClickHandler( new ClickHandler(){
+
+			@Override
+			public void onClick( ClickEvent event ) {
+				sure.hide();
+			}
+			
+		});
+		buttons.add( no );
+		sure.setText( "Are you sure?" );
+		sure.setAnimationEnabled( true );
+		sure.setWidget( vpanel );
+		sure.center();
+		sure.setModal( true );
+		sure.show();
+	}
+
 	private void showButtons() {
 		VerticalPanel vpanel = new VerticalPanel();
 		HorizontalPanel commentPanel = new HorizontalPanel();
@@ -74,7 +117,7 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 
 			@Override
 			public void onClick( ClickEvent event ) {
-				classify( Classification.VANDALISM, comment.getText() );
+				classify( Classification.VANDALISM, comment.getText(), false );
 				comment.setText( "" );
 			}
 			
@@ -85,7 +128,7 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 
 			@Override
 			public void onClick( ClickEvent event ) {
-				classify( Classification.SKIPPED, comment.getText() );
+				classify( Classification.SKIPPED, comment.getText(), false );
 				comment.setText( "" );
 			}
 			
@@ -96,7 +139,7 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 
 			@Override
 			public void onClick( ClickEvent event ) {
-				classify( Classification.CONSTRUCTIVE, comment.getText() );
+				classify( Classification.CONSTRUCTIVE, comment.getText(), false );
 				comment.setText( "" );
 			}
 			

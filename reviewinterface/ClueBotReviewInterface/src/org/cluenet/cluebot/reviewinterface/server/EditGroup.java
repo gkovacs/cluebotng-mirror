@@ -75,6 +75,10 @@ public class EditGroup extends Persist {
 		return new ArrayList< Key >( edits );
 	}
 	
+	public List< Key > getDone() {
+		return new ArrayList< Key >( done );
+	}
+	
 	public Edit getRandomEdit( User user ) {
 		if( edits.size() == 0 )
 			return null;

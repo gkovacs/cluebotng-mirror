@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 
@@ -24,13 +25,20 @@ public class ViewEditGroupWindow {
 	private void display() {
 		if( popup == null )
 			popup = new DialogBox();
-		popup.setText( "User List" );
+		popup.setText( "Edit Group " + editGroup.name );
 		popup.setAnimationEnabled( true );
 		popup.setModal( false );
 		
 		VerticalPanel vpanel = new VerticalPanel();
+		FlexTable properties = new FlexTable();
+		properties.setText( 0, 0, "Name:" );
+		properties.setText( 0, 1, editGroup.name );
+		properties.setText( 1, 0, "Weight:" );
+		properties.setText( 1, 1, editGroup.weight.toString() );
+		vpanel.add( properties );
 
 		FlexTable editTable = new FlexTable();
+		vpanel.add( new Label( "Active:" ) );
 		vpanel.add( editTable );
 		editTable.setBorderWidth( 1 );
 		
@@ -68,6 +76,7 @@ public class ViewEditGroupWindow {
 			i++;
 		}
 		
+		vpanel.add( new Label( "Finished:" ) );
 		FlexTable doneTable = new FlexTable();
 		vpanel.add( doneTable );
 		doneTable.setBorderWidth( 1 );

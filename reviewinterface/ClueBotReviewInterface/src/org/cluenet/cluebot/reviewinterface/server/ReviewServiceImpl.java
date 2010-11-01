@@ -20,8 +20,8 @@ public class ReviewServiceImpl extends RemoteServiceServlet implements
 	public ReturnData reviewId( Integer id, Classification type, String comment ) throws IllegalArgumentException {
 		User user = User.findByEmail( new Email( UserServiceFactory.getUserService().getCurrentUser().getEmail() ) );
 		Edit edit = Edit.findById( id );
-		System.err.println( "Edit: id=" + id + " class=" + type + " cmt=" + comment );
 		edit.newClassification( user, type, comment );
+		user.incClassifications();
 		return getId();
 	}
 
