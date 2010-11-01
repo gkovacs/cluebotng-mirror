@@ -1,6 +1,9 @@
 
 package org.cluenet.cluebot.reviewinterface.client;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.cluenet.cluebot.reviewinterface.shared.Classification;
 import org.cluenet.cluebot.reviewinterface.shared.Edit;
 import org.cluenet.cluebot.reviewinterface.shared.ReturnData;
@@ -14,6 +17,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -25,6 +29,7 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 
 	private DialogBox pleaseWait;
 	private Edit currentEdit;
+	private List< RadioButton > options;
 	
 	/**
 	 * Create a remote service proxy to talk to the server-side Greeting service.
@@ -164,6 +169,7 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 	 */
 	public void onModuleLoad() {
 		showButtons();
+		setOptions();
 		doWait();
 		review.getId( this );
 	}
@@ -185,6 +191,44 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 		doneWait();
 		setUser( result.user.userName, result.user.classifications );
 		currentEdit = result.edit;
-		setURL( "http://en.wikipedia.org/w/index.php?action=view&diff=" + currentEdit.id );
+		setURL( getURL() + currentEdit.id );
+	}
+	
+	private String getURL() {
+		String option = "Normal";
+		for( RadioButton rb : options )
+			if( rb.getValue() )
+				option = rb.getText();
+		
+		if( option.equals( "Normal" ) )
+			return "http://en.wikipedia.org/w/index.php?action=view&diff=";
+		if( option.equals( "Diff only" ) )
+			return "http://en.wikipedia.org/w/index.php?action=view&diffonly=1&diff=";
+		if( option.equals( "Render" ) )
+			return "http://en.wikipedia.org/w/index.php?action=render&diffonly=1&diff=";
+		
+		return "http://en.wikipedia.org/w/index.php?action=view&diff=";
+	}
+
+	private void setOptions() {
+		options = new ArrayList< RadioButton >();
+		HorizontalPanel hpanel = new HorizontalPanel();
+		RadioButton rb;
+		rb = new RadioButton( "url", "Normal" );
+		rb.setValue( true );
+		hpanel.add( rb );
+		options.add( rb );
+		
+		rb = new RadioButton( "url", "Diff only" );
+		hpanel.add( rb );
+		options.add( rb );
+		
+		rb = new RadioButton( "url", "Render" );
+		hpanel.add( rb );
+		options.add( rb );
+		
+		hpanel.setStyleName( "options" );
+		
+		RootPanel.get( "options" ).add( hpanel );
 	}
 }

@@ -26,6 +26,15 @@ body {
 	text-align: right;
 	width: 100%;
 }
+#top #options {
+	position: absolute;
+	top: 0;
+	left: 0;
+	padding-left: 1em;
+}
+#top #options .options * {
+	padding-left: 1em;
+}
 #top #username, #top #count {
 	margin-right: 1em;
 }

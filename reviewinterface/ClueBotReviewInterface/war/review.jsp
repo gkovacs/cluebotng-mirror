@@ -46,11 +46,12 @@
     </noscript>
 	
 	<div id="iframediv">
-		<iframe src="http://en.wikipedia.org/wiki/Main_Page" id="iframe" frameborder="0"></iframe>
+		<iframe src="about:blank" id="iframe" frameborder="0"></iframe>
 	</div>
 	<div id="top">
-		<span id="username">test</span>
-		<span id="count">1234</span>
+		<span id="options"></span>
+		<span id="username">Username</span>
+		<span id="count">0</span>
 	</div>
   </body>
 </html>
