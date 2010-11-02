@@ -17,6 +17,6 @@
 		public static $coreport = 3565;
 		
 		public static $fork = true;
-		public static $dry = true;
+		public static $dry = false;
 	}
 ?>
