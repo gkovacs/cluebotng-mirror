@@ -39,7 +39,7 @@ public class NewEditGroupWindow {
 
 			@Override
 			public void onFailure( Throwable caught ) {
-				ClueBotReviewAdminInterface.error();
+				ClueBotReviewAdminInterface.error( caught.getMessage() );
 			}
 
 			@Override
@@ -63,7 +63,7 @@ public class NewEditGroupWindow {
 
 			@Override
 			public void onFailure( Throwable caught ) {
-				ClueBotReviewAdminInterface.error();
+				ClueBotReviewAdminInterface.error( caught.getMessage() );
 			}
 
 			@Override

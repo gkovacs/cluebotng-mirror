@@ -3,6 +3,7 @@ package org.cluenet.cluebot.reviewinterface.client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 
 /**
@@ -10,11 +11,14 @@ import com.google.gwt.user.client.ui.Label;
  */
 public class ClueBotReviewAdminInterface implements EntryPoint {
 	
-	public static void error() {
+	public static void error( String error ) {
+		HorizontalPanel hpanel = new HorizontalPanel();
+		hpanel.add( new Label( "An error occurred.  Please refresh the page." ) );
+		hpanel.add( new Label( error ) );
 		DialogBox errorBox = new DialogBox();
 		errorBox.setText( "Error" );
 		errorBox.setAnimationEnabled( true );
-		errorBox.add( new Label( "An error occurred.  Please refresh the page." ) );
+		errorBox.add( hpanel );
 		errorBox.center();
 		errorBox.setModal( true );
 		errorBox.show();

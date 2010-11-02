@@ -36,6 +36,16 @@
     <url-pattern>/cluebotreviewadmininterface/admin</url-pattern>
   </servlet-mapping>
   
+  <servlet>
+  <servlet-name>addEditQueueServlet</servlet-name>
+    <servlet-class>org.cluenet.cluebot.reviewinterface.server.AddEditQueueImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>addEditQueueServlet</servlet-name>
+  	<url-pattern>/_ah/queue/add-edit-queue</url-pattern>
+  </servlet-mapping>
+  
   <filter>
     <filter-name>requireAdmin</filter-name>
     <filter-class>org.cluenet.cluebot.reviewinterface.server.Authentication</filter-class>

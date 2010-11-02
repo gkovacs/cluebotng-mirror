@@ -27,6 +27,7 @@ public abstract class Persist {
 			em.close();
 		}
 	}
+	
 	public void persist() {
 		Persist.persist( this );
 	}

@@ -52,7 +52,7 @@ public class EditGroupListWindow implements Refreshable {
 					admin.deleteEditGroup( eg.key, new AsyncCallback< Void >() {
 						@Override
 						public void onFailure( Throwable caught ) {
-							ClueBotReviewAdminInterface.error();
+							ClueBotReviewAdminInterface.error( caught.getMessage() );
 						}
 
 						@Override
@@ -64,6 +64,17 @@ public class EditGroupListWindow implements Refreshable {
 				
 			});
 			actions.add( delete );
+			
+			Button add = new Button("+");
+			add.addClickHandler( new ClickHandler(){
+
+				@Override
+				public void onClick( ClickEvent event ) {
+					addEdits( eg );
+				}
+				
+			});
+			actions.add( add );
 			
 			Button view = new Button("View");
 			view.addClickHandler( new ClickHandler(){
@@ -100,6 +111,10 @@ public class EditGroupListWindow implements Refreshable {
 			popup.show();
 	}
 	
+	private void addEdits( EditGroup editGroup ) {
+		new NewEditGroupWindow( this, editGroup.key, editGroup.name, editGroup.weight );
+	}
+	
 	private void newEditGroup() {
 		new NewEditGroupWindow( this );
 	}
@@ -113,7 +128,7 @@ public class EditGroupListWindow implements Refreshable {
 
 			@Override
 			public void onFailure( Throwable caught ) {
-				ClueBotReviewAdminInterface.error();
+				ClueBotReviewAdminInterface.error( caught.getMessage() );
 			}
 
 			@Override

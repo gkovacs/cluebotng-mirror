@@ -168,7 +168,7 @@ public class ViewEditGroupWindow implements Refreshable {
 
 			@Override
 			public void onFailure( Throwable caught ) {
-				ClueBotReviewAdminInterface.error();
+				ClueBotReviewAdminInterface.error( caught.getMessage() );
 			}
 
 			@Override

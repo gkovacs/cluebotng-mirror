@@ -1,3 +1,4 @@
 TODO:
 	Support editgroup names from download.
 	Handle old formats in createEditGroup.
+	Fix error message.

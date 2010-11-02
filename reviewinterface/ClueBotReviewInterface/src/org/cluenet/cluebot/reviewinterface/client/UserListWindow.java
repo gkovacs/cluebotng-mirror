@@ -55,7 +55,7 @@ public class UserListWindow implements Refreshable {
 					admin.deleteUser( user.key, new AsyncCallback< Void >() {
 						@Override
 						public void onFailure( Throwable caught ) {
-							ClueBotReviewAdminInterface.error();
+							ClueBotReviewAdminInterface.error( caught.getMessage() );
 						}
 
 						@Override
@@ -76,7 +76,7 @@ public class UserListWindow implements Refreshable {
 					admin.setAdmin( user.key, true, new AsyncCallback< Void >() {
 						@Override
 						public void onFailure( Throwable caught ) {
-							ClueBotReviewAdminInterface.error();
+							ClueBotReviewAdminInterface.error( caught.getMessage() );
 						}
 
 						@Override
@@ -97,7 +97,7 @@ public class UserListWindow implements Refreshable {
 					admin.setAdmin( user.key, false, new AsyncCallback< Void >() {
 						@Override
 						public void onFailure( Throwable caught ) {
-							ClueBotReviewAdminInterface.error();
+							ClueBotReviewAdminInterface.error( caught.getMessage() );
 						}
 
 						@Override
@@ -143,7 +143,7 @@ public class UserListWindow implements Refreshable {
 
 			@Override
 			public void onFailure( Throwable caught ) {
-				ClueBotReviewAdminInterface.error();
+				ClueBotReviewAdminInterface.error( caught.getMessage() );
 			}
 
 			@Override

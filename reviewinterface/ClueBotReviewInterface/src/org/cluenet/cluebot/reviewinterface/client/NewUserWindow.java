@@ -48,7 +48,7 @@ public class NewUserWindow {
 
 					@Override
 					public void onFailure( Throwable caught ) {
-						ClueBotReviewAdminInterface.error();
+						ClueBotReviewAdminInterface.error( caught.getMessage() );
 					}
 
 					@Override
