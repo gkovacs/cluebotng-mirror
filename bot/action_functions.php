@@ -44,7 +44,8 @@
 		}
 		
 		private static function warn( $change, $report, $content, $warning ) {
-			API::$a->edit(
+			echo 'Warning ' . $change[ 'user' ] . ' ...';
+			$ret = API::$a->edit(
 				'User talk:' . $change[ 'user' ],
 				$content . "\n\n"
 				. '{{subst:User:' . $user . '/Warnings/Warning'
@@ -58,6 +59,8 @@
 				false,
 				false
 			); /* Warn the user */
+			
+			print_r( $ret );
 		}
 		
 		public static function doWarn( $change, $report ) {

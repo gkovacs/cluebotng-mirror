@@ -528,7 +528,7 @@
 			$params = Array(
 				'action' => 'edit',
 				'format' => 'php',
-				'assert' => 'bot',
+//				'assert' => 'bot',
 				'title' => $page,
 				'text' => $data,
 				'token' => $this->getedittoken(),

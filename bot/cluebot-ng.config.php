@@ -18,5 +18,9 @@
 		
 		public static $fork = true;
 		public static $dry = false;
+		
+		public static $proxyhost = '127.0.0.1';
+		public static $proxyport = 1080;
+		public static $proxytype = CURLPROXY_SOCKS5;
 	}
 ?>
