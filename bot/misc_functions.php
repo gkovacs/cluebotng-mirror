@@ -10,6 +10,9 @@
 	}
 	
 	function doInit() {
+		if( Config::$pass == null )
+			Config::$pass = file_get_contents( '/home/cobi/cluebotng.password.only' );
+		
 		API::init();
 		API::$a->login( Config::$user, Config::$pass );
 
@@ -19,7 +22,7 @@
 		Globals::$tfas = 0;
 		Globals::$stdin = fopen( 'php://stdin','r' );
 		Globals::$run = API::$q->getpage( 'User:' . Config::$user . '/Run' );
-		Globals::$wl = API::$q->getpage( 'User:' . Config::$user . '/Whitelist' );
+		Globals::$wl = API::$q->getpage( 'Wikipedia:Huggle/Whitelist' );
 		Globals::$optin = API::$q->getpage( 'User:' . Config::$user . '/Optin' );
 		Globals::$aoptin = API::$q->getpage( 'User:' . Config::$user . '/AngryOptin' );
 

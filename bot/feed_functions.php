@@ -54,6 +54,21 @@
 							if( stripos( 'N', $data[ 'flags' ] ) !== false )
 								return;
 							
+							switch( $data[ 'namespace' ] . $data[ 'title' ] ) {
+								case 'User:' . Config::$user . '/Run':
+									Globals::$run = API::$q->getpage( 'User:' . Config::$user . '/Run' );
+									break;
+								case 'Wikipedia:Huggle/Whitelist';
+									Globals::$wl = API::$q->getpage( 'Wikipedia:Huggle/Whitelist' );
+									break;
+								case 'User:' . Config::$user . '/Optin':
+									Globals::$optin = API::$q->getpage( 'User:' . Config::$user . '/Optin' );
+									break;
+								case 'User:' . Config::$user . '/AngryOptin':
+									Globals::$aoptin = API::$q->getpage( 'User:' . Config::$user . '/AngryOptin' );
+									break;
+							}
+							
 							if(
 								( $data[ 'namespace' ] != 'Main:' )
 								and ( ( !preg_match( '/\* \[\[(' . preg_quote( $data[ 'namespace' ] . $data[ 'title' ], '/' ) . ')\]\] \- .*/i', Globals::$optin ) ) )

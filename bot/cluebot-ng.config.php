@@ -1,7 +1,7 @@
 <?PHP
 	class Config {
 		public static $user = 'ClueBot NG';
-		public static $pass = '';
+		public static $pass = null;
 		public static $status = 'auto';
 		public static $angry = false;
 		public static $owner = 'Cobi';

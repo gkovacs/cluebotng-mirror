@@ -34,7 +34,9 @@
 					$aivdata . "\n\n"
 					. '* {{' . ( ( long2ip( ip2long( $change[ 'user' ] ) ) == $change[ 'user' ] ) ? 'IPvandal' : 'Vandal' ) . '|' . $change[ 'user' ] . '}}'
 					. ' - ' . $report . ' (Automated) ~~~~' . "\n",
-					'Automatically reporting [[Special:Contributions/' . $change[ 'user' ] . ']]. (bot)',
+					'Automatically reporting [[Special:Contributions/' . $change[ 'user' ] . ']].' .
+					'Questions, comments, complaints -> [[User:' . Config::$user . '/B|BRFA]]' .
+					' (bot)',
 					false,
 					false
 				);
@@ -51,7 +53,8 @@
 				. '|3=' . $report
 				. ' <!{{subst:ns:0}}-- MySQL ID: ' . $change[ 'mysqlid' ] . ' --{{subst:ns:0}}>}} ~~~~'
 				. "\n",
-				'Warning [[Special:Contributions/' . $change[ 'user' ] . '|' . $change[ 'user' ] . ']] - #' . $warning,
+				'Warning [[Special:Contributions/' . $change[ 'user' ] . '|' . $change[ 'user' ] . ']] - #' . $warning . ' ' .
+				'Questions, comments, complaints -> [[User:' . Config::$user . '/B|BRFA]]',
 				false,
 				false
 			); /* Warn the user */
@@ -87,7 +90,8 @@
 				$change[ 'user' ],
 				'Reverting possible vandalism by [[Special:Contributions/' . $change[ 'user' ] . '|' . $change[ 'user' ] . ']] ' .
 				'to ' . ( ( $revid == 0 ) ? 'older version' : 'version by ' . $revdata[ 'user' ] ) . '. ' .
-				'False positive? [[User:' . Config::$user . '/FalsePositives|Report it]]. '.
+				//'False positive? [[User:' . Config::$user . '/FalsePositives|Report it]]. ' .
+				'Questions, comments, complaints -> [[User:' . Config::$user . '/B|BRFA]] ' .
 				'Thanks, [[User:' . Config::$user . '|' . Config::$user . ']]. (' . $change[ 'mysqlid' ] . ') (Bot)',
 				$rbtok
 			);
@@ -108,6 +112,13 @@
 					Globals::$tfa = $tfam[ 1 ];
 				}
 			}
+			
+			if( stripos( '{{nobots}}', $change[ 'all' ][ 'current' ][ 'text' ] ) !== false )
+				return false;
+				
+			if( $change[ 'all' ][ 'user_edit_count' ] > 300 )
+				return false;
+			
 			if( Globals::$tfa == $change[ 'title' ] )
 				return true;
 			if( preg_match( '/\* \[\[('. preg_quote( $change[ 'title' ], '/' ) . ')\]\] \- .*/i', Globals::$aoptin ) ) {
@@ -127,23 +138,8 @@
 		}
 		
 		public static function isWhitelisted( $user ) {
-//			if (
-//				(
-//					( /* IP users with 250 contributions are fine .. */
-//						(long2ip(ip2long($change['user'])) == $change['user'])
-//						/* and ($uc = $wpapi->usercontribs($change['user'],250))
-//						and (!isset($uc[249])) */
-//					)
-//					or ( /* Users with 50 contributions are fine .. */
-//						(long2ip(ip2long($change['user'])) != $change['user'])
-//						and ($wpq->contribcount($change['user']) < 50)
-//					)
-//				)
-//				and ( /* Whitelisted users are ok. */
-//					/* ($wl = $wpq->getpage('User:'.$user.'/Whitelist'))
-//					and */ (!preg_match('/^\* \[\[User:('.preg_quote($change['user'],'/').')|\1\]\] \- .*/',$wl))
-//				)
-//			) {
+			if( !preg_match( '/^' . preg_quote( $user, '/' ) . '$/', Globals::$wl ) )
+				return true;
 			return false;
 		}
 	}
