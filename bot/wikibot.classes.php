@@ -189,10 +189,12 @@
 			$this->user = $user;
 			$this->pass = $pass;
 			$x = unserialize($this->http->post($this->apiurl.'?action=login&format=php',array('lgname' => $user, 'lgpassword' => $pass)));
+			print_r( $x );
 			if($x['login']['result'] == 'Success')
 				return true;
 			if($x['login']['result'] == 'NeedToken') {
 				$x = unserialize($this->http->post($this->apiurl.'?action=login&format=php',array('lgname' => $user, 'lgpassword' => $pass, 'lgtoken' => $x['login']['token'])));
+				print_r( $x );
 				if($x['login']['result'] == 'Success')
 					return true;
 			}
