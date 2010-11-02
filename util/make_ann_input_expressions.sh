@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This script generates the ANN input expressions and list used for the neural network.
+
 ALLNAMES=""
 export LISTFILE=ann_input_list.conf
 
