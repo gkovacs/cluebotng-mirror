@@ -3,6 +3,7 @@
  */
 package org.cluenet.cluebot.reviewinterface.server;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +28,12 @@ import com.google.appengine.api.datastore.KeyFactory;
  *
  */
 @Entity
-public class EditGroup extends Persist {
+public class EditGroup extends Persist implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8009102135611412035L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Key key;
@@ -137,6 +143,10 @@ public class EditGroup extends Persist {
 	}
 	
 	public static EditGroup findByKey( Key key ) {
+		String strKey = KeyFactory.keyToString( key );
+		if( TheCache.cache().containsKey( strKey ) )
+			return (EditGroup) TheCache.cache().get( strKey );
+		
 		EntityManager em = EMF.get().createEntityManager();
 		EditGroup editGroup = null;
 		try {
@@ -146,6 +156,8 @@ public class EditGroup extends Persist {
 		} finally {
 			em.close();
 		}
+		
+		TheCache.cache().put( strKey, editGroup );
 		return editGroup;
 	}
 	

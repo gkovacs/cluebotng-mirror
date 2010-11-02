@@ -3,6 +3,7 @@
  */
 package org.cluenet.cluebot.reviewinterface.server;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,12 @@ import com.google.appengine.api.datastore.KeyFactory;
  *
  */
 @Entity
-public class User extends Persist {
+public class User extends Persist implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1480988301383776284L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Key key;
@@ -84,6 +90,20 @@ public class User extends Persist {
 	public Key getKey() {
 		return key;
 	}
+	
+	@Override
+	public void delete() {
+		if( TheCache.cache().containsKey( "User-Email-" + this.email.toString() ) )
+			TheCache.cache().remove( "User-Email-" + this.email.toString() );
+		super.delete();
+	}
+
+
+	@Override
+	public void persist() {
+		super.persist();
+		TheCache.cache().put( "User-Email-" + this.email.toString(), this );
+	}
 
 
 	/* (non-Javadoc)
@@ -99,6 +119,10 @@ public class User extends Persist {
 	}
 	
 	public static User findByKey( Key key ) {
+		String strKey = KeyFactory.keyToString( key );
+		if( TheCache.cache().containsKey( strKey ) )
+			return (User) TheCache.cache().get( strKey );
+		
 		EntityManager em = EMF.get().createEntityManager();
 		User person = null;
 		try {
@@ -108,6 +132,8 @@ public class User extends Persist {
 		} finally {
 			em.close();
 		}
+		
+		TheCache.cache().put( strKey, person );
 		return person;
 	}
 	
@@ -116,6 +142,10 @@ public class User extends Persist {
 	}
 	
 	public static User findByEmail( Email email ) {
+		String strKey = "User-Email-" + email.toString();
+		if( TheCache.cache().containsKey( strKey ) )
+			return (User) TheCache.cache().get( strKey );
+		
 		EntityManager em = EMF.get().createEntityManager();
 		User person = null;
 		try {
@@ -127,6 +157,8 @@ public class User extends Persist {
 		} finally {
 			em.close();
 		}
+		
+		TheCache.cache().put( strKey, person );
 		return person;
 	}
 	

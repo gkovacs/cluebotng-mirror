@@ -3,6 +3,7 @@
  */
 package org.cluenet.cluebot.reviewinterface.server;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,12 @@ import com.google.appengine.api.datastore.KeyFactory;
  *
  */
 @Entity
-public class Edit extends Persist {
+public class Edit extends Persist implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4076138576500078491L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Key key;
@@ -152,7 +158,26 @@ public class Edit extends Persist {
 		return new AdminEdit( id, classification, vandalism, constructive, skipped, required, weight, new ArrayList< String >( comments ), users );
 	}
 	
+	@Override
+	public void delete() {
+		if( TheCache.cache().containsKey( "Edit-Id-" + this.id.toString() ) )
+			TheCache.cache().remove( "Edit-Id-" + this.id.toString() );
+		super.delete();
+	}
+
+
+	@Override
+	public void persist() {
+		super.persist();
+		TheCache.cache().put( "Edit-Id-" + this.id.toString(), this );
+	}
+
+
 	public static Edit findByKey( Key key ) {
+		String strKey = KeyFactory.keyToString( key );
+		if( TheCache.cache().containsKey( strKey ) )
+			return (Edit) TheCache.cache().get( strKey );
+		
 		EntityManager em = EMF.get().createEntityManager();
 		Edit edit = null;
 		try {
@@ -162,6 +187,8 @@ public class Edit extends Persist {
 		} finally {
 			em.close();
 		}
+		
+		TheCache.cache().put( strKey, edit );
 		return edit;
 	}
 	
@@ -170,6 +197,10 @@ public class Edit extends Persist {
 	}
 	
 	public static Edit findById( Integer id ) {
+		String strKey = "Edit-Id-" + id.toString();
+		if( TheCache.cache().containsKey( strKey ) )
+			return (Edit) TheCache.cache().get( strKey );
+		
 		EntityManager em = EMF.get().createEntityManager();
 		Edit edit = null;
 		try {
@@ -181,6 +212,8 @@ public class Edit extends Persist {
 		} finally {
 			em.close();
 		}
+		
+		TheCache.cache().put( strKey, edit );
 		return edit;
 	}
 	
