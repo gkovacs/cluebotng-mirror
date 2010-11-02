@@ -150,6 +150,7 @@ diff_linear_scale template_count 0 8
 diff_linear_scale wikimarkup_listitem_count 0 10
 diff_linear_scale wikimarkup_indent_count 0 10
 diff_linear_scale proper_pluralities 0 16
+#diff_linear_scale redirect_count 0 2
 
 
 linear_scale added_longest_char_run 0 6
