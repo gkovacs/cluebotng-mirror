@@ -715,6 +715,7 @@ class PosixRegexSearch : public TextProcessor {
 		struct PosixRegex {
 			regex_t preg;
 			std::string metric;
+			boost::mutex mut;
 			
 			PosixRegex(const std::string & regexstr, int flags, const std::string & name) {
 				int r = regcomp(&preg, regexstr.c_str(), flags);
@@ -743,6 +744,7 @@ class PosixRegexSearch : public TextProcessor {
 			}
 			
 			int countMatches(const std::string & str) {
+				boost::lock_guard<boost::mutex> lock(mut);
 				regmatch_t matches[10];
 				const char * pos = str.c_str();
 				int c = 0;
@@ -799,6 +801,7 @@ class PosixRegexReplace : public TextProcessor {
 		struct PosixRegex {
 			regex_t preg;
 			std::string replacement;
+			boost::mutex mut;
 			
 			PosixRegex(const std::string & regexstr, int flags, const std::string & name) {
 				int r = regcomp(&preg, regexstr.c_str(), flags);
@@ -827,6 +830,7 @@ class PosixRegexReplace : public TextProcessor {
 			}
 			
 			std::string replaceStr(const std::string & str) {
+				boost::lock_guard<boost::mutex> lock(mut);
 				regmatch_t matches[10];
 				const char * pos = str.c_str();
 				std::string res;
