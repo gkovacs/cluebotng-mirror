@@ -107,6 +107,10 @@
 				if( strtolower( substr( fgets( Globals::$stdin, 3 ), 0, 1 ) ) != 'y' )
 					return false;
 			}
+			
+			if( $change[ 'user' ] == Config::$user )
+				return false;
+			
 			if( Config::$angry )
 				return true;
 			if( ( time() - Globals::$tfas ) >= 1800 ) {
