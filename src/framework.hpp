@@ -261,36 +261,53 @@ class EditProcessor {
 
 class TextProcessor : public EditProcessor {
 	public:
-		TextProcessor(libconfig::Setting & cfg) : EditProcessor(cfg) {}
-		~TextProcessor() {}
-		
-		void process(Edit & ed) {
+		TextProcessor(libconfig::Setting & cfg) : EditProcessor(cfg) {
 			libconfig::Setting & io = configuration["inputs"];
 			for(int i = 0; i < io.getLength(); ++i) {
 				std::string propname = io[i].getName();
 				std::string outpfx = io[i];
+				inputs.push_back(std::pair<std::string,std::string>(propname, outpfx));
+			}
+		}
+		~TextProcessor() {}
+		
+		void process(Edit & ed) {
+			for(std::vector<std::pair<std::string,std::string> >::iterator it = inputs.begin(); it != inputs.end(); ++it) {
+				std::string propname = it->first;
+				std::string outpfx = it->second;
 				if(ed.hasProp(propname)) processText(ed, ed.getProp<std::string>(propname), outpfx);
 			}
 		}
 		
 		virtual void processText(Edit & ed, const std::string & text, const std::string & proppfx) = 0;
+	private:
+		std::vector<std::pair<std::string,std::string> > inputs;
 };
 
 class WordSetProcessor : public EditProcessor {
 	public:
-		WordSetProcessor(libconfig::Setting & cfg) : EditProcessor(cfg) {}
-		~WordSetProcessor() {}
-		
-		void process(Edit & ed) {
+		WordSetProcessor(libconfig::Setting & cfg) : EditProcessor(cfg) {
 			libconfig::Setting & io = configuration["inputs"];
 			for(int i = 0; i < io.getLength(); ++i) {
 				std::string propname = io[i].getName();
 				std::string outpfx = io[i];
+				inputs.push_back(std::pair<std::string,std::string>(propname, outpfx));
+			}
+		}
+		~WordSetProcessor() {}
+		
+		void process(Edit & ed) {
+			libconfig::Setting & io = configuration["inputs"];
+			for(std::vector<std::pair<std::string,std::string> >::iterator it = inputs.begin(); it != inputs.end(); ++it) {
+				std::string propname = it->first;
+				std::string outpfx = it->second;
 				processWordSet(ed, ed.getProp<WordSet>(propname), outpfx);
 			}
 		}
 		
 		virtual void processWordSet(Edit & ed, const WordSet & wordset, const std::string & proppfx) = 0;
+	private:
+		std::vector<std::pair<std::string,std::string> > inputs;
 };
 
 class EditProcessChain {

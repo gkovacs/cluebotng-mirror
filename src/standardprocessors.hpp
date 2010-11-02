@@ -364,6 +364,7 @@ class FastStringSearch : public TextProcessor {
 		}
 		
 		void processText(Edit & ed, const std::string & text, const std::string & proppfx) {
+			boost::lock_guard<boost::mutex> lock(mut);
 			strfinder.processString(text);
 			std::map<std::string,unsigned int> cnts = strfinder.getCategoryCounts();
 			for(std::map<std::string,unsigned int>::iterator it = cnts.begin(); it != cnts.end(); ++it) {
@@ -374,6 +375,7 @@ class FastStringSearch : public TextProcessor {
 		}
 		
 	private:
+		boost::mutex mut;
 		MultiStrFind<256,0> strfinder;
 };
 
