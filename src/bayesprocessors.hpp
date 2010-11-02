@@ -76,12 +76,13 @@ class BayesScorer : public EditProcessor {
 				unsigned int good_cnt, bad_cnt;
 				baydb.getWord(it->first, good_cnt, bad_cnt);
 				if((good_cnt + bad_cnt) < min_edits) continue;
-				float p = baydb.getWordVandalProb(good_cnt, bad_cnt, true);
+				float p = baydb.getWordVandalProb(good_cnt, bad_cnt, true); // Corrected probability
+				float p2 = baydb.getWordVandalProb(good_cnt, bad_cnt, false);	// Raw probability
 				if(p < 0.0) continue;
-				if(prob_ranges.size()) {
+				if(prob_ranges.size() && p2 >= 0.0) {
 					int priti = 0;
 					for(std::vector<std::pair<std::string,std::pair<float,float> > >::iterator prit = prob_ranges.begin(); prit != prob_ranges.end(); ++prit) {
-						if(p >= (*prit).second.first && p <= (*prit).second.second) probrangecnts[priti]++;
+						if(p2 >= (*prit).second.first && p2 <= (*prit).second.second) probrangecnts[priti]++;
 						++priti;
 					}
 				}

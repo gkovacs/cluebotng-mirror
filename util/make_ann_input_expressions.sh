@@ -188,8 +188,8 @@ echo 'ann_bayes_range_high = "bayes_prob_range_high / added_distinct_word_count"
 echo 'ann_bayes_range_mid = "bayes_prob_range_mid / added_distinct_word_count";'
 echo 'ann_bayes_range_low = "bayes_prob_range_low / added_distinct_word_count";'
 #addallnames "ann_bayes_range_top"
-addallnames "ann_bayes_range_high"
-addallnames "ann_bayes_range_mid"
+#addallnames "ann_bayes_range_high"
+#addallnames "ann_bayes_range_mid"
 addallnames "ann_bayes_range_low"
 
 echo 'ann_distinct_pages = "user_distinct_pages / user_edit_count";'
