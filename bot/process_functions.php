@@ -4,8 +4,10 @@
 			if( !isVandalism( $change[ 'all' ], $s ) )
 				return;
 			
+			echo 'Is ' . $change[ 'user' ] . ' whitelisted ?' . "\n";
 			if( Action::isWhitelisted( $change[ 'user' ] ) )
 				return;
+			echo 'No.' . "\n";
 			
 			$reason = 'ANN scored at ' . $s;
 			
@@ -49,8 +51,11 @@
 			checkMySQL();
 			mysql_query( $query );
 			$change[ 'mysqlid' ] = mysql_insert_id();
+			
+			echo 'Should revert?' . "\n";
 
 			if( Action::shouldRevert( $change ) ) {
+				echo 'Yes.' . "\n";
 				$rbret = Action::doRevert( $change );
 				if ($rbret !== false) {
 					IRC::say( 'debugchannel', 'Reverted. (' . ( microtime( true ) - $change[ 'startTime' ] ) . ' s)' );

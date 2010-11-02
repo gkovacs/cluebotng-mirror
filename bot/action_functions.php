@@ -138,7 +138,7 @@
 		}
 		
 		public static function isWhitelisted( $user ) {
-			if( !preg_match( '/^' . preg_quote( $user, '/' ) . '$/', Globals::$wl ) )
+			if( preg_match( '/^' . preg_quote( $user, '/' ) . '$/', Globals::$wl ) )
 				return true;
 			return false;
 		}
