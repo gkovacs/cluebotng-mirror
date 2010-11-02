@@ -48,7 +48,7 @@
 			$ret = API::$a->edit(
 				'User talk:' . $change[ 'user' ],
 				$content . "\n\n"
-				. '{{subst:User:' . $user . '/Warnings/Warning'
+				. '{{subst:User:' . Config::$user . '/Warnings/Warning'
 				. '|1=' . $warning
 				. '|2=' . str_replace( 'File:', ':File:', $change[ 'title' ] )
 				. '|3=' . $report
