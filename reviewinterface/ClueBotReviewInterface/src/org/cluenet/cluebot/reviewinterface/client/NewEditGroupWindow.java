@@ -90,15 +90,21 @@ public class NewEditGroupWindow {
 		
 		Classification type = Classification.UNKNOWN;
 		
-		if( lineParts[ 1 ].equals( "V" ) )
+		if( lineParts.length == 1 )
+			type = Classification.UNKNOWN;
+		else if( lineParts[ 1 ].equals( "V" ) )
 			type = Classification.VANDALISM;
 		else if( lineParts[ 1 ].equals( "C" ) )
 			type = Classification.CONSTRUCTIVE;
 		
+		Integer weight = 1;
+		if( lineParts.length == 3 )
+			weight = new Integer( lineParts[ 2 ] );
+		
 		return new Edit(
 				new Integer( lineParts[ 0 ] ),
 				type,
-				new Integer( lineParts[ 2 ] )
+				weight
 		);
 	}
 

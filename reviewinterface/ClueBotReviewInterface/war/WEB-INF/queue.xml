@@ -2,6 +2,6 @@
 <queue-entries>
   <queue>
     <name>add-edit-queue</name>
-    <rate>5/s</rate>
+    <rate>2/s</rate>
   </queue>
 </queue-entries>

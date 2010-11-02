@@ -30,7 +30,7 @@ public class ReviewServiceImpl extends RemoteServiceServlet implements
 		User user = User.findByEmail( new Email( UserServiceFactory.getUserService().getCurrentUser().getEmail() ) );
 		Edit randomEdit = EditGroup.getRandomEditGroup().getRandomEdit( user );
 		if( randomEdit == null )
-			throw new Exception( "No more edits available." );
+			throw new IllegalArgumentException( "No more edits available." );
 		return new ReturnData(
 				EditGroup.getRandomEditGroup().getRandomEdit( user ).getClientClass(),
 				user.getClientClass()

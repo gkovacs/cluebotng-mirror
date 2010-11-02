@@ -4,9 +4,9 @@
 package org.cluenet.cluebot.reviewinterface.server;
 
 import java.io.Serializable;
-import java.util.Collections;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
 import com.google.appengine.api.datastore.Key;
@@ -18,20 +18,52 @@ import com.google.appengine.api.datastore.KeyFactory;
  *
  */
 public abstract class Persist implements Serializable {
+	private static EntityManager em;
+	private static Boolean use = false;
+	
+	
+	public static void use( EntityManager em ) {
+		Persist.em = em;
+		Persist.use = true;
+	}
+	
+	public static void unuse() {
+		Persist.em = null;
+		Persist.use = false;
+	}
+	
 	public abstract Key getKey();
 	public static void persist( Persist o ) {
-		String strKey = KeyFactory.keyToString( o.getKey() );
-		
-		EntityManager em = EMF.get().createEntityManager();
-		try {
-			em.getTransaction().begin();
-			em.persist( o );
-			em.getTransaction().commit();
-		} finally {
-			em.close();
+		if( use )
+			if( Persist.em.contains( o ) )
+				Persist.em.flush();
+			else
+				Persist.em.persist( o );
+		else {
+			EntityManager em = EMF.get().createEntityManager();
+			try {
+				EntityTransaction txn = em.getTransaction();
+				txn.begin();
+				try {
+					if( em.contains( o ) )
+						em.flush();
+					else
+						em.persist( o );
+					txn.commit();
+				} catch( Exception e ) {
+					txn.rollback();
+				}
+			} finally {
+				em.close();
+			}
 		}
 		
-		TheCache.cache().put( strKey, o );
+		String strKey = KeyFactory.keyToString( o.getKey() );
+		try {
+			TheCache.cache().put( strKey, o );
+		} catch( Exception e ) {
+			
+		}
 	}
 	
 	public void persist() {
@@ -45,21 +77,31 @@ public abstract class Persist implements Serializable {
 	}
 	public static void delete( Persist o ) {
 		String strKey = KeyFactory.keyToString( o.getKey() );
-		
-		if( TheCache.cache().containsKey( strKey ) )
-			TheCache.cache().remove( strKey );
-		
-		EntityManager em = EMF.get().createEntityManager();
 		try {
-			em.getTransaction().begin();
-			Query q = em.createQuery( "DELETE FROM " + o.getClass().getName() + " WHERE key = :key" );
+			if( TheCache.cache().containsKey( strKey ) )
+				TheCache.cache().remove( strKey );
+		} catch( Exception e ) {
+			
+		}
+		
+		if( use ) {
+			Query q = Persist.em.createQuery( "DELETE FROM " + o.getClass().getName() + " WHERE key = :key" );
 			q.setParameter( "key", o.getKey() );
 			q.executeUpdate();
-			em.getTransaction().commit();
-		} catch( Exception e ) {
-			/* Do nothing */
-		} finally {
-			em.close();
+		} else {
+			EntityManager em = EMF.get().createEntityManager();
+			try {
+				EntityTransaction txn = em.getTransaction();
+				txn.begin();
+				Query q = em.createQuery( "DELETE FROM " + o.getClass().getName() + " WHERE key = :key" );
+				q.setParameter( "key", o.getKey() );
+				q.executeUpdate();
+				txn.commit();
+			} catch( Exception e ) {
+				/* Do nothing */
+			} finally {
+				em.close();
+			}
 		}
 	}
 	public void delete() {

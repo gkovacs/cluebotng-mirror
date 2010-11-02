@@ -7,6 +7,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -101,6 +102,7 @@ public class EditGroupListWindow implements Refreshable {
 		});
 		
 		HorizontalPanel buttons = new HorizontalPanel();
+		buttons.add( new Anchor( "Download as tar", "/download?format=tar" ) );
 		buttons.add( newButton );
 		
 		vpanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);

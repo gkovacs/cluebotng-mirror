@@ -93,8 +93,12 @@ public class User extends Persist implements Serializable {
 	
 	@Override
 	public void delete() {
-		if( TheCache.cache().containsKey( "User-Email-" + this.email.toString() ) )
-			TheCache.cache().remove( "User-Email-" + this.email.toString() );
+		try {
+			if( TheCache.cache().containsKey( "User-Email-" + this.email.toString() ) )
+				TheCache.cache().remove( "User-Email-" + this.email.toString() );
+		} catch( Exception e ) {
+			
+		}
 		super.delete();
 	}
 
@@ -102,7 +106,11 @@ public class User extends Persist implements Serializable {
 	@Override
 	public void persist() {
 		super.persist();
-		TheCache.cache().put( "User-Email-" + this.email.toString(), this );
+		try {
+			TheCache.cache().put( "User-Email-" + this.email.toString(), this );
+		} catch( Exception e ) {
+			
+		}
 	}
 
 
@@ -120,8 +128,15 @@ public class User extends Persist implements Serializable {
 	
 	public static User findByKey( Key key ) {
 		String strKey = KeyFactory.keyToString( key );
-		if( TheCache.cache().containsKey( strKey ) )
-			return (User) TheCache.cache().get( strKey );
+		try {
+			if( TheCache.cache().containsKey( strKey ) ) {
+				User obj = (User) TheCache.cache().get( strKey );
+				if( obj != null )
+					return obj;
+			}
+		} catch( Exception e ) {
+			
+		}
 		
 		EntityManager em = EMF.get().createEntityManager();
 		User person = null;
@@ -133,7 +148,11 @@ public class User extends Persist implements Serializable {
 			em.close();
 		}
 		
-		TheCache.cache().put( strKey, person );
+		try {
+			TheCache.cache().put( strKey, person );
+		} catch( Exception e ) {
+			
+		}
 		return person;
 	}
 	
@@ -143,8 +162,15 @@ public class User extends Persist implements Serializable {
 	
 	public static User findByEmail( Email email ) {
 		String strKey = "User-Email-" + email.toString();
-		if( TheCache.cache().containsKey( strKey ) )
-			return (User) TheCache.cache().get( strKey );
+		try {
+			if( TheCache.cache().containsKey( strKey ) ) {
+				User obj = (User) TheCache.cache().get( strKey );
+				if( obj != null )
+					return obj;
+			}
+		} catch( Exception e ) {
+			
+		}
 		
 		EntityManager em = EMF.get().createEntityManager();
 		User person = null;
@@ -158,7 +184,11 @@ public class User extends Persist implements Serializable {
 			em.close();
 		}
 		
-		TheCache.cache().put( strKey, person );
+		try {
+			TheCache.cache().put( strKey, person );
+		} catch( Exception e ) {
+			
+		}
 		return person;
 	}
 	

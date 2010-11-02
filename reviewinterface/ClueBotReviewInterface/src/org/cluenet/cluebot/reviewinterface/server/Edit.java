@@ -160,8 +160,12 @@ public class Edit extends Persist implements Serializable {
 	
 	@Override
 	public void delete() {
-		if( TheCache.cache().containsKey( "Edit-Id-" + this.id.toString() ) )
-			TheCache.cache().remove( "Edit-Id-" + this.id.toString() );
+		try {
+			if( TheCache.cache().containsKey( "Edit-Id-" + this.id.toString() ) )
+				TheCache.cache().remove( "Edit-Id-" + this.id.toString() );
+		} catch( Exception e ) {
+			
+		}
 		super.delete();
 	}
 
@@ -169,14 +173,26 @@ public class Edit extends Persist implements Serializable {
 	@Override
 	public void persist() {
 		super.persist();
-		TheCache.cache().put( "Edit-Id-" + this.id.toString(), this );
+		try {
+			TheCache.cache().put( "Edit-Id-" + this.id.toString(), this );
+		} catch( Exception e ) {
+			
+		}
 	}
 
 
 	public static Edit findByKey( Key key ) {
 		String strKey = KeyFactory.keyToString( key );
-		if( TheCache.cache().containsKey( strKey ) )
-			return (Edit) TheCache.cache().get( strKey );
+		try {
+			if( TheCache.cache().containsKey( strKey ) ) {
+				Edit obj = (Edit) TheCache.cache().get( strKey );
+				if( obj != null )
+					return obj;
+			}
+				
+		} catch( Exception e ) {
+			
+		}
 		
 		EntityManager em = EMF.get().createEntityManager();
 		Edit edit = null;
@@ -188,7 +204,11 @@ public class Edit extends Persist implements Serializable {
 			em.close();
 		}
 		
-		TheCache.cache().put( strKey, edit );
+		try {
+			TheCache.cache().put( strKey, edit );
+		} catch( Exception e ) {
+			
+		}
 		return edit;
 	}
 	
@@ -198,8 +218,15 @@ public class Edit extends Persist implements Serializable {
 	
 	public static Edit findById( Integer id ) {
 		String strKey = "Edit-Id-" + id.toString();
-		if( TheCache.cache().containsKey( strKey ) )
-			return (Edit) TheCache.cache().get( strKey );
+		try {
+			if( TheCache.cache().containsKey( strKey ) ) {
+				Edit obj = (Edit) TheCache.cache().get( strKey );
+				if( obj != null )
+					return obj;
+			}
+		} catch( Exception e ) {
+			
+		}
 		
 		EntityManager em = EMF.get().createEntityManager();
 		Edit edit = null;
@@ -213,7 +240,11 @@ public class Edit extends Persist implements Serializable {
 			em.close();
 		}
 		
-		TheCache.cache().put( strKey, edit );
+		try {
+			TheCache.cache().put( strKey, edit );
+		} catch( Exception e ) {
+			
+		}
 		return edit;
 	}
 	

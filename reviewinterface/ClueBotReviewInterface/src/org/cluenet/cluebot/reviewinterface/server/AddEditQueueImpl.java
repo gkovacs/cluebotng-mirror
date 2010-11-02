@@ -37,7 +37,6 @@ public class AddEditQueueImpl extends HttpServlet {
 		Integer required = Integer.decode( strRequired );
 		Integer weight = Integer.decode( strWeight );
 		Classification classification;
-		EditGroup eg = EditGroup.findByKey( strKey );
 		
 		if( strClassification.equals( "CONSTRUCTIVE" ) )
 			classification = Classification.CONSTRUCTIVE;
@@ -49,8 +48,11 @@ public class AddEditQueueImpl extends HttpServlet {
 			classification = Classification.UNKNOWN;
 		
 		Edit edit = Edit.newFromId( id, classification, required, weight );
+		
 		List< Edit > edits = new ArrayList< Edit >();
 		edits.add( edit );
-		eg.addEdits( edits );
+		
+		EditGroup eg = EditGroup.findByKey( strKey );
+		eg.addEdits( edits );		
 	}
 }

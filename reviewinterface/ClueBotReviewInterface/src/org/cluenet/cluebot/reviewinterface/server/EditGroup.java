@@ -144,8 +144,15 @@ public class EditGroup extends Persist implements Serializable {
 	
 	public static EditGroup findByKey( Key key ) {
 		String strKey = KeyFactory.keyToString( key );
-		if( TheCache.cache().containsKey( strKey ) )
-			return (EditGroup) TheCache.cache().get( strKey );
+		try {
+			if( TheCache.cache().containsKey( strKey ) ) {
+				EditGroup obj = (EditGroup) TheCache.cache().get( strKey );
+				if( obj != null )
+					return obj;
+			}
+		} catch( Exception e ) {
+			
+		}
 		
 		EntityManager em = EMF.get().createEntityManager();
 		EditGroup editGroup = null;
@@ -157,7 +164,11 @@ public class EditGroup extends Persist implements Serializable {
 			em.close();
 		}
 		
-		TheCache.cache().put( strKey, editGroup );
+		try {
+			TheCache.cache().put( strKey, editGroup );
+		} catch( Exception e ) {
+			
+		}
 		return editGroup;
 	}
 	

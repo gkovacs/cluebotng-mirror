@@ -75,6 +75,11 @@
   </filter-mapping>
   
   <filter-mapping>
+    <filter-name>requirePrivileged</filter-name>
+    <url-pattern>/</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
     <filter-name>requireAdmin</filter-name>
     <servlet-name>adminServlet</servlet-name>
   </filter-mapping>

@@ -8,6 +8,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -35,6 +36,8 @@ public class ViewEditGroupWindow implements Refreshable {
 		properties.setText( 0, 1, editGroup.name );
 		properties.setText( 1, 0, "Weight:" );
 		properties.setText( 1, 1, editGroup.weight.toString() );
+		properties.setText( 2, 0, "Links:" );
+		properties.setWidget( 2, 1, new Anchor( "Dump done", "/download?format=done&editgroup=" + editGroup.key ) );
 		vpanel.add( properties );
 
 		FlexTable editTable = new FlexTable();
@@ -63,7 +66,7 @@ public class ViewEditGroupWindow implements Refreshable {
 			for( User user : edit.users )
 				users += user.userName + " (" + user.classifications.toString() + ")" + ( user.isAdmin ? " (admin)" : "" ) + "\n";
 			
-			editTable.setText( i, 0, edit.id.toString() );
+			editTable.setWidget( i, 0, new Anchor( edit.id.toString(), "http://en.wikipedia.org/w/index.php?action=view&diff=" + edit.id.toString() ) );
 			editTable.setText( i, 1, edit.weight.toString() );
 			editTable.setText( i, 2, edit.classification.toString() );
 			editTable.setText( i, 3, edit.vandalism.toString() );
@@ -102,7 +105,7 @@ public class ViewEditGroupWindow implements Refreshable {
 			for( User user : edit.users )
 				users += user.userName + " (" + user.classifications.toString() + ")" + ( user.isAdmin ? " (admin)" : "" ) + "<br />\n";
 			
-			doneTable.setText( i, 0, edit.id.toString() );
+			doneTable.setWidget( i, 0, new Anchor( edit.id.toString(), "http://en.wikipedia.org/w/index.php?action=view&diff=" + edit.id.toString() ) );
 			doneTable.setText( i, 1, edit.weight.toString() );
 			doneTable.setText( i, 2, edit.classification.toString() );
 			doneTable.setText( i, 3, edit.vandalism.toString() );
