@@ -31,7 +31,10 @@ public class Authentication implements Filter {
 		UserService userService = UserServiceFactory.getUserService();
 		if( userService.isUserAdmin() )
 			return true;
-		return User.findByEmail( new Email( req.getUserPrincipal().getName() ) ).isAdmin();
+		User user = User.findByEmail( new Email( req.getUserPrincipal().getName() ) );
+		if( user == null )
+			return false;
+		return user.isAdmin();
 	}
 	
 	public static boolean isPrivileged( HttpServletRequest req ) {

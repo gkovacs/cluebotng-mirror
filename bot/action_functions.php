@@ -123,7 +123,7 @@
 			if( stripos( '{{nobots}}', $change[ 'all' ][ 'current' ][ 'text' ] ) !== false )
 				return false;
 				
-			if( $change[ 'all' ][ 'user_edit_count' ] > 300 )
+			if( $change[ 'all' ][ 'user_edit_count' ] > 50 )
 				return false;
 			
 			if( Globals::$tfa == $change[ 'title' ] )
