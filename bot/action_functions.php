@@ -101,6 +101,24 @@
 			return $rbret;
 		}
 		
+		public static function findAndParseBots( $change ) {
+			$text = $change[ 'all' ][ 'current' ][ 'text' ];
+			
+			if( stripos( '{{nobots}}', $text ) !== false )
+				return false;
+			
+			$botname = preg_quote( Config::$user, '/' );
+			$botname = str_replace( ' ', '(_| )?', $botname );
+			if( preg_match( '/\{\{bots\s*\|\s*deny\s*\=[^}]*(' . $botname . '|\*)[^}]*\}\}/i', $text ) )
+				return false;
+			
+			if( preg_match( '/\{\{bots\s*\|\s*allow\s*\=([^}]*)\}\}/i', $text, $matches ) )
+				if( !preg_match( '/(' . $botname . '|\*)/i', $matches[ 1 ] ) )
+					return false;
+			
+			return true;
+		}
+		
 		public static function shouldRevert( $change ) {
 			if( preg_match( '/(assisted|manual)/iS', Config::$status ) ) {
 				echo 'Revert [y/N]? ';
@@ -120,7 +138,10 @@
 				}
 			}
 			
-			if( stripos( '{{nobots}}', $change[ 'all' ][ 'current' ][ 'text' ] ) !== false )
+			if( !self::findAndParseBots( $change ) )
+				return false;
+			
+			if( $change[ 'all' ][ 'user' ] == $change[ 'all' ][ 'common' ][ 'creator' ] )
 				return false;
 				
 			if( $change[ 'all' ][ 'user_edit_count' ] > 50 )
