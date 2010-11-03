@@ -52,6 +52,7 @@ function diff_linear_scale {
 	echo "ann_removed_${1} = \"${M} * (previous_${1} - current_${1}) + ${B}\";"
 	addallnames "ann_added_${1}"
 	addallnames "ann_removed_${1}"
+	linear_scale "previous_${1}" $LOW $HIGH
 }
 
 function log_scale {
@@ -150,7 +151,8 @@ diff_linear_scale template_count 0 8
 diff_linear_scale wikimarkup_listitem_count 0 10
 diff_linear_scale wikimarkup_indent_count 0 10
 diff_linear_scale proper_pluralities 0 16
-#diff_linear_scale redirect_count 0 2
+diff_linear_scale redirect_count 0 2
+diff_linear_scale disambiguation 0 2
 
 
 linear_scale added_longest_char_run 0 6
