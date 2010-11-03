@@ -72,8 +72,8 @@
 							if(
 								( $data[ 'namespace' ] != 'Main:' )
 								and ( ( !preg_match( '/\* \[\[(' . preg_quote( $data[ 'namespace' ] . $data[ 'title' ], '/' ) . ')\]\] \- .*/i', Globals::$optin ) ) )
-								and ( $change[ 'flags' ] != 'move' )
-								and ( $change[ 'namespace' ] != 'Template:')
+//								and ( $change[ 'flags' ] != 'move' )
+//								and ( $change[ 'namespace' ] != 'Template:')
 							)
 								return;
 							

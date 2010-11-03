@@ -126,6 +126,9 @@
 					return false;
 			}
 			
+			if( !preg_match( '/(yes|enable|true)/iS', Globals::$run ) )
+				return false;
+			
 			if( $change[ 'user' ] == Config::$user )
 				return false;
 			
