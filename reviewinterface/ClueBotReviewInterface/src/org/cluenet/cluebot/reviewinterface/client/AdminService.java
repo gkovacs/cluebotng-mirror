@@ -15,13 +15,15 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath( "admin" )
 public interface AdminService extends RemoteService {
 	List< EditGroup > getEditGroups() throws IllegalArgumentException;
-	EditGroup getEditGroup( String key ) throws IllegalArgumentException;
+	EditGroup getEditGroup( String key, Integer editStart, Integer editCount, Integer reviewStart, Integer reviewCount, Integer doneStart, Integer doneCount ) throws IllegalArgumentException;
 	void createEditGroup( String name, Integer weight, Integer required, List< Edit > edits ) throws IllegalArgumentException;
 	void deleteEditGroup( String key ) throws IllegalArgumentException;
 	void addEditsToEditGroup( String key, Integer required, List< Edit > edits ) throws IllegalArgumentException;
+	void reevalEditsInEditGroup( String key ) throws IllegalArgumentException;
 	
 	List< User > getUsers() throws IllegalArgumentException;
-	void createUser( String email, Boolean isAdmin ) throws IllegalArgumentException;
+	void createUser( String nick, String email, Boolean isAdmin, Boolean sendEmail ) throws IllegalArgumentException;
 	void setAdmin( String key, Boolean isAdmin ) throws IllegalArgumentException;
+	void setNick( String key, String nick ) throws IllegalArgumentException;
 	void deleteUser( String key ) throws IllegalArgumentException;
 }

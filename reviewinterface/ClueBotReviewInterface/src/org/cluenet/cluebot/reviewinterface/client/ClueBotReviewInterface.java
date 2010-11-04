@@ -177,10 +177,13 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 	@Override
 	public void onFailure( Throwable caught ) {
 		doneWait();
+		VerticalPanel hpanel = new VerticalPanel();
+		hpanel.add( new Label( "An error occurred.  Please refresh the page." ) );
+		hpanel.add( new Label( caught.getMessage() ) );
 		DialogBox errorBox = new DialogBox();
 		errorBox.setText( "Error" );
 		errorBox.setAnimationEnabled( true );
-		errorBox.add( new Label( "An error occurred:  " + caught.getMessage() + "  Please refresh the page." ) );
+		errorBox.add( hpanel );
 		errorBox.center();
 		errorBox.setModal( true );
 		errorBox.show();

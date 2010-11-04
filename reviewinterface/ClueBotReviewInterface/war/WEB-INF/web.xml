@@ -17,6 +17,36 @@
   </servlet-mapping>
   
   <servlet>
+    <servlet-name>welcomeServlet</servlet-name>
+    <servlet-class>org.cluenet.cluebot.reviewinterface.server.WelcomeImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>welcomeServlet</servlet-name>
+    <url-pattern>/welcome</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>queryServlet</servlet-name>
+    <servlet-class>org.cluenet.cluebot.reviewinterface.server.QueryImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>queryServlet</servlet-name>
+    <url-pattern>/query</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>flushServlet</servlet-name>
+    <servlet-class>org.cluenet.cluebot.reviewinterface.server.FlushImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>flushServlet</servlet-name>
+    <url-pattern>/flush</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>reviewServlet</servlet-name>
     <servlet-class>org.cluenet.cluebot.reviewinterface.server.ReviewServiceImpl</servlet-class>
   </servlet>
@@ -37,7 +67,7 @@
   </servlet-mapping>
   
   <servlet>
-  <servlet-name>addEditQueueServlet</servlet-name>
+  	<servlet-name>addEditQueueServlet</servlet-name>
     <servlet-class>org.cluenet.cluebot.reviewinterface.server.AddEditQueueImpl</servlet-class>
   </servlet>
   
@@ -45,6 +75,37 @@
   	<servlet-name>addEditQueueServlet</servlet-name>
   	<url-pattern>/_ah/queue/add-edit-queue</url-pattern>
   </servlet-mapping>
+  
+  <servlet>
+  	<servlet-name>GarbageCollectionQueueServlet</servlet-name>
+    <servlet-class>org.cluenet.cluebot.reviewinterface.server.GarbageCollectionQueueImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>GarbageCollectionQueueServlet</servlet-name>
+  	<url-pattern>/_ah/queue/garbage-collection-queue</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+  	<servlet-name>EditDoneQueueServlet</servlet-name>
+    <servlet-class>org.cluenet.cluebot.reviewinterface.server.EditDoneQueueImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>EditDoneQueueServlet</servlet-name>
+  	<url-pattern>/_ah/queue/edit-done-queue</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+  	<servlet-name>GarbageCollectionServlet</servlet-name>
+    <servlet-class>org.cluenet.cluebot.reviewinterface.server.GarbageCollectionImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>GarbageCollectionServlet</servlet-name>
+  	<url-pattern>/collectGarbage</url-pattern>
+  </servlet-mapping>
+  
   
   <filter>
     <filter-name>requireAdmin</filter-name>
@@ -70,13 +131,18 @@
   </filter-mapping>
   
   <filter-mapping>
-    <filter-name>requirePrivileged</filter-name>
-    <url-pattern>*review.jsp</url-pattern>
+    <filter-name>requireAdmin</filter-name>
+    <servlet-name>queryServlet</servlet-name>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>requireAdmin</filter-name>
+    <servlet-name>GarbageCollectionServlet</servlet-name>
   </filter-mapping>
   
   <filter-mapping>
     <filter-name>requirePrivileged</filter-name>
-    <url-pattern>/</url-pattern>
+    <url-pattern>*review.jsp</url-pattern>
   </filter-mapping>
   
   <filter-mapping>
@@ -91,7 +157,7 @@
   
   <!-- Default page to serve -->
   <welcome-file-list>
-    <welcome-file>review.jsp</welcome-file>
+    <welcome-file>welcome</welcome-file>
   </welcome-file-list>
 
 </web-app>

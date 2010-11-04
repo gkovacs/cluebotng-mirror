@@ -175,8 +175,10 @@ public class NewEditGroupWindow {
 		vpanel.add(buttons);
 		
 		popup.setWidget( vpanel );
-		if( !popup.isShowing() )
+		if( !popup.isShowing() ) {
+			popup.center();
 			popup.show();
+		}
 	}
 	
 	public NewEditGroupWindow( Refreshable parent ) {

@@ -42,16 +42,20 @@ public class User extends Persist implements Serializable {
 	private Boolean admin = false;
 	
 	@Basic
+	private String nick = null;
+	
+	@Basic
 	private Integer classifications = 0;
 	
 	
 	/**
 	 * 
 	 */
-	public User( Email email, Boolean admin ) {
+	public User( String nick, Email email, Boolean admin ) {
+		this.nick = nick;
 		this.email = email;
 		this.admin = admin;
-		this.persist();
+		this.store();
 	}
 
 	
@@ -61,6 +65,17 @@ public class User extends Persist implements Serializable {
 	public Email getEmail() {
 		return email;
 	}
+	
+	public String getNick() {
+		if( nick == null )
+			return email.getEmail();
+		return nick;
+	}
+	
+	public void setNick( String nick ) {
+		this.nick = nick;
+		this.merge();
+	}
 
 	public Boolean isAdmin() {
 		return admin;
@@ -68,7 +83,7 @@ public class User extends Persist implements Serializable {
 	
 	public void setAdmin( Boolean admin ) {
 		this.admin = admin;
-		this.persist();
+		this.merge();
 	}
 	
 	public Integer getClassifications() {
@@ -76,12 +91,12 @@ public class User extends Persist implements Serializable {
 	}
 	
 	public org.cluenet.cluebot.reviewinterface.shared.User getClientClass() {
-		return new org.cluenet.cluebot.reviewinterface.shared.User( email.getEmail(), classifications, admin, KeyFactory.keyToString( key ) );
+		return new org.cluenet.cluebot.reviewinterface.shared.User( nick, email.getEmail(), classifications, admin, KeyFactory.keyToString( key ) );
 	}
 	
 	public void incClassifications() {
 		classifications++;
-		this.persist();
+		this.merge();
 	}
 	
 	/**
@@ -104,8 +119,19 @@ public class User extends Persist implements Serializable {
 
 
 	@Override
-	public void persist() {
-		super.persist();
+	public void merge() {
+		super.merge();
+		try {
+			TheCache.cache().put( "User-Email-" + this.email.toString(), this );
+		} catch( Exception e ) {
+			
+		}
+	}
+
+
+	@Override
+	public void store() {
+		super.store();
 		try {
 			TheCache.cache().put( "User-Email-" + this.email.toString(), this );
 		} catch( Exception e ) {

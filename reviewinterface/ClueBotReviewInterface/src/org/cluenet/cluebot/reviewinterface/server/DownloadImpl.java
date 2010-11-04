@@ -209,9 +209,15 @@ public class DownloadImpl extends HttpServlet {
 			Edit edit = Edit.findByKey( key );
 			pw.print( edit.getId().toString() + " " );
 			if( edit.getVandalism() >= edit.getRequired() )
-				pw.println( "V" );
+				if( edit.getConstructive() > 0 )
+					pw.println( "VS" );
+				else
+					pw.println( "V" );
 			else if( edit.getConstructive() >= edit.getRequired() )
-				pw.println( "C" );
+				if( edit.getVandalism() > 0 )
+					pw.println( "CS" );
+				else
+					pw.println( "C" );
 			else if( edit.getSkipped() >= edit.getRequired() )
 				pw.println( "S" );
 			else

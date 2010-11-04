@@ -33,10 +33,11 @@ public abstract class Persist implements Serializable {
 	}
 	
 	public abstract Key getKey();
-	public static void persist( Persist o ) {
+	
+	public static void persist( Persist o, Boolean persist ) {
 		if( use )
-			if( Persist.em.contains( o ) )
-				Persist.em.flush();
+			if( !persist )
+				Persist.em.merge( o );
 			else
 				Persist.em.persist( o );
 		else {
@@ -45,13 +46,14 @@ public abstract class Persist implements Serializable {
 				EntityTransaction txn = em.getTransaction();
 				txn.begin();
 				try {
-					if( em.contains( o ) )
-						em.flush();
+					if( !persist )
+						em.merge( o );
 					else
 						em.persist( o );
 					txn.commit();
 				} catch( Exception e ) {
-					txn.rollback();
+					if( txn.isActive() )
+						txn.rollback();
 				}
 			} finally {
 				em.close();
@@ -66,14 +68,14 @@ public abstract class Persist implements Serializable {
 		}
 	}
 	
-	public void persist() {
-		Persist.persist( this );
+	public void merge() {
+		Persist.persist( this, false );
 	}
 	public static void store( Persist o ) {
-		Persist.persist( o );
+		Persist.persist( o, true );
 	}
 	public void store() {
-		Persist.store( this );
+		Persist.persist( this, true );
 	}
 	public static void delete( Persist o ) {
 		String strKey = KeyFactory.keyToString( o.getKey() );

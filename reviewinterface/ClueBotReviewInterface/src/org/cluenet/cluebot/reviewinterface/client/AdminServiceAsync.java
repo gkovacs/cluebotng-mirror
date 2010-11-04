@@ -25,12 +25,6 @@ public interface AdminServiceAsync {
 	
 	/**
 	 * 
-	 * @see org.cluenet.cluebot.reviewinterface.client.AdminService#createUser(java.lang.String, java.lang.Boolean)
-	 */
-	void createUser( String email, Boolean isAdmin, AsyncCallback< Void > callback );
-	
-	/**
-	 * 
 	 * @see org.cluenet.cluebot.reviewinterface.client.AdminService#deleteEditGroup(java.lang.String)
 	 */
 	void deleteEditGroup( String key, AsyncCallback< Void > callback );
@@ -40,12 +34,6 @@ public interface AdminServiceAsync {
 	 * @see org.cluenet.cluebot.reviewinterface.client.AdminService#deleteUser(java.lang.String)
 	 */
 	void deleteUser( String key, AsyncCallback< Void > callback );
-	
-	/**
-	 * 
-	 * @see org.cluenet.cluebot.reviewinterface.client.AdminService#getEditGroup(java.lang.String)
-	 */
-	void getEditGroup( String key, AsyncCallback< EditGroup > callback );
 	
 	/**
 	 * 
@@ -62,5 +50,13 @@ public interface AdminServiceAsync {
 	void setAdmin( String key, Boolean isAdmin, AsyncCallback< Void > callback );
 
 	void addEditsToEditGroup( String key, Integer required, List< Edit > edits, AsyncCallback< Void > callback );
+
+	void getEditGroup( String key, Integer editStart, Integer editCount, Integer reviewStart, Integer reviewCount, Integer doneStart, Integer doneCount, AsyncCallback< EditGroup > callback );
+
+	void createUser( String nick, String email, Boolean isAdmin, Boolean sendEmail, AsyncCallback< Void > callback );
+
+	void setNick( String key, String nick, AsyncCallback< Void > callback );
+
+	void reevalEditsInEditGroup( String key, AsyncCallback< Void > callback );
 	
 }

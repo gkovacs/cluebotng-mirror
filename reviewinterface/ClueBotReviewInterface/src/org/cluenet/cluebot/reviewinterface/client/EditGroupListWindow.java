@@ -36,6 +36,10 @@ public class EditGroupListWindow implements Refreshable {
 		editGroupTable.setText( 0, 0, "Actions" );
 		editGroupTable.setText( 0, 1, "Name" );
 		editGroupTable.setText( 0, 2, "Weight" );
+		editGroupTable.setText( 0, 3, "Done" );
+		editGroupTable.setText( 0, 4, "Partial" );
+		editGroupTable.setText( 0, 5, "To Do" );
+		
 		
 		int i = 1;
 		
@@ -44,6 +48,10 @@ public class EditGroupListWindow implements Refreshable {
 			editGroupTable.setWidget( i, 0, actions );
 			editGroupTable.setText( i, 1, eg.name );
 			editGroupTable.setText( i, 2, eg.weight.toString() );
+			editGroupTable.setText( i, 3, eg.countDone.toString() );
+			editGroupTable.setText( i, 4, eg.countReviewed.toString() );
+			editGroupTable.setText( i, 5, eg.countLeft.toString() );
+			
 			
 			Button delete = new Button("X");
 			delete.addClickHandler( new ClickHandler(){
@@ -91,6 +99,16 @@ public class EditGroupListWindow implements Refreshable {
 			i++;
 		}
 		
+		Button refreshButton = new Button("Refresh");
+		refreshButton.addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				refresh();
+			}
+			
+		});
+		
 		Button newButton = new Button("New");
 		newButton.addClickHandler(new ClickHandler(){
 
@@ -103,14 +121,17 @@ public class EditGroupListWindow implements Refreshable {
 		
 		HorizontalPanel buttons = new HorizontalPanel();
 		buttons.add( new Anchor( "Download as tar", "/download?format=tar" ) );
+		buttons.add( refreshButton );
 		buttons.add( newButton );
 		
 		vpanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
 		vpanel.add(buttons);
 		
 		popup.setWidget( vpanel );
-		if( !popup.isShowing() )
+		if( !popup.isShowing() ) {
+			popup.center();
 			popup.show();
+		}
 	}
 	
 	private void addEdits( EditGroup editGroup ) {

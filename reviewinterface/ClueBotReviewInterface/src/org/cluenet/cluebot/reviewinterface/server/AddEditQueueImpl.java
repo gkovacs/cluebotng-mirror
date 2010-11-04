@@ -52,7 +52,17 @@ public class AddEditQueueImpl extends HttpServlet {
 		List< Edit > edits = new ArrayList< Edit >();
 		edits.add( edit );
 		
-		EditGroup eg = EditGroup.findByKey( strKey );
-		eg.addEdits( edits );		
+		try {
+			Transaction.begin();
+			
+			EditGroup eg = EditGroup.findByKey( strKey );
+			eg.addEdits( edits );
+			
+			Transaction.end();
+		} catch( Exception e ) {
+			resp.sendError( 500 );
+		} finally {
+			Transaction.fin();
+		}
 	}
 }

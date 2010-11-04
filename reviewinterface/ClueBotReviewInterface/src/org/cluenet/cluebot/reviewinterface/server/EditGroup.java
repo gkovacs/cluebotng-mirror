@@ -21,6 +21,10 @@ import org.cluenet.cluebot.reviewinterface.shared.AdminEdit;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.labs.taskqueue.Queue;
+import com.google.appengine.api.labs.taskqueue.QueueFactory;
+import com.google.appengine.api.labs.taskqueue.TaskOptions;
+import com.google.appengine.api.labs.taskqueue.TaskOptions.Method;
 
 
 /**
@@ -42,10 +46,13 @@ public class EditGroup extends Persist implements Serializable {
 	private String name;
 
 	@Basic
-	private List< Key > edits;
+	private List< Key > edits = null;
 	
 	@Basic
-	private List< Key > done;
+	private List< Key > reviewed = null;
+	
+	@Basic
+	private List< Key > done = null;
 	
 	@Basic
 	private Integer weight;
@@ -53,10 +60,11 @@ public class EditGroup extends Persist implements Serializable {
 	public EditGroup( String name, List< Edit > edits, Integer weight ) {
 		this.name = name;
 		this.edits = new ArrayList< Key >();
+		this.reviewed = new ArrayList< Key >();
 		this.weight = weight;
 		this.done = new ArrayList< Key >();
 		addEdits( edits );
-		this.persist();
+		this.store();
 	}
 	
 	public void addEdits( List< Edit > edits ) {
@@ -66,7 +74,7 @@ public class EditGroup extends Persist implements Serializable {
 					this.done.add( edit.getKey() );
 				else
 					this.edits.add( edit.getKey() );
-		this.persist();
+		this.merge();
 	}
 
 	
@@ -76,7 +84,9 @@ public class EditGroup extends Persist implements Serializable {
 
 	
 	public Integer getWeight() {
-		if( edits.size() == 0 )
+		checkNulls();
+		
+		if( edits.size() == 0 && reviewed.size() == 0 )
 			return 0;
 		return weight;
 	}
@@ -90,15 +100,30 @@ public class EditGroup extends Persist implements Serializable {
 		return new ArrayList< Key >( edits );
 	}
 	
+	public List< Key > getReviewed() {
+		return new ArrayList< Key >( reviewed );
+	}
+	
 	public List< Key > getDone() {
 		return new ArrayList< Key >( done );
 	}
 	
 	public Edit getRandomEdit( User user ) {
-		List< Key > edits = new ArrayList< Key >( this.edits );
+		checkNulls();
 		
-		if( edits.size() == 0 )
+		List< Key > edits = new ArrayList< Key >( this.edits );
+		List< Key > reviewed = new ArrayList< Key >( this.reviewed );
+		
+		if( edits.size() == 0 && reviewed.size() == 0 )
 			return null;
+		
+		Collections.shuffle( reviewed );
+		
+		for( Key key : reviewed ) {
+			Edit edit = Edit.findByKey( key );
+			if( !edit.getUsers().contains( user.getKey() ) )
+				return edit;
+		}
 		
 		Collections.shuffle( edits );
 		
@@ -110,35 +135,94 @@ public class EditGroup extends Persist implements Serializable {
 		
 		return null;
 	}
-
-	public void editDone( Edit edit ) {
-		this.done.add( edit.getKey() );
-		this.edits.remove( edit.getKey() );
-		this.persist();
+	
+	public void updateEditState( Edit edit ) {
+		checkNulls();
+		
+		edits.remove( edit.getKey() );
+		reviewed.remove( edit.getKey() );
+		done.remove( edit.getKey() );
+		
+		if( edit.getConstructive() >= edit.getRequired() || edit.getSkipped() >= edit.getRequired() || edit.getVandalism() >= edit.getRequired() )
+			done.add( edit.getKey() );
+		else if( edit.getConstructive() > 0 || edit.getVandalism() > 0 || edit.getSkipped() > 0 )
+			reviewed.add( edit.getKey() );
+		else
+			edits.add( edit.getKey() );
+		
+		this.merge();
 	}
 	
-	public org.cluenet.cluebot.reviewinterface.shared.EditGroup getClientClass() {
+	private void checkNulls() {
+		if( edits == null )
+			edits = new ArrayList< Key >();
+		if( reviewed == null )
+			reviewed = new ArrayList< Key >();
+		if( done == null )
+			done = new ArrayList< Key >();
+	}
+
+	public org.cluenet.cluebot.reviewinterface.shared.EditGroup getClientClass( Integer editStart, Integer editEnd, Integer reviewStart, Integer reviewEnd, Integer doneStart, Integer doneEnd ) {
+		checkNulls();
 		List< AdminEdit > edits = new ArrayList< AdminEdit >();
+		List< AdminEdit > reviewed = new ArrayList< AdminEdit >();
 		List< AdminEdit > done = new ArrayList< AdminEdit >();
 		
-		for( Key key : this.edits )
-			edits.add( Edit.findByKey( key ).getAdminClass() );
-		
-		for( Key key : this.done )
-			done.add( Edit.findByKey( key ).getAdminClass() );
+		try {
+			if( editEnd > this.edits.size() )
+				editEnd = this.edits.size();
+			if( editStart > editEnd || editStart >= this.edits.size() )
+				editEnd = editStart = 0;
+			if( editStart < 0 )
+				editStart = 0;
 			
+			for( Key key : this.edits.subList( editStart, editEnd ) )
+				edits.add( Edit.findByKey( key ).getAdminClass() );
+		} catch( Exception e ) {
+			/* Do nothing. */
+		}
+		
+		try {
+			if( reviewEnd > this.reviewed.size() )
+				reviewEnd = this.reviewed.size();
+			if( reviewStart > reviewEnd || reviewStart >= this.reviewed.size() )
+				reviewEnd = reviewStart = 0;
+			if( reviewStart < 0 )
+				reviewStart = 0;
+			
+			for( Key key : this.reviewed.subList( reviewStart, reviewEnd ) )
+				reviewed.add( Edit.findByKey( key ).getAdminClass() );
+		} catch( Exception e ) {
+			/* Do nothing. */
+		}
+		
+		try {
+			if( doneEnd > this.done.size() )
+				doneEnd = this.done.size();
+			if( doneStart > doneEnd || doneStart >= this.done.size() )
+				doneEnd = doneStart = 0;
+			if( doneStart < 0 )
+				doneStart = 0;
+			
+			for( Key key : this.done.subList( doneStart, doneEnd ) )
+				done.add( Edit.findByKey( key ).getAdminClass() );
+		} catch( Exception e ) {
+			/* Do nothing. */
+		}
 		
 		return new org.cluenet.cluebot.reviewinterface.shared.EditGroup(
-				KeyFactory.keyToString( key ), name, edits, done, weight
+				KeyFactory.keyToString( key ), name, edits, reviewed, done, weight, this.done.size(), this.reviewed.size(), this.edits.size()
 		);
 	}
 	
 	public org.cluenet.cluebot.reviewinterface.shared.EditGroup getLightClientClass() {
+		checkNulls();
 		List< AdminEdit > edits = new ArrayList< AdminEdit >();
+		List< AdminEdit > reviewed = new ArrayList< AdminEdit >();
 		List< AdminEdit > done = new ArrayList< AdminEdit >();
 		
 		return new org.cluenet.cluebot.reviewinterface.shared.EditGroup(
-				KeyFactory.keyToString( key ), name, edits, done, weight
+				KeyFactory.keyToString( key ), name, edits, reviewed, done, weight, this.done.size(), this.reviewed.size(), this.edits.size()
 		);
 	}
 	
@@ -194,7 +278,7 @@ public class EditGroup extends Persist implements Serializable {
 	public static List< EditGroup > findByEdit( Edit edit ) {
 		List< EditGroup > list = new ArrayList< EditGroup >();
 		for( EditGroup eg : list() )
-			if( eg.edits.contains( edit.getKey() ) )
+			if( eg.edits.contains( edit.getKey() ) || eg.reviewed.contains( edit.getKey() ) || eg.done.contains( edit.getKey() ) )
 				list.add( eg );
 		return list;
 	}
@@ -207,6 +291,9 @@ public class EditGroup extends Persist implements Serializable {
 		Integer sum = 0;
 		for( EditGroup eg : editGroups )
 			sum += eg.getWeight();
+		
+		if( editGroups.size() == 0 )
+			return null;
 		
 		Integer num = new Random().nextInt( sum );
 		for( EditGroup eg : editGroups ) {
@@ -225,11 +312,22 @@ public class EditGroup extends Persist implements Serializable {
 		List< List< Key > > types = new ArrayList< List< Key > >();
 		types.add( edits );
 		types.add( done );
-		for( List< Key > list : types )
-			for( Key key : list ) {
-				Edit edit = Edit.findByKey( key );
-				if( EditGroup.findByEdit( edit ).size() == 0 )
-					edit.delete();
+		for( List< Key > list : types ) {
+			Queue queue = QueueFactory.getQueue( "garbage-collection-queue" );
+			if( list.size() == 0 )
+				continue;
+			for( int i = 0 ; i <= list.size() / 100 ; i++ ) {
+				int fromIndex = 100 * i;
+				int toIndex = fromIndex + 99;
+				if( toIndex >= list.size() )
+					toIndex = list.size() - 1;
+				if( toIndex > fromIndex )
+					continue;
+				List< TaskOptions > tasks = new ArrayList< TaskOptions >();
+				for( Key key : list.subList( fromIndex, toIndex ) )
+					tasks.add( TaskOptions.Builder.param( "key", KeyFactory.keyToString( key ) ).method( Method.GET ) );
+				queue.add( tasks );
 			}
+		}
 	}
 }

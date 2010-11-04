@@ -16,26 +16,38 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class NewUserWindow {
 	private DialogBox popup = null;
 	private Refreshable parent;
+	private String key = null;
 	private final AdminServiceAsync admin = GWT.create( AdminService.class );
 
 	
 	private void display() {
 		if( popup == null )
 			popup = new DialogBox();
-		popup.setText( "Add User" );
+		if( key == null )
+			popup.setText( "Add User" );
+		else
+			popup.setText( "Change User" );
 		popup.setAnimationEnabled( true );
 		popup.setModal( false );
 		
 		VerticalPanel vpanel = new VerticalPanel();
 		FlexTable properties = new FlexTable();
 		
+		final TextBox nick = new TextBox();
 		final TextBox email = new TextBox();
 		final CheckBox isadmin = new CheckBox();
+		final CheckBox sendemail = new CheckBox();
 		
-		properties.setText( 0, 0, "E-mail:" );
-		properties.setWidget( 0, 1, email );
-		properties.setText( 1, 0, "Admin:" );
-		properties.setWidget( 1, 1, isadmin );
+		properties.setText( 0, 0, "Nickname:" );
+		properties.setWidget( 0, 1, nick );
+		if( key == null ) {
+			properties.setText( 1, 0, "E-mail:" );
+			properties.setWidget( 1, 1, email );
+			properties.setText( 2, 0, "Admin:" );
+			properties.setWidget( 2, 1, isadmin );
+			properties.setText( 3, 0, "Send welcome e-mail?:" );
+			properties.setWidget( 3, 1, sendemail );
+		}
 
 		vpanel.add( properties );
 		
@@ -44,7 +56,7 @@ public class NewUserWindow {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				admin.createUser( email.getText(), isadmin.getValue(), new AsyncCallback< Void >() {
+				AsyncCallback< Void > callback = new AsyncCallback< Void >() {
 
 					@Override
 					public void onFailure( Throwable caught ) {
@@ -58,7 +70,11 @@ public class NewUserWindow {
 						parent.refresh();
 					}
 					
-				});
+				};
+				if( key == null )
+					admin.createUser( nick.getText(), email.getText(), isadmin.getValue(), sendemail.getValue(), callback );
+				else
+					admin.setNick( key, nick.getText(), callback );
 			}
 			
 		});
@@ -82,12 +98,21 @@ public class NewUserWindow {
 		vpanel.add(buttons);
 		
 		popup.setWidget( vpanel );
-		if( !popup.isShowing() )
+		if( !popup.isShowing() ) {
+			popup.center();
 			popup.show();
+		}
 	}
 	
 	public NewUserWindow( Refreshable parent ) {
 		this.parent = parent;
+		this.key = null;
+		display();
+	}
+
+	public NewUserWindow( Refreshable parent, String key ) {
+		this.parent = parent;
+		this.key = key;
 		display();
 	}
 	

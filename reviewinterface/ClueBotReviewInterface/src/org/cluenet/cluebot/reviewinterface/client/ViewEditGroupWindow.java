@@ -7,6 +7,8 @@ import org.cluenet.cluebot.reviewinterface.shared.User;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -14,12 +16,20 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 
 public class ViewEditGroupWindow implements Refreshable {
 	private DialogBox popup = null;
 	private EditGroup editGroup;
+	private Integer editStart = 0;
+	private Integer editCount = 20;
+	private Integer reviewStart = 0;
+	private Integer reviewCount = 20;
+	private Integer doneStart = 0;
+	private Integer doneCount = 20;
+	
 	private String key;
 	private final AdminServiceAsync admin = GWT.create( AdminService.class );
 
@@ -36,8 +46,14 @@ public class ViewEditGroupWindow implements Refreshable {
 		properties.setText( 0, 1, editGroup.name );
 		properties.setText( 1, 0, "Weight:" );
 		properties.setText( 1, 1, editGroup.weight.toString() );
-		properties.setText( 2, 0, "Links:" );
-		properties.setWidget( 2, 1, new Anchor( "Dump done", "/download?format=done&editgroup=" + editGroup.key ) );
+		properties.setText( 2, 0, "Done:" );
+		properties.setText( 2, 1, editGroup.countDone.toString() );
+		properties.setText( 3, 0, "Partial:" );
+		properties.setText( 3, 1, editGroup.countReviewed.toString() );
+		properties.setText( 4, 0, "To do:" );
+		properties.setText( 4, 1, editGroup.countLeft.toString() );
+		properties.setText( 5, 0, "Links:" );
+		properties.setWidget( 5, 1, new Anchor( "Dump done", "/download?format=done&editgroup=" + editGroup.key ) );
 		vpanel.add( properties );
 
 		FlexTable editTable = new FlexTable();
@@ -78,6 +94,138 @@ public class ViewEditGroupWindow implements Refreshable {
 			
 			i++;
 		}
+		HorizontalPanel editPage = new HorizontalPanel();
+		vpanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
+		vpanel.add(editPage);
+		vpanel.setHorizontalAlignment(VerticalPanel.ALIGN_DEFAULT);
+		
+		final TextBox editPageSize = new TextBox();
+		final TextBox editPageStart = new TextBox();
+		KeyPressHandler gotoEditPage = new KeyPressHandler(){
+
+			@Override
+			public void onKeyPress( KeyPressEvent event ) {
+				if( event.getCharCode() == 13 )
+					pageTo( new Integer( editPageStart.getText() ), new Integer( editPageSize.getText() ), reviewStart, reviewCount, doneStart, doneCount );
+			}
+			
+		};
+		
+		editPageStart.setText( editStart.toString() );
+		editPageStart.addKeyPressHandler( gotoEditPage );
+		editPage.add( editPageStart );
+		
+		editPageSize.setText( editCount.toString() );
+		editPageSize.addKeyPressHandler( gotoEditPage );
+		editPage.add( editPageSize );
+		
+		Button editPageLeft = new Button( "&lt;" );
+		editPageLeft.addClickHandler( new ClickHandler(){
+
+			@Override
+			public void onClick( ClickEvent event ) {
+				pageTo( new Integer( editPageStart.getText() ) - new Integer( editPageSize.getText() ), new Integer( editPageSize.getText() ), reviewStart, reviewCount, doneStart, doneCount );
+			}
+			
+		});
+		editPage.add( editPageLeft );
+		
+		Button editPageRight = new Button( ">" );
+		editPageRight.addClickHandler( new ClickHandler(){
+
+			@Override
+			public void onClick( ClickEvent event ) {
+				pageTo( new Integer( editPageStart.getText() ) + new Integer( editPageSize.getText() ), new Integer( editPageSize.getText() ), reviewStart, reviewCount, doneStart, doneCount );
+			}
+			
+		});
+		editPage.add( editPageRight );
+		
+		vpanel.add( new Label( "Partial:" ) );
+		FlexTable reviewTable = new FlexTable();
+		vpanel.add( reviewTable );
+		reviewTable.setBorderWidth( 1 );
+		
+		reviewTable.setText( 0, 0, "ID" );
+		reviewTable.setText( 0, 1, "Weight" );
+		reviewTable.setText( 0, 2, "Type" );
+		reviewTable.setText( 0, 3, "Vandalism" );
+		reviewTable.setText( 0, 4, "Constructive" );
+		reviewTable.setText( 0, 5, "Skipped" );
+		reviewTable.setText( 0, 6, "Required" );
+		reviewTable.setText( 0, 7, "Comments" );
+		reviewTable.setText( 0, 8, "Users" );
+		
+		i = 1;
+		
+		for( final AdminEdit edit : editGroup.reviewed ) {
+			String comments = "";
+			for( String comment : edit.comments )
+				comments += comment + "<br />\n";
+			
+			String users = "";
+			for( User user : edit.users )
+				users += user.userName + " (" + user.classifications.toString() + ")" + ( user.isAdmin ? " (admin)" : "" ) + "<br />\n";
+			
+			reviewTable.setWidget( i, 0, new Anchor( edit.id.toString(), "http://en.wikipedia.org/w/index.php?action=view&diff=" + edit.id.toString() ) );
+			reviewTable.setText( i, 1, edit.weight.toString() );
+			reviewTable.setText( i, 2, edit.classification.toString() );
+			reviewTable.setText( i, 3, edit.vandalism.toString() );
+			reviewTable.setText( i, 4, edit.constructive.toString() );
+			reviewTable.setText( i, 5, edit.skipped.toString() );
+			reviewTable.setText( i, 6, edit.required.toString() );
+			reviewTable.setHTML( i, 7, comments );
+			reviewTable.setHTML( i, 8, users );
+			
+			i++;
+		}
+		
+		HorizontalPanel reviewPage = new HorizontalPanel();
+		vpanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
+		vpanel.add(reviewPage);
+		vpanel.setHorizontalAlignment(VerticalPanel.ALIGN_DEFAULT);
+		
+		final TextBox reviewPageSize = new TextBox();
+		final TextBox reviewPageStart = new TextBox();
+		KeyPressHandler gotoReviewPage = new KeyPressHandler(){
+
+			@Override
+			public void onKeyPress( KeyPressEvent event ) {
+				if( event.getCharCode() == 13 )
+					pageTo( editStart, editCount, new Integer( reviewPageStart.getText() ), new Integer( reviewPageSize.getText() ), doneStart, doneCount );
+			}
+			
+		};
+		
+		reviewPageStart.setText( reviewStart.toString() );
+		reviewPageStart.addKeyPressHandler( gotoReviewPage );
+		reviewPage.add( reviewPageStart );
+		
+		reviewPageSize.setText( reviewCount.toString() );
+		reviewPageSize.addKeyPressHandler( gotoReviewPage );
+		reviewPage.add( reviewPageSize );
+		
+		Button reviewPageLeft = new Button( "&lt;" );
+		reviewPageLeft.addClickHandler( new ClickHandler(){
+
+			@Override
+			public void onClick( ClickEvent event ) {
+				pageTo( editStart, editCount, new Integer( reviewPageStart.getText() ) - new Integer( reviewPageSize.getText() ), new Integer( reviewPageSize.getText() ), doneStart, doneCount );
+			}
+			
+		});
+		reviewPage.add( reviewPageLeft );
+		
+		Button reviewPageRight = new Button( ">" );
+		reviewPageRight.addClickHandler( new ClickHandler(){
+
+			@Override
+			public void onClick( ClickEvent event ) {
+				pageTo( editStart, editCount, new Integer( reviewPageStart.getText() ) + new Integer( reviewPageSize.getText() ), new Integer( reviewPageSize.getText() ), doneStart, doneCount );
+			}
+			
+		});
+		reviewPage.add( reviewPageRight );
 		
 		vpanel.add( new Label( "Finished:" ) );
 		FlexTable doneTable = new FlexTable();
@@ -118,12 +266,82 @@ public class ViewEditGroupWindow implements Refreshable {
 			i++;
 		}
 		
+		HorizontalPanel donePage = new HorizontalPanel();
+		vpanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
+		vpanel.add(donePage);
+		vpanel.setHorizontalAlignment(VerticalPanel.ALIGN_DEFAULT);
+		
+		final TextBox donePageSize = new TextBox();
+		final TextBox donePageStart = new TextBox();
+		KeyPressHandler gotoDonePage = new KeyPressHandler(){
+
+			@Override
+			public void onKeyPress( KeyPressEvent event ) {
+				if( event.getCharCode() == 13 )
+					pageTo( editStart, editCount, reviewStart, reviewCount, new Integer( donePageStart.getText() ), new Integer( donePageSize.getText() ) );
+			}
+			
+		};
+		
+		donePageStart.setText( doneStart.toString() );
+		donePageStart.addKeyPressHandler( gotoDonePage );
+		donePage.add( donePageStart );
+		
+		donePageSize.setText( doneCount.toString() );
+		donePageSize.addKeyPressHandler( gotoDonePage );
+		donePage.add( donePageSize );
+		
+		Button donePageLeft = new Button( "&lt;" );
+		donePageLeft.addClickHandler( new ClickHandler(){
+
+			@Override
+			public void onClick( ClickEvent event ) {
+				pageTo( editStart, editCount, reviewStart, reviewCount, new Integer( donePageStart.getText() ) - new Integer( donePageSize.getText() ), new Integer( donePageSize.getText() ) );
+			}
+			
+		});
+		donePage.add( donePageLeft );
+		
+		Button donePageRight = new Button( ">" );
+		donePageRight.addClickHandler( new ClickHandler(){
+
+			@Override
+			public void onClick( ClickEvent event ) {
+				pageTo( editStart, editCount, reviewStart, reviewCount, new Integer( donePageStart.getText() ) + new Integer( donePageSize.getText() ), new Integer( donePageSize.getText() ) );
+			}
+			
+		});
+		donePage.add( donePageRight );
+		
+		
 		Button newButton = new Button("New");
 		newButton.addClickHandler(new ClickHandler(){
 
 			@Override
 			public void onClick(ClickEvent event) {
 				addEdits();
+			}
+			
+		});
+		
+		Button reevalButton = new Button("Re-sort");
+		reevalButton.addClickHandler(new ClickHandler(){
+
+			@Override
+			public void onClick(ClickEvent event) {
+				admin.reevalEditsInEditGroup( editGroup.key, new AsyncCallback< Void >() {
+
+					@Override
+					public void onFailure( Throwable caught ) {
+						ClueBotReviewAdminInterface.error( caught.getMessage() );
+					}
+
+					@Override
+					public void onSuccess( Void result ) {
+						refresh();
+					}
+					
+				});
 			}
 			
 		});
@@ -151,6 +369,7 @@ public class ViewEditGroupWindow implements Refreshable {
 		
 		HorizontalPanel buttons = new HorizontalPanel();
 		buttons.add( newButton );
+		buttons.add( reevalButton );
 		buttons.add( refreshButton );
 		buttons.add( closeButton );
 		
@@ -158,16 +377,28 @@ public class ViewEditGroupWindow implements Refreshable {
 		vpanel.add(buttons);
 		
 		popup.setWidget( vpanel );
-		if( !popup.isShowing() )
+		if( !popup.isShowing() ) {
+			popup.center();
 			popup.show();
+		}
 	}
 	
 	private void addEdits() {
 		new NewEditGroupWindow( this, editGroup.key, editGroup.name, editGroup.weight );
 	}
 	
+	public void pageTo( Integer eStart, Integer eCount, Integer rStart, Integer rCount, Integer dStart, Integer dCount ) {
+		editStart = eStart;
+		editCount = eCount;
+		reviewStart = rStart;
+		reviewCount = rCount;
+		doneStart = dStart;
+		doneCount = dCount;
+		refresh();
+	}
+	
 	public void refresh() {
-		admin.getEditGroup( key, new AsyncCallback< EditGroup >() {
+		admin.getEditGroup( key, editStart, editCount, reviewStart, reviewCount, doneStart, doneCount, new AsyncCallback< EditGroup >() {
 
 			@Override
 			public void onFailure( Throwable caught ) {

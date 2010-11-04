@@ -19,6 +19,10 @@ import org.cluenet.cluebot.reviewinterface.shared.Classification;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.labs.taskqueue.Queue;
+import com.google.appengine.api.labs.taskqueue.QueueFactory;
+import com.google.appengine.api.labs.taskqueue.TaskOptions;
+import com.google.appengine.api.labs.taskqueue.TaskOptions.Method;
 
 
 /**
@@ -71,7 +75,7 @@ public class Edit extends Persist implements Serializable {
 		this.vandalism = this.constructive = this.skipped = 0;
 		this.comments = new ArrayList< String >();
 		this.users = new ArrayList< Key >();
-		this.persist();
+		this.store();
 	}
 
 	
@@ -99,10 +103,10 @@ public class Edit extends Persist implements Serializable {
 				skipped++;
 				break;
 		}
-		this.persist();
-		if( vandalism == required || constructive == required || skipped == required )
-			for( EditGroup eg : EditGroup.findByEdit( this ) )
-				eg.editDone( this );
+		this.merge();
+		Queue queue = QueueFactory.getQueue( "edit-done-queue" );
+		for( EditGroup eg : EditGroup.findByEdit( this ) )
+			queue.add( TaskOptions.Builder.param( "ekey", KeyFactory.keyToString( key ) ).param( "egkey", KeyFactory.keyToString( eg.getKey() ) ).method( Method.GET ) );
 	}
 	
 	public Integer getVandalism() {
@@ -120,6 +124,8 @@ public class Edit extends Persist implements Serializable {
 
 	
 	public Integer getRequired() {
+		if( required < 2 )
+			return 2;
 		return required;
 	}
 
@@ -155,7 +161,7 @@ public class Edit extends Persist implements Serializable {
 				continue;
 			users.add( user.getClientClass() );
 		}
-		return new AdminEdit( id, classification, vandalism, constructive, skipped, required, weight, new ArrayList< String >( comments ), users );
+		return new AdminEdit( id, classification, vandalism, constructive, skipped, getRequired(), weight, new ArrayList< String >( comments ), users );
 	}
 	
 	@Override
@@ -171,8 +177,19 @@ public class Edit extends Persist implements Serializable {
 
 
 	@Override
-	public void persist() {
-		super.persist();
+	public void merge() {
+		super.merge();
+		try {
+			TheCache.cache().put( "Edit-Id-" + this.id.toString(), this );
+		} catch( Exception e ) {
+			
+		}
+	}
+
+
+	@Override
+	public void store() {
+		super.store();
 		try {
 			TheCache.cache().put( "Edit-Id-" + this.id.toString(), this );
 		} catch( Exception e ) {
@@ -255,4 +272,19 @@ public class Edit extends Persist implements Serializable {
 		return edit;
 	}
 	
+	@SuppressWarnings( "unchecked" )
+	public static List< Key > list() {
+		EntityManager em = EMF.get().createEntityManager();
+		List< Key > list = new ArrayList< Key >();
+		try {
+			Query query = em.createQuery( "select from " + Edit.class.getName() );
+			for( Edit edit : (List< Edit >) query.getResultList() )
+				list.add( edit.getKey() );
+		} catch( Exception e ) {
+			/* Do nothing */
+		} finally {
+			em.close();
+		}
+		return list;
+	}
 }
