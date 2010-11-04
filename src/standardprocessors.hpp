@@ -143,6 +143,7 @@ class TrialRunReport : public EditProcessor {
 				float fal_pos_perc = (float)fal_pos / (float)act_neg;
 				if(fal_pos_perc <= fprate) return t;
 			}
+			return 1.0;
 		}
 		
 		void makeThresholdTable(const std::string & filename, float interval) {

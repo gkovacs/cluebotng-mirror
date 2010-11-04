@@ -176,6 +176,8 @@ boolean comment_typo
 boolean comment_auto
 boolean comment_revert
 boolean comment_common
+boolean current_speedydel_count
+boolean previous_speedydel_count
 
 exact main_bayes_score
 linear_scale main_bayes_nwords 0 20
@@ -213,6 +215,9 @@ echo 'ann_added_ucase_words_cnt = "(added_all_ucase_word_count - added_acceptabl
 addallnames "ann_added_ucase_words"
 addallnames "ann_removed_ucase_words"
 addallnames "ann_added_ucase_words_cnt"
+
+echo 'ann_added_speedydel = "current_speedydel_count - previous_speedydel_count";'
+addallnames "ann_added_speedydel"
 
 #echo 'ann_current_quote_mismatch = "current_charcount_quote % 2";'
 #echo 'ann_previous_quote_mismatch = "previous_charcount_quote % 2";'
