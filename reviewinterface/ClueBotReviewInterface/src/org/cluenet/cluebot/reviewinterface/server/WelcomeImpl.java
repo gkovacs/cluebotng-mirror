@@ -5,6 +5,9 @@ package org.cluenet.cluebot.reviewinterface.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -78,6 +81,7 @@ public class WelcomeImpl extends HttpServlet {
 		pw.println( "    <title>ClueBot Review Interface</title>" );
 		pw.println( "  </head>" );
 		pw.println( "  <body>" );
+		pw.println( "    <div id='box'>" );
 		pw.println( "    <div id='content'>" );
 		pw.println( "      <p>" );
 		pw.println( "        One of the keys to Cluebot-NG functioning well is its dataset." );
@@ -157,6 +161,11 @@ public class WelcomeImpl extends HttpServlet {
 			pw.println( "        such as an edit that's clearly constructive but may look like vandalism based on simple statistics," );
 			pw.println( "        leave a comment about it, and the Cluebot-NG operators will take that into account." );
 			pw.println( "      </p>" );
+			pw.println( "      <p style='font-size: 120%; color: #990000;'>" );
+			pw.println( "        To be clear, if an edit is definitely vandalism, even if it's not easy-to-catch vandalism, still mark it as vandalism!" );
+			pw.println( "        The bot is capable of catching many things you may not think it can - do not baby the bot!" );
+			pw.println( "        If it's vandalism, mark it as such!" );
+			pw.println( "      </p>" );
 			pw.println( "      <p>" );
 			pw.println( "        To get started, <a href='/review.jsp'>click here</a>." );
 			pw.println( "      </p>" );
@@ -171,16 +180,29 @@ public class WelcomeImpl extends HttpServlet {
 			pw.println( "        <li><a href='http://appengine.google.com/'>AppEngine Admin</a></li>" );
 			pw.println( "      </ul>" );
 		}
-		
+		pw.println( "    </div>");		
+		pw.println( "    <div id='stats'>");
 		pw.println( "      <a name='stats' />" );
 		pw.println( "      <p>" );
 		pw.println( "        Here are some stats:" );
 		pw.println( "      </p>" );
 		pw.println( "      <table>" );
 		pw.println( "        <tr><th>Nickname</th><th>Contributions</th></tr>" );
-		for( User user : User.list() )
+		
+		List< User > users = User.list();
+		Collections.sort( users, new Comparator< User >() {
+
+			@Override
+			public int compare( User o1, User o2 ) {
+				return o2.getClassifications().compareTo( o1.getClassifications() );
+			}
+			
+		});
+		for( User user : users )
 			pw.println( "        <tr><td>" + user.getNick() + "</td><td>" + user.getClassifications().toString() + "</td></tr>" );
 		pw.println( "      </table>" );
+		pw.println( "    </div>");
+
 		pw.println( "    </div>");
 		pw.println( "  </body>");
 		pw.println( "</html>");

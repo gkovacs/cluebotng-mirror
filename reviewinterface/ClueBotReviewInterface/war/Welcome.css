@@ -3,14 +3,21 @@
 body {
 	background: #444444;
 }
+#box {
+	position: absolute;
+	top: 8px;
+	left: 8px;
+	right: 8px;
+	min-width: 1000px;
+}
 #content {
-	width: 550px;
+	width: 500px;
 	background: #e0e0ff;
-	margin-left: auto;
-	margin-right: auto;
 	padding-left: 25px;
 	padding-right: 25px;
 	border: 1px solid #ddffee;
+	margin-left: auto;
+	margin-right: auto;
 }
 p:first-letter {
 	font-weight: bold;
@@ -20,4 +27,14 @@ p:first-line {
 }
 p {
 	text-align: justify;
+}
+
+#stats {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	padding-left: 25px;
+	padding-right: 25px;
+	background: #e0e0ff;
+	border: 1px solid #ddffee;
 }

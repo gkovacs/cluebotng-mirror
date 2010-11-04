@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.Query;
 
 import org.cluenet.cluebot.reviewinterface.shared.AdminEdit;
+import org.datanucleus.jpa.annotations.Extension;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -46,12 +47,15 @@ public class EditGroup extends Persist implements Serializable {
 	private String name;
 
 	@Basic
+	@Extension(vendorName = "datanucleus", key = "gae.unindexed", value="true")
 	private List< Key > edits = null;
 	
 	@Basic
+	@Extension(vendorName = "datanucleus", key = "gae.unindexed", value="true")
 	private List< Key > reviewed = null;
 	
 	@Basic
+	@Extension(vendorName = "datanucleus", key = "gae.unindexed", value="true")
 	private List< Key > done = null;
 	
 	@Basic
@@ -308,10 +312,10 @@ public class EditGroup extends Persist implements Serializable {
 
 	@Override
 	public void delete() {
-		super.delete();
 		List< List< Key > > types = new ArrayList< List< Key > >();
-		types.add( edits );
-		types.add( done );
+		types.add( new ArrayList< Key >( edits ) );
+		types.add( new ArrayList< Key >( done ) );
+		super.delete();
 		for( List< Key > list : types ) {
 			Queue queue = QueueFactory.getQueue( "garbage-collection-queue" );
 			if( list.size() == 0 )

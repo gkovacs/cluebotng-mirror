@@ -40,6 +40,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public void createUser( String nick, String email, Boolean isAdmin, Boolean sendEmail ) throws IllegalArgumentException {
+		Persist.unuse();
 		new User( nick, new Email( email ), isAdmin );
 		if( sendEmail ) {
 			Properties props = new Properties();
