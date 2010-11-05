@@ -39,7 +39,7 @@ CREATE TABLE `editset_remote` (
 	`updated`                      TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	`source`                       VARCHAR(128)       NULL,
 	`reviewers`                    INTEGER            NULL,
-	`reviewers_agreeing`           INTEGER            NULL,
+	`reviewers_agreeing`           INTEGER            NULL
 )
 ENGINE=FEDERATED
 CONNECTION='cbng_editdb_master_server/editset';
