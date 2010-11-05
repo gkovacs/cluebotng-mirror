@@ -40,9 +40,6 @@ CREATE TABLE `editset_remote` (
 	`source`                       VARCHAR(128)       NULL,
 	`reviewers`                    INTEGER            NULL,
 	`reviewers_agreeing`           INTEGER            NULL,
-	
-	PRIMARY KEY (`editid`),
-	INDEX USING BTREE (`updated`)
 )
 ENGINE=FEDERATED
 CONNECTION='cbng_editdb_master_server/editset';
