@@ -7,7 +7,7 @@ DROP SERVER IF EXISTS 'cbng_editdb_master_server';
 CREATE SERVER 'cbng_editdb_master_server'
 FOREIGN DATA WRAPPER mysql
 OPTIONS (
-	HOST '10.156.12.11',
+	HOST 'gamma.cluenet.org',
 	DATABASE 'cbng_editdb_master',
 	USER 'cbng_editdb_slv',
 	PASSWORD 'cbng-editdb-slave'
@@ -42,7 +42,7 @@ CREATE TABLE `editset_remote` (
 	`reviewers_agreeing`           INTEGER            NULL,
 	
 	PRIMARY KEY (`editid`),
-	INDEX USING BTREE (`updated`)
+	KEY (`updated`)
 )
 ENGINE=FEDERATED
 CONNECTION='cbng_editdb_master_server/editset';
@@ -76,7 +76,9 @@ CREATE TABLE `editset` (
 	`reviewers_agreeing`           INTEGER            NULL,
 	
 	PRIMARY KEY (`editid`),
-	INDEX USING BTREE (`updated`)
+	INDEX USING BTREE (`updated`),
+	INDEX USING BTREE (`isactive`),
+	INDEX USING BTREE (`source`)
 )
 ENGINE=InnoDB
 ROW_FORMAT=COMPRESSED 
@@ -92,8 +94,8 @@ CREATE TABLE `lastupdated` (
 	`lastupdated` TIMESTAMP NOT NULL
 );
 
-INSERT INTO `lastupdated` SELECT * FROM `lastupdated_remote`;
-INSERT INTO `editset` SELECT * FROM `editset_remote`;
+-- INSERT INTO `lastupdated` SELECT * FROM `lastupdated_remote`;
+-- INSERT INTO `editset` SELECT * FROM `editset_remote`;
 
 DELIMITER |
 CREATE PROCEDURE update_data()

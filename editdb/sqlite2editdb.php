@@ -158,7 +158,7 @@ EOQ;
 	$mysql = mysql_connect( 'localhost', 'cbngdb', '' );
 	if( !$mysql )
 		die( 'Error: ' . mysql_error() );
-	if( !mysql_select_db( $mysql, 'cbng_editdb_master' ) )
+	if( !mysql_select_db( 'cbng_editdb_master', $mysql ) )
 		die( 'Error; ' . mysql_error() );
 	$sqlite = new SQLite3( $sqlitedb );
 	$query = $sqlite->query( 'SELECT EditID, EditXML, IsVandalism, EditSource FROM dataset' );
