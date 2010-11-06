@@ -55,9 +55,9 @@ public class WelcomeImpl extends HttpServlet {
 	        	msg.setSubject( "New user request" );
 	        	msg.setText( msgBody );
 	        	Transport.send( msg );
-	        	resp.getWriter().println( "Stored." );
+	        	resp.getWriter().println( "<html><body>Your request has been stored.  An admin will review it shortly.  If you are approved, you will receive an e-mail at <a href='mailto:" + email + "'>" + email + "</a>.</body></html>" );
 	        } catch( Exception e ) {
-	        	resp.getWriter().println( "There was an error." );
+	        	resp.getWriter().println( "<html><body>There was an error.</body></html>" );
 	        	resp.getWriter().println( e.getMessage() );
 	        	e.printStackTrace( resp.getWriter() );
 	        }
