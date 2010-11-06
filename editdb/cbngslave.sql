@@ -39,7 +39,10 @@ CREATE TABLE `editset_remote` (
 	`updated`                      TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	`source`                       VARCHAR(128)       NULL,
 	`reviewers`                    INTEGER            NULL,
-	`reviewers_agreeing`           INTEGER            NULL
+	`reviewers_agreeing`           INTEGER            NULL,
+	
+	PRIMARY KEY (`editid`),
+	INDEX USING BTREE (`updated`)
 )
 ENGINE=FEDERATED
 CONNECTION='cbng_editdb_master_server/editset';
@@ -89,14 +92,16 @@ CREATE TABLE `lastupdated` (
 	`lastupdated` TIMESTAMP NOT NULL
 );
 
-INSERT INTO `editset` SELECT * FROM `editset_remote`;
 INSERT INTO `lastupdated` SELECT * FROM `lastupdated_remote`;
+INSERT INTO `editset` SELECT * FROM `editset_remote`;
 
 DELIMITER |
 CREATE PROCEDURE update_data()
 BEGIN
-	REPLACE INTO `editset` SELECT `edittype`, `editid`, `comment`, `user`, `user_edit_count`, `user_distinct_pages`, `user_warns`, `prev_user`, `user_reg_time`, `common_page_made_time`, `common_title`, `common_namespace`, `common_creator`, `common_num_recent_edits`, `common_num_recent_reversions`, `current_minor`, `current_timestamp`, `current_text`, `previous_timestamp`, `previous_text`, `isvandalism`, `isactive`, `updated`, `source`, `reviewers`, `reviewers_agreeing` FROM `editset_remote`, `lastupdated` WHERE `editset_remote`.`updated` > `lastupdated`.`lastupdated`;
-	DELETE FROM `editset` WHERE `editid` NOT IN (SELECT `editid` FROM `editset_remote`);
+	SET @lastupdated = (SELECT `lastupdated` FROM `lastupdated` LIMIT 1);
+	CREATE TEMPORARY TABLE `editset_temp` SELECT * FROM `editset_remote` WHERE `editset_remote`.`updated` > @lastupdated;
+	REPLACE INTO `editset` SELECT * FROM `editset_temp`;
+	DROP TABLE `editset_temp`;
 	UPDATE `lastupdated` SET `lastupdated` = (SELECT `lastupdated` FROM `lastupdated_remote` LIMIT 1);
 END;
 |
