@@ -2,6 +2,11 @@ DROP DATABASE IF EXISTS `cbng_editdb`;
 CREATE DATABASE `cbng_editdb`;
 USE `cbng_editdb`;
 
+GRANT SELECT, EXECUTE
+ON `cbng_editdb`.*
+TO 'cbng_editdb'@'localhost'
+IDENTIFIED BY 'cbng-editdb-pass';
+
 DROP SERVER IF EXISTS 'cbng_editdb_master_server';
 
 CREATE SERVER 'cbng_editdb_master_server'
@@ -89,6 +94,12 @@ CREATE TABLE `lastupdated_remote` (
 )
 ENGINE=FEDERATED
 CONNECTION='cbng_editdb_master_server/lastupdated';
+
+CREATE TABLE `lastdumped_remote` (
+	`lastdumped` TIMESTAMP NOT NULL
+)
+ENGINE=FEDERATED
+CONNECTION='cbng_editdb_master_server/lastdumped';
 
 CREATE TABLE `lastupdated` (
 	`lastupdated` TIMESTAMP NOT NULL

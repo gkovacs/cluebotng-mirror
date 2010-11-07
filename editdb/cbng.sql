@@ -46,6 +46,10 @@ CREATE TABLE `lastupdated` (
 	`lastupdated` TIMESTAMP NOT NULL
 );
 
+CREATE TABLE `lastdumped` (
+	`lastdumped` TIMESTAMP NOT NULL
+);
+
 INSERT INTO `lastupdated` (`lastupdated`) VALUES (CURRENT_TIMESTAMP);
 
 DELIMITER |
