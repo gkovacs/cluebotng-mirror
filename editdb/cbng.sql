@@ -46,8 +46,9 @@ CREATE TABLE `lastupdated` (
 	`lastupdated` TIMESTAMP NOT NULL
 );
 
-CREATE TABLE `lastdumped` (
-	`lastdumped` TIMESTAMP NOT NULL
+CREATE TABLE `dumps` (
+	`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`time` TIMESTAMP NOT NULL
 );
 
 INSERT INTO `lastupdated` (`lastupdated`) VALUES (CURRENT_TIMESTAMP);

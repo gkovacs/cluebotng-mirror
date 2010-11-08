@@ -95,11 +95,17 @@ CREATE TABLE `lastupdated_remote` (
 ENGINE=FEDERATED
 CONNECTION='cbng_editdb_master_server/lastupdated';
 
-CREATE TABLE `lastdumped_remote` (
-	`lastdumped` TIMESTAMP NOT NULL
+CREATE TABLE `dumps_remote` (
+	`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`time` TIMESTAMP NOT NULL
 )
 ENGINE=FEDERATED
-CONNECTION='cbng_editdb_master_server/lastdumped';
+CONNECTION='cbng_editdb_master_server/dumps';
+
+CREATE TABLE `dumps` (
+	`id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`time` TIMESTAMP NOT NULL
+);
 
 CREATE TABLE `lastupdated` (
 	`lastupdated` TIMESTAMP NOT NULL
