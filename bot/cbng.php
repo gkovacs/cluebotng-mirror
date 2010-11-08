@@ -159,6 +159,25 @@
 		
 		$api = current( $api[ 'query' ][ 'pages' ] );
 		
+		if(
+			!(
+				isset( $cb[ 'user_edit_count' ] )
+				and isset( $cb[ 'user_distinct_pages' ] )
+				and isset( $cb[ 'user_warns' ] )
+				and isset( $api[ 'revisions' ][ 1 ][ 'user' ] )
+				and isset( $cb[ 'user_reg_time' ] )
+				and isset( $cb[ 'common' ][ 'page_made_time' ] )
+				and isset( $cb[ 'common' ][ 'creator' ] )
+				and isset( $cb[ 'common' ][ 'num_recent_edits' ] )
+				and isset( $cb[ 'common' ][ 'num_recent_reversions' ] )
+				and isset( $api[ 'revisions' ][ 0 ][ 'timestamp' ] )
+				and isset( $api[ 'revisions' ][ 0 ][ '*' ] )
+				and isset( $api[ 'revisions' ][ 1 ][ 'timestamp' ] )
+				and isset( $api[ 'revisions' ][ 1 ][ '*' ] )
+			)
+		)
+			die( 'API error.' );
+		
 		$data = Array(
 			'EditType' => 'change',
 			'EditID' => $feedData[ 'revid' ],

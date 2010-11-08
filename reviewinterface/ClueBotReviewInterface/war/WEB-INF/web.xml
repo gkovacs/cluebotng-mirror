@@ -155,6 +155,17 @@
     <url-pattern>*admin.jsp</url-pattern>
   </filter-mapping>
   
+  
+  <servlet>
+  	<servlet-name>xmppServlet</servlet-name>
+  	<servlet-class>org.cluenet.cluebot.reviewinterface.server.XMPPReceiverServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>xmppServlet</servlet-name>
+  	<url-pattern>/_ah/xmpp/message/chat/</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>welcome</welcome-file>

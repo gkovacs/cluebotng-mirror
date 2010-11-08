@@ -22,6 +22,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.appengine.api.xmpp.JID;
+import com.google.appengine.api.xmpp.MessageBuilder;
+import com.google.appengine.api.xmpp.XMPPService;
+import com.google.appengine.api.xmpp.XMPPServiceFactory;
 
 
 /**
@@ -47,15 +51,17 @@ public class WelcomeImpl extends HttpServlet {
 	        		"ClueBot NG Review Interface.";
 
 	        try {
-	        	Message msg = new MimeMessage( session );
-	        	msg.setFrom( new InternetAddress( "interface@cluebotreview.appspotmail.com", "ClueBot-NG Review Interface" ) );
-	        	for( User user : User.list() )
-	        		if( user.isAdmin() )
-	        			msg.addRecipient( Message.RecipientType.TO, new InternetAddress( user.getEmail().getEmail(), user.getNick() ) );
-	        	msg.setSubject( "New user request" );
-	        	msg.setText( msgBody );
-	        	Transport.send( msg );
-	        	resp.getWriter().println( "<html><body>Your request has been stored.  An admin will review it shortly.  If you are approved, you will receive an e-mail at <a href='mailto:" + email + "'>" + email + "</a>.</body></html>" );
+				Message msg = new MimeMessage( session );
+				msg.setFrom( new InternetAddress( "interface@cluebotreview.appspotmail.com", "ClueBot-NG Review Interface" ) );
+				for( User user : User.list() )
+					if( user.isAdmin() )
+						msg.addRecipient( Message.RecipientType.TO, new InternetAddress( user.getEmail().getEmail(), user.getNick() ) );
+				msg.setSubject( "New user request" );
+				msg.setText( msgBody );
+				Transport.send( msg );
+				XMPPService xmpp = XMPPServiceFactory.getXMPPService();
+				xmpp.sendMessage( new MessageBuilder().withRecipientJids( new JID( "cobi@cluenet.org" ) ).withBody( msgBody ).build() );
+				resp.getWriter().println( "<html><body>Your request has been stored.  An admin will review it shortly.  If you are approved, you will receive an e-mail at <a href='mailto:" + email + "'>" + email + "</a>.</body></html>" );
 	        } catch( Exception e ) {
 	        	resp.getWriter().println( "<html><body>There was an error.</body></html>" );
 	        	resp.getWriter().println( e.getMessage() );
