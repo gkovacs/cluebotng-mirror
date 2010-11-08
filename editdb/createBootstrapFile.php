@@ -42,7 +42,7 @@
 		$user = prompt( 'User: ' );
 		$pass = prompt( 'Pass: ' );
 		
-		clear()
+		clear();
 		
 		$mysql = mysql_connect( $host, $user, $pass );
 		if( !$mysql )
