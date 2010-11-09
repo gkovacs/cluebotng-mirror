@@ -217,6 +217,7 @@ public class APIImpl extends HttpServlet {
 	
 	@SuppressWarnings( "unchecked" )
 	public void doGet( HttpServletRequest req, HttpServletResponse res ) throws IOException {
+		res.setContentType( "text/xml" );
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();

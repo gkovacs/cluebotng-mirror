@@ -45,7 +45,8 @@
 			Array(
 				'http' => Array(
 					'method'  => 'POST',
-					'content' => implode( '&', $parts )
+					'content' => implode( '&', $parts ),
+					'header'  => 'Content-Type: application/x-www-form-urlencoded'
 				)
 			)
 		);
