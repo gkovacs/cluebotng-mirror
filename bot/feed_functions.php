@@ -57,20 +57,20 @@
 							$stalkchannel = array();
 
 							foreach( Globals::$stalk as $key => $value )
-								if( myfnmatch( str_replace( '_', ' ', $key ), str_replace( '_', ' ', $change[ 'user' ] ) ) )
+								if( myfnmatch( str_replace( '_', ' ', $key ), str_replace( '_', ' ', $data[ 'user' ] ) ) )
 									$stalkchannel = array_merge( $stalkchannel, explode( ',', $value ) );
 
 							foreach( Globals::$edit as $key => $value )
-								if( myfnmatch( str_replace( '_', ' ', $key ), str_replace( '_', ' ', $change[ 'namespace' ] . $change[ 'title' ] ) ) )
+								if( myfnmatch( str_replace( '_', ' ', $key ), str_replace( '_', ' ', ( $data[ 'namespace' ] == 'Main:' ? '' : $data[ 'namespace' ] ) . $data[ 'title' ] ) ) )
 									$stalkchannel = array_merge( $stalkchannel, explode( ',', $value ) );
 
 							$stalkchannel = array_unique( $stalkchannel );
 
 							foreach( $stalkchannel as $chan )
 								IRC::send(
-									'PRIVMSG ' . $chan . ' :New edit: [[' . $change[ 'namespace' ] . $change[ 'title' ] . ']] http://en.wikipedia.org/w/index.php?title=' .
-									urlencode( $change[ 'namespace' ] . $change[ 'title' ] ) . '&diff=prev&oldid=' . urlencode( $change[ 'revid' ] ) . ' * ' . $change[ 'user' ] .
-									' * ' . $change[ 'comment' ]
+									'PRIVMSG ' . $chan . ' :New edit: [[' . ( $data[ 'namespace' ] == 'Main:' ? '' : $data[ 'namespace' ] ) . $data[ 'title' ] . ']] http://en.wikipedia.org/w/index.php?title=' .
+									urlencode( $data[ 'namespace' ] . $data[ 'title' ] ) . '&diff=prev&oldid=' . urlencode( $data[ 'revid' ] ) . ' * ' . $data[ 'user' ] .
+									' * ' . $data[ 'comment' ]
 								);
 
 							switch( $data[ 'namespace' ] . $data[ 'title' ] ) {
