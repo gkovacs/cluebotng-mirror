@@ -8,5 +8,7 @@
 		public static $run;
 		public static $wl;
 		public static $optin;
+		public static $edit;
+		public static $stalk;
 	}
 ?>

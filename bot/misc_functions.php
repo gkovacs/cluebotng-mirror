@@ -26,18 +26,21 @@
 		Globals::$optin = API::$q->getpage( 'User:' . Config::$user . '/Optin' );
 		Globals::$aoptin = API::$q->getpage( 'User:' . Config::$user . '/AngryOptin' );
 
+		Globals::$stalk = Array();
+		Globals::$edit = Array();
+
 		$tmp = explode( "\n", API::$q->getpage( 'User:' . Config::$owner . '/CBAutostalk.js' ) );
 		foreach( $tmp as $tmp2 )
 			if( substr( $tmp2, 0, 1 ) != '#' ) {
 				$tmp3 = explode( '|', $tmp2, 2 );
-				$stalk[ $tmp3[ 0 ] ] = trim( $tmp3[ 1 ] );
+				Globals::$stalk[ $tmp3[ 0 ] ] = trim( $tmp3[ 1 ] );
 			}
 			
 		$tmp = explode( "\n", API::$q->getpage( 'User:' . Config::$owner . '/CBAutoedit.js' ) );
 		foreach( $tmp as $tmp2 )
 			if( substr( $tmp2, 0, 1 ) != '#' ) {
 				$tmp3 = explode( '|', $tmp2, 2 );
-				$edit[ $tmp3[ 0 ] ] = trim( $tmp3[ 1 ] );
+				Globals::$edit[ $tmp3[ 0 ] ] = trim( $tmp3[ 1 ] );
 			}
 	}
 ?>

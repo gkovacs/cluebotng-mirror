@@ -53,7 +53,26 @@
 							
 							if( stripos( 'N', $data[ 'flags' ] ) !== false )
 								return;
-							
+
+							$stalkchannel = array();
+
+							foreach( Globals::$stalk as $key => $value )
+								if( myfnmatch( str_replace( '_', ' ', $key ), str_replace( '_', ' ', $change[ 'user' ] ) ) )
+									$stalkchannel = array_merge( $stalkchannel, explode( ',', $value ) );
+
+							foreach( Globals::$edit as $key => $value )
+								if( myfnmatch( str_replace( '_', ' ', $key ), str_replace( '_', ' ', $change[ 'namespace' ] . $change[ 'title' ] ) ) )
+									$stalkchannel = array_merge( $stalkchannel, explode( ',', $value ) );
+
+							$stalkchannel = array_unique( $stalkchannel );
+
+							foreach( $stalkchannel as $chan )
+								IRC::send(
+									'PRIVMSG ' . $chan . ' :New edit: [[' . $change[ 'namespace' ] . $change[ 'title' ] . ']] http://en.wikipedia.org/w/index.php?title=' .
+									urlencode( $change[ 'namespace' ] . $change[ 'title' ] ) . '&diff=prev&oldid=' . urlencode( $change[ 'revid' ] ) . ' * ' . $change[ 'user' ] .
+									' * ' . $change[ 'comment' ]
+								);
+
 							switch( $data[ 'namespace' ] . $data[ 'title' ] ) {
 								case 'User:' . Config::$user . '/Run':
 									Globals::$run = API::$q->getpage( 'User:' . Config::$user . '/Run' );
