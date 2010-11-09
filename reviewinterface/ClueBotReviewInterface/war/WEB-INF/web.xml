@@ -166,6 +166,16 @@
   	<url-pattern>/_ah/xmpp/message/chat/</url-pattern>
   </servlet-mapping>
   
+  <servlet>
+  	<servlet-name>apiServlet</servlet-name>
+  	<servlet-class>org.cluenet.cluebot.reviewinterface.server.APIImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>apiServlet</servlet-name>
+  	<url-pattern>/api</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>welcome</welcome-file>
