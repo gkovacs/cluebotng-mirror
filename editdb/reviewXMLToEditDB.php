@@ -29,10 +29,10 @@
 				$updates[] = '`isvandalism` = \'' . mysql_real_escape_string( $isVand ) . '\'';
 			if( $row[ 'isactive' ] != $isActive )
 				$updates[] = '`isactive` = \'' . mysql_real_escape_string( $isActive ) . '\'';
-			if( $row[ 'reviewers' ] != $isVand )
-				$updates[] = '`reviewers` = \'' . mysql_real_escape_string( $isVand ) . '\'';
-			if( $row[ 'reviewers_agreeing' ] != $isVand )
-				$updates[] = '`reviewers_agreeing` = \'' . mysql_real_escape_string( $isVand ) . '\'';
+			if( $row[ 'reviewers' ] != $reviewers )
+				$updates[] = '`reviewers` = \'' . mysql_real_escape_string( $reviewers ) . '\'';
+			if( $row[ 'reviewers_agreeing' ] != $reviewers_agreeing )
+				$updates[] = '`reviewers_agreeing` = \'' . mysql_real_escape_string( $reviewers_agreeing ) . '\'';
 			if( count( $updates ) > 0 ) {
 				echo 'Updating ' . $id . ' ...';
 				mysql_query( 'UPDATE `editset` SET ' . implode( ', ', $updates ) . ' WHERE `editid` = \'' . mysql_real_escape_string( $id ) . '\'' );
