@@ -176,8 +176,11 @@
 				and isset( $api[ 'revisions' ][ 1 ][ 'timestamp' ] )
 				and isset( $api[ 'revisions' ][ 1 ][ '*' ] )
 			)
-		)
+		) {
+			print_r( $cb );
+			print_r( $api );
 			die( 'API error.' );
+		}
 		
 		$data = Array(
 			'EditType' => 'change',
