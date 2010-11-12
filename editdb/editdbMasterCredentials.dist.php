@@ -1,5 +1,5 @@
 <?PHP
-	$mysqlhost = 'localhost';
-	$mysqluser = 'cbngdb';
-	$mysqlpass = '';
+	$mysqlmasterhost = 'localhost';
+	$mysqlmasteruser = 'cbngdb';
+	$mysqlmasterpass = '';
 ?>
