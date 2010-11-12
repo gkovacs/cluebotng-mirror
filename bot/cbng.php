@@ -177,6 +177,7 @@
 				and isset( $api[ 'revisions' ][ 1 ][ '*' ] )
 			)
 		) {
+			print_r( $feedData );
 			print_r( $cb );
 			print_r( $api );
 			die( 'API error.' );
