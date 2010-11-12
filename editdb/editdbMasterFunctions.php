@@ -9,6 +9,10 @@
 
 	function getMasterMySQL() {
 		global $mysqlmasteruser, $mysqlmasterpass, $mysqlmasterhost;
+		static $mysql = null;
+		
+		if( $mysql !== null )
+			return $mysql;
 		
 		$mysql = mysql_connect( $mysqlmasterhost, $mysqlmasteruser, $mysqlmasterpass );
 		if( !$mysql )
