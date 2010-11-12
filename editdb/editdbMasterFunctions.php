@@ -99,7 +99,10 @@
 		$query .= ' )';
 		
 		$ret = mysql_query( $query );
-		if( !$ret )
-			error( 'Error inserting ' . $id . ': ' . mysql_error() );
+		if( !$ret ) {
+			echo 'Error inserting ' . $id . ': ' . mysql_error();
+			return false;
+		}
+		return true;
 	}
 ?>
