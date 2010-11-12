@@ -21,8 +21,11 @@
 		
 		if( !$row ) {
 			echo 'Inserting ' . $id . ' ...';
-			insertEdit( $id, $isVand, $isActive, $reviewers, $reviewers_agreeing, $source );
-			echo ' Done.' . "\n";
+			$ret = insertEdit( $id, $isVand, $isActive, $reviewers, $reviewers_agreeing, $source );
+				if( $ret )
+					echo ' Done.' . "\n";
+				else
+					echo ' Failed.' . "\n";
 		} else {
 			$updates = Array();
 			if( $row[ 'isvandalism' ] != $isVand )
@@ -35,8 +38,11 @@
 				$updates[] = '`reviewers_agreeing` = \'' . mysql_real_escape_string( $reviewers_agreeing ) . '\'';
 			if( count( $updates ) > 0 ) {
 				echo 'Updating ' . $id . ' ...';
-				mysql_query( 'UPDATE `editset` SET ' . implode( ', ', $updates ) . ' WHERE `editid` = \'' . mysql_real_escape_string( $id ) . '\'' );
-				echo ' Done.' . "\n";
+				$ret = mysql_query( 'UPDATE `editset` SET ' . implode( ', ', $updates ) . ' WHERE `editid` = \'' . mysql_real_escape_string( $id ) . '\'' );
+				if( $ret )
+					echo ' Done.' . "\n";
+				else
+					echo ' Failed.' . "\n";
 			}
 		}
 	}

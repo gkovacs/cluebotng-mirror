@@ -28,8 +28,10 @@
 		$mysql = getMasterMySQL();
 		
 		$data = oldData( $id );
-		if( $data === false )
+		if( $data === false ) {
 			echo 'Bad revid.  Not inserted.';
+			return false;
+		}
 		
 		$query = 'INSERT INTO `editset` (
 				`edittype`,
