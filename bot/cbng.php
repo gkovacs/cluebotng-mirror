@@ -135,7 +135,7 @@
 		$change = Array(
 			'namespace' => namespace2name( $data[ 'ns' ] ),
 			'namespaceid' => $data[ 'ns' ],
-			'title' => $data[ 'title' ],
+			'title' => str_replace( namespace2name( $data[ 'ns' ] ) . ':', '', $data[ 'title' ] ),
 			'flags' => '',
 			'url' => '',
 			'revid' => $id,
