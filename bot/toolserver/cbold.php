@@ -29,7 +29,7 @@
 	if( long2ip( ip2long( $user ) ) == $user )
 		$stmt->bind_param( /*'isiiisiisisiissi'*/ 'ssssssssssssssss', $namespace, $title, $recent, $timestamp, $namespace, $title, $recent, $timestamp, $userPage, $timestamp, $user, $timestamp, $namespace, $title, $user, $timestamp );
 	else
-		$stmt->bind_param( /*'isiiisiisisiissi'*/ 'ssssssssssssssss', $namespace, $title, $recent, $timestamp, $namespace, $title, $recent, $timestamp, $userPage, $timestamp, $user, $timestamp, $namespace, $title, $user, $timestamp, $user );
+		$stmt->bind_param( /*'isiiisiisisiissi'*/ 'sssssssssssssssss', $namespace, $title, $recent, $timestamp, $namespace, $title, $recent, $timestamp, $userPage, $timestamp, $user, $timestamp, $namespace, $title, $user, $timestamp, $user );
 	$stmt->execute();
 	$stmt->bind_result( $time, $creator, $recentEdits, $recentReverts, $warnings, $distinctPages, $editCount, $regTime );
 	$stmt->fetch();
