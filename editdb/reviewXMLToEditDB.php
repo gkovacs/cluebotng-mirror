@@ -24,7 +24,6 @@
 			insertEdit( $id, $isVand, $isActive, $reviewers, $reviewers_agreeing, $source );
 			echo ' Done.' . "\n";
 		} else {
-			echo 'Updating ' . $id . ' ...';
 			$updates = Array();
 			if( $row[ 'isvandalism' ] != $isVand )
 				$updates[] = '`isvandalism` = \'' . mysql_real_escape_string( $isVand ) . '\'';
@@ -34,9 +33,11 @@
 				$updates[] = '`reviewers` = \'' . mysql_real_escape_string( $isVand ) . '\'';
 			if( $row[ 'reviewers_agreeing' ] != $isVand )
 				$updates[] = '`reviewers_agreeing` = \'' . mysql_real_escape_string( $isVand ) . '\'';
-			if( count( $updates ) > 0 )
+			if( count( $updates ) > 0 ) {
+				echo 'Updating ' . $id . ' ...';
 				mysql_query( 'UPDATE `editset` SET ' . implode( ', ', $updates ) . ' WHERE `editid` = \'' . mysql_real_escape_string( $id ) . '\'' );
-			echo ' Done.' . "\n";
+				echo ' Done.' . "\n";
+			}
 		}
 	}
 	
