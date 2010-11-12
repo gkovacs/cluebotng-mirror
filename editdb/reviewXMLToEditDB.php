@@ -1,4 +1,6 @@
 <?PHP
+	include 'editdbMasterFunctions.php';
+
 	function processEdit( &$stack, &$frame ) {
 		$id = $frame[ 'ID' ];
 		$isVand = $frame[ 'RealClassification' ] == 'V' ? 1 : 0;
@@ -13,8 +15,29 @@
 		foreach( $stack as &$stackFrame )
 			if( isset( $stackFrame[ 'Name' ] ) )
 				$source = $stackFrame[ 'Name' ];
-			
-		echo $id . ' | ' . $isVand . ' | ' . $isActive . ' | ' . $reviewers . ' | ' . $reviewers_agreeing . ' | ' . $source . "\n";
+		
+		$mysql = getMasterMySQL();
+		$row = mysql_fetch_assoc( mysql_query( 'SELECT `isvandalism`, `isactive`, `reviewers`, `reviewers_agreeing` FROM `editset` WHERE `editid` = \'' . mysql_real_escape_string( $id ) . '\'' ) );
+		
+		if( !$row ) {
+			echo 'Inserting ' . $id . ' ...';
+			insertEdit( $id, $isVand, $isActive, $reviewers, $reviewers_agreeing, $source );
+			echo ' Done.' . "\n";
+		} else {
+			echo 'Updating ' . $id . ' ...';
+			$updates = Array();
+			if( $row[ 'isvandalism' ] != $isVand )
+				$updates[] = '`isvandalism` = \'' . mysql_real_escape_string( $isVand ) . '\'';
+			if( $row[ 'isactive' ] != $isActive )
+				$updates[] = '`isactive` = \'' . mysql_real_escape_string( $isActive ) . '\'';
+			if( $row[ 'reviewers' ] != $isVand )
+				$updates[] = '`reviewers` = \'' . mysql_real_escape_string( $isVand ) . '\'';
+			if( $row[ 'reviewers_agreeing' ] != $isVand )
+				$updates[] = '`reviewers_agreeing` = \'' . mysql_real_escape_string( $isVand ) . '\'';
+			if( count( $updates ) > 0 )
+				mysql_query( 'UPDATE `editset` SET ' . implode( ', ', $updates ) . ' WHERE `editid` = \'' . mysql_real_escape_string( $id ) . '\'' );
+			echo ' Done.' . "\n";
+		}
 	}
 	
 	function processXML( &$xml, &$stack, $name ) {
