@@ -131,6 +131,8 @@
 		/* namespace, namespaceid, title, flags, url, revid, old_revid, user, length, comment, timestamp */
 		ini_set( 'user_agent', 'ClueBot/2.0 (Training EditDB Scraper)' );
 		$data = unserialize( file_get_contents( 'http://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=timestamp|user|comment&format=php&revids=' . urlencode( $id ) ) );
+		if( isset( $data[ 'query' ][ 'badrevids' ] ) )
+			return false;
 		$data = current( $data[ 'query' ][ 'pages' ] );
 		$change = Array(
 			'namespace' => namespace2name( $data[ 'ns' ] ),
@@ -250,6 +252,8 @@
 	
 	function oldData( $id ) {
 		$feedData = genOldFeedData( $id );
+		if( $feedData === false )
+			return false;
 		$feedData = parseFeedData( $feedData, true );
 		$feedData = $feedData[ 'all' ];
 		return $feedData;
