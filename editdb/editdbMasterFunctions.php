@@ -90,6 +90,8 @@
 		$query .= implode( ',', $escaped );
 		$query .= ' )';
 		
-		return mysql_query( $query );
+		$ret = mysql_query( $query );
+		if( !$ret )
+			error( 'Error inserting ' . $id . ': ' . mysql_error() );
 	}
 ?>
