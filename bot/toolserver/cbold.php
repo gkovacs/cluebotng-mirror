@@ -22,11 +22,14 @@
 	if( long2ip( ip2long( $user ) ) == $user )
 		$query .= 'SELECT COUNT(*) AS `user1_editcount`, UNIX_TIMESTAMP() AS `user_registration` FROM `revision` WHERE `rev_user_text` = ? AND `rev_timestamp` < ?';
 	else
-		$query .= 'SELECT COUNT(*) AS `user1_editcount`, `user_registration` FROM `user` JOIN `revision` ON `user_id` = `rev_user` WHERE `user_name` = ? AND `rev_timestamp` < ? GROUP BY `user_registration`';
+		$query .= 'SELECT COUNT(*) AS `user1_editcount` FROM `user` JOIN `revision` ON `user_id` = `rev_user` WHERE `user_name` = ? AND `rev_timestamp` < ?) as `c`, ( SELECT `user_registration` FROM `user` WHERE `user_name` = ?';
 	$query .= ') AS `b`';
 	
 	$stmt = $db->prepare( $query );
-	$stmt->bind_param( /*'isiiisiisisiissi'*/ 'ssssssssssssssss', $namespace, $title, $recent, $timestamp, $namespace, $title, $recent, $timestamp, $userPage, $timestamp, $user, $timestamp, $namespace, $title, $user, $timestamp );
+	if( long2ip( ip2long( $user ) ) == $user )
+		$stmt->bind_param( /*'isiiisiisisiissi'*/ 'ssssssssssssssss', $namespace, $title, $recent, $timestamp, $namespace, $title, $recent, $timestamp, $userPage, $timestamp, $user, $timestamp, $namespace, $title, $user, $timestamp );
+	else
+		$stmt->bind_param( /*'isiiisiisisiissi'*/ 'ssssssssssssssss', $namespace, $title, $recent, $timestamp, $namespace, $title, $recent, $timestamp, $userPage, $timestamp, $user, $timestamp, $namespace, $title, $user, $timestamp, $user );
 	$stmt->execute();
 	$stmt->bind_result( $time, $creator, $recentEdits, $recentReverts, $warnings, $distinctPages, $editCount, $regTime );
 	$stmt->fetch();
