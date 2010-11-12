@@ -74,7 +74,7 @@
 			$data[ 'current' ][ 'text' ],
 			$data[ 'previous' ][ 'timestamp' ],
 			$data[ 'previous' ][ 'text' ],
-			$isVandal ? 1 : 0,
+			$isVand ? 1 : 0,
 			$isActive ? 1 : 0,
 			$source,
 			$reviewers,
