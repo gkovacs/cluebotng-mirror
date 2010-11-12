@@ -150,7 +150,7 @@
 		return $change;
 	}
 	
-	function parseFeedData( $feedData, $useOld = false ) {
+	function parseFeedData( $feedData, $useOld = false, $pleasedontdie = false ) {
 		$startTime = microtime( true );
 		
 		$urls = Array(
@@ -182,7 +182,9 @@
 			print_r( $feedData );
 			print_r( $cb );
 			print_r( $api );
-			die( 'API error.' );
+			if( !$pleasedontdie )
+				die( 'API error.' );
+			return false;
 		}
 		
 		$data = Array(
@@ -254,7 +256,9 @@
 		$feedData = genOldFeedData( $id );
 		if( $feedData === false )
 			return false;
-		$feedData = parseFeedData( $feedData, true );
+		$feedData = parseFeedData( $feedData, true, true );
+		if( $feedData === false )
+			return false;
 		$feedData = $feedData[ 'all' ];
 		return $feedData;
 	}
