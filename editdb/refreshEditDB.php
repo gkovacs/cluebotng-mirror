@@ -1,15 +1,23 @@
 <?PHP
 	include 'editdbMasterFunctions.php';
 	
-	function compareArray( $arr1, $arr2 ) {
-		if( !is_array( $arr1 ) or !is_array( $arr2 ) )
+	function compareArray( $arr1, $arr2, $path = '' ) {
+		if( !is_array( $arr1 ) or !is_array( $arr2 ) ) {
+			if( $arr1 != $arr2 )
+				echo 'Mismatch at ' . $path . '.  Not Equal.  ';
 			return $arr1 == $arr2;
+		}
+		
 		foreach( $arr1 as $key => $value )
 			if( isset( $arr2[ $key ] ) ) {
-				if( !compareArray( $value, $arr2[ $key ] ) )
+				if( !compareArray( $value, $arr2[ $key ], $path . '->' . $key ) ) {
+					echo 'Mismatch at ' . $path . '.  compareArray() returned false.  ';
 					return false;
-			} else
+				}
+			} else {
+				echo 'Mismatch at ' . $path . '.  No corrisponding key.  ';
 				return false;
+			}
 		
 		return true;
 	}

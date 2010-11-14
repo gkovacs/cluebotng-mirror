@@ -144,7 +144,7 @@
 			'old_revid' => '',
 			'user' => $data[ 'revisions' ][ 0 ][ 'user' ],
 			'length' => '',
-			'comment' => $data[ 'revisions' ][ 0 ][ 'comment' ],
+			'comment' => isset( $data[ 'revisions' ][ 0 ][ 'comment' ] ) ? $data[ 'revisions' ][ 0 ][ 'comment' ] : '',
 			'timestamp' => strtotime( $data[ 'revisions' ][ 0 ][ 'timestamp' ] )
 		);
 		return $change;
