@@ -1,10 +1,10 @@
 <?PHP
 	include 'editdbMasterFunctions.php';
 	
-	function compareArray( $arr1, $arr2, $path = '' ) {
+	function compareArray( $arr1, $arr2, $path = 'root' ) {
 		if( !is_array( $arr1 ) or !is_array( $arr2 ) ) {
 			if( $arr1 != $arr2 )
-				echo 'Mismatch at ' . $path . '.  Not Equal.  ';
+				echo 'Mismatch at ' . $path . '.  ' . $arr1 ' != ' . $arr2 . '.  ';
 			return $arr1 == $arr2;
 		}
 		
