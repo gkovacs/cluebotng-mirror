@@ -39,7 +39,7 @@
 
 			//IRC::say( 'debugchannel', 'Possible vandalism: ' . $change[ 'title' ] . ' changed by ' . $change[ 'user' ] . ' ' . $reason . '(' . $s . ')' );
 			//IRC::say( 'debugchannel', '( http://en.wikipedia.org/w/index.php?title=' . urlencode( $change[ 'title' ] ) . '&action=history | ' . $change[ 'url' ] . ' )' );
-			$ircreport = "\x0315[[\x0307" . $change[ 'title' ] . "\x0315]] by \"\x0303" . $change[ 'user' ] . "\x0315\" (\x0312 " . $change[ 'url' ] . " \x0315) \x0306" . $s . "\x0315 (\x0304";
+			$ircreport = "\x0315[[\x0307" . $change[ 'title' ] . "\x0315]] by \"\x0303" . $change[ 'user' ] . "\x0315\" (\x0312 " . $change[ 'url' ] . " \x0315) \x0306" . $s . "\x0315 (";
 
 			$query = 'INSERT INTO `vandalism` ' .
 				'(`id`,`user`,`article`,`heuristic`' . ( ( is_array( $log ) ) ? ',`regex`' : '' ) . ',`reason`,`diff`,`old_id`,`new_id`,`reverted`) ' .
@@ -65,7 +65,7 @@
 				$rbret = Action::doRevert( $change );
 				if ($rbret !== false) {
 					//IRC::say( 'debugchannel', 'Reverted. (' . ( microtime( true ) - $change[ 'startTime' ] ) . ' s)' );
-					IRC::say( 'debugchannel', $ircreport . "Reverted.\x0315) (\x0313" . $revertReason . "\x0315) (\x0302" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
+					IRC::say( 'debugchannel', $ircreport . "\x0304Reverted.\x0315) (\x0313" . $revertReason . "\x0315) (\x0302" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
 					Action::doWarn( $change, $report );
 					checkMySQL();
 					mysql_query( 'UPDATE `vandalism` SET `reverted` = 1 WHERE `id` = \'' . mysql_real_escape_string( $change[ 'mysqlid' ] ) . '\'' );
@@ -73,13 +73,13 @@
 					$rv2 = API::$a->revisions( $change[ 'title' ], 1 );
 					if( $change[ 'user' ] != $rv2[ 0 ][ 'user' ] ) {
 						//IRC::say( 'debugchannel', 'Grr! Beaten by ' . $rv2[ 0 ][ 'user' ] );
-						IRC::say( 'debugchannel', $ircreport . "Not Reverted. \x0315) (\x0313Beaten by " . $rv2[ 0 ][ 'user' ] . "\x0315) (\x0302" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
+						IRC::say( 'debugchannel', $ircreport . "\x0303Not Reverted. \x0315) (\x0313Beaten by " . $rv2[ 0 ][ 'user' ] . "\x0315) (\x0302" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
 						checkMySQL();
 						mysql_query( 'INSERT INTO `beaten` (`id`,`article`,`diff`,`user`) VALUES (NULL,\'' . mysql_real_escape_string( $change['title'] ) . '\',\'' . mysql_real_escape_string( $change[ 'url' ] ) . '\',\'' . mysql_real_escape_string( $rv2[ 0 ][ 'user' ] ) . '\')' );
 					}
 				}
 			} else
-				IRC::say( 'debugchannel', $ircreport . "Not Reverted. \x0315) (\x0313" . $revertReason . "\x0315) (\x0302" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
+				IRC::say( 'debugchannel', $ircreport . "\x0303Not Reverted. \x0315) (\x0313" . $revertReason . "\x0315) (\x0302" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
 		}
 		
 		public static function processEdit( $change ) {
