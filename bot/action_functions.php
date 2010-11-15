@@ -83,7 +83,7 @@
 					$revid = $revdata[ 'revid' ];
 					break;
 				}
-			if( ( $revdata[ 'user' ] == $user ) or ( in_array( $revdata[ 'user' ], explode( ',', Config::$friends ) ) ) )
+			if( ( $revdata[ 'user' ] == Config::$user ) or ( in_array( $revdata[ 'user' ], explode( ',', Config::$friends ) ) ) )
 				return false;
 			IRC::say( 'debugchannel', 'Reverting ...' );
 			if( Config::$dry )
