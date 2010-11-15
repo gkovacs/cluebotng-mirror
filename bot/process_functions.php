@@ -65,7 +65,7 @@
 				$rbret = Action::doRevert( $change );
 				if ($rbret !== false) {
 					//IRC::say( 'debugchannel', 'Reverted. (' . ( microtime( true ) - $change[ 'startTime' ] ) . ' s)' );
-					IRC::say( 'debugchannel', $ircreport . "Reverted.\x0315) (\x0313" . $revertReason . "\x0315) (\x0313" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
+					IRC::say( 'debugchannel', $ircreport . "Reverted.\x0315) (\x0313" . $revertReason . "\x0315) (\x0302" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
 					Action::doWarn( $change, $report );
 					checkMySQL();
 					mysql_query( 'UPDATE `vandalism` SET `reverted` = 1 WHERE `id` = \'' . mysql_real_escape_string( $change[ 'mysqlid' ] ) . '\'' );
@@ -73,13 +73,13 @@
 					$rv2 = API::$a->revisions( $change[ 'title' ], 1 );
 					if( $change[ 'user' ] != $rv2[ 0 ][ 'user' ] ) {
 						//IRC::say( 'debugchannel', 'Grr! Beaten by ' . $rv2[ 0 ][ 'user' ] );
-						IRC::say( 'debugchannel', $ircreport . "Not Reverted. \x0315) (\x0313Beaten by " . $rv2[ 0 ][ 'user' ] . "\x0315) (\x0313" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
+						IRC::say( 'debugchannel', $ircreport . "Not Reverted. \x0315) (\x0313Beaten by " . $rv2[ 0 ][ 'user' ] . "\x0315) (\x0302" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
 						checkMySQL();
 						mysql_query( 'INSERT INTO `beaten` (`id`,`article`,`diff`,`user`) VALUES (NULL,\'' . mysql_real_escape_string( $change['title'] ) . '\',\'' . mysql_real_escape_string( $change[ 'url' ] ) . '\',\'' . mysql_real_escape_string( $rv2[ 0 ][ 'user' ] ) . '\')' );
 					}
 				}
 			} else
-				IRC::say( 'debugchannel', $ircreport . "Not Reverted. \x0315) (\x0313" . $revertReason . "\x0315) (\x0313" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
+				IRC::say( 'debugchannel', $ircreport . "Not Reverted. \x0315) (\x0313" . $revertReason . "\x0315) (\x0302" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
 		}
 		
 		public static function processEdit( $change ) {
