@@ -223,8 +223,8 @@
 	
 	function toXML( $data ) {
 		$xml = xmlize( $data );
-		$totalTime = microtime( true ) - $startTime;
-		$xml .= '<!-- Processing time = ' . $totalTime . 's -->';
+//		$totalTime = microtime( true ) - $startTime;
+//		$xml .= '<!-- Processing time = ' . $totalTime . 's -->';
 		return $xml;
 	}
 	
