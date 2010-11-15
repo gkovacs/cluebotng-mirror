@@ -8,6 +8,9 @@
 		public static $pass;
 		
 		public static function split( $message ) {
+			if( !$message )
+				return null;
+			
 			$return = Array();
 			$i = 0;
 			$quotes = false;
@@ -76,6 +79,8 @@
 		
 		private static function loop( $data ) {
 			$d = self::split( $data );
+			if( $d === null )
+				return;
 			if( $d[ 'type' ] == 'direct' )
 				switch( $d[ 'command' ] ) {
 					case 'ping':

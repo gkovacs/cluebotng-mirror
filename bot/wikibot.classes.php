@@ -224,21 +224,28 @@
 			if (isset($this->tokencache[$title]) && (!$flush)) {
 				return $this->tokencache[$title]['tokens'];
 			} else {
-				$tokens = array();
 				$x = $this->http->get($this->apiurl.'?action=query&format=php&prop=info&intoken=edit|delete|protect|move|block|unblock|email&titles='.urlencode($title));
 				$x = unserialize($x);
 				foreach ($x['query']['pages'] as $y) {
-					$tokens['edittoken'] = $y['edittoken'];
-					$tokens['deletetoken'] = $y['deletetoken'];
-					$tokens['protecttoken'] = $y['protecttoken'];
-					$tokens['movetoken'] = $y['movetoken'];
-					$tokens['blocktoken'] = $y['blocktoken'];
-					$tokens['unblocktoken'] = $y['unblocktoken'];
-					$tokens['emailtoken'] = $y['emailtoken'];
+					$tokens = array();
+					if( isset( $y[ 'edittoken' ] ) )
+						$tokens['edittoken'] = $y['edittoken'];
+					if( isset( $y[ 'deletetoken' ] ) )
+						$tokens['deletetoken'] = $y['deletetoken'];
+					if( isset( $y[ 'protecttoken' ] ) )
+						$tokens['protecttoken'] = $y['protecttoken'];
+					if( isset( $y[ 'movetoken' ] ) )
+						$tokens['movetoken'] = $y['movetoken'];
+					if( isset( $y[ 'blocktoken' ] ) )
+						$tokens['blocktoken'] = $y['blocktoken'];
+					if( isset( $y[ 'unblocktoken' ] ) )
+						$tokens['unblocktoken'] = $y['unblocktoken'];
+					if( isset( $y[ 'emailtoken' ] ) )
+						$tokens['emailtoken'] = $y['emailtoken'];
 					$this->tokencache[$title] = array(
 							'timestamp' => time(),
 							'tokens' => $tokens
-									 );
+					);
 					return $tokens;
 				}
 			}

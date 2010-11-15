@@ -3,6 +3,7 @@
 	
 	$convert = Array
 		(
+			'special'	=> -1,	'media'		=> -2,
 			'main'		=> 0,	'talk'		=> 1,
 			'user'		=> 2,	'user talk'	=> 3,
 			'wikipedia'	=> 4,	'wikipedia talk'=> 5,

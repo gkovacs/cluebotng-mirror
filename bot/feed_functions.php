@@ -30,6 +30,9 @@
 		private static function loop( $line ) {
 			$d = IRC::split( $line );
 			
+			if( $d === null )
+				return;
+			
 			if( $d[ 'type' ] == 'direct' )
 				switch( $d[ 'command' ] ) {
 					case 'ping':

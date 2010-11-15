@@ -11,6 +11,9 @@
 			
 			$reason = 'ANN scored at ' . $s;
 			
+			$heuristic = '';
+			$log = null;
+			
 			$diff = 'http://en.wikipedia.org/w/index.php' .
 				'?title=' . urlencode( $change[ 'title' ] ) .
 				'&diff=' . urlencode( $change[ 'revid' ] ) .
