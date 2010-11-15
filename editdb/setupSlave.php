@@ -62,7 +62,7 @@
 	system( 'mysql -h ' . escapeshellarg( $host ) . ' -u ' . escapeshellarg( $user ) . ( $pass == '' ? '' : ' -p' . escapeshellarg( $pass ) ) . ' < cbngslave.sql' );
 	write( ' Done.' . "\n" );
 	
-	if( mysql_select_db( 'cbng_editdb', $mysql ) )
+	if( !mysql_select_db( 'cbng_editdb', $mysql ) )
 		error( 'I could not find the database that was supposed to have been created.' . "\n" );
 	
 	write( 'Now, we will need to populate the database.' . "\n" );
@@ -77,7 +77,7 @@
 	do {
 		$retry = false;
 		if( strtolower( prompt( 'Do you have a bootstrap file [Y/n]? ' ) ) != 'n' ) {
-			write( 'If it is compressed, you need to decompress it before continuing.' );
+			write( 'If it is compressed, you need to decompress it before continuing.' . "\n" );
 			$filename = prompt( 'Where is this file (path)? ' );
 			if( !file_exists( $filename ) ) {
 				$retry = true;
@@ -85,7 +85,7 @@
 			}
 			
 			write( 'Importing bootstrap file ...' );
-			system( 'mysql -h ' . escapeshellarg( $host ) . ' -u ' . escapeshellarg( $user ) . ( $pass == '' ? '' : ' -p' . escapeshellarg( $pass ) ) . ' < ' . escapeshellarg( $filename ) );
+			system( 'mysql -h ' . escapeshellarg( $host ) . ' -u ' . escapeshellarg( $user ) . ( $pass == '' ? '' : ' -p' . escapeshellarg( $pass ) ) . ' cbng_editdb < ' . escapeshellarg( $filename ) );
 			write( ' Done.' . "\n" );
 			
 			write( 'Adjusting timestamps ...' );
