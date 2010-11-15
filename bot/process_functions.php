@@ -65,7 +65,7 @@
 				$rbret = Action::doRevert( $change );
 				if ($rbret !== false) {
 					//IRC::say( 'debugchannel', 'Reverted. (' . ( microtime( true ) - $change[ 'startTime' ] ) . ' s)' );
-					IRC::say( 'debugchannel', $ircreport . "Reverted. \x0315 ) (\x0313" . $revertReason . "\x0315) (\x0313" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
+					IRC::say( 'debugchannel', $ircreport . "Reverted.\x0315) (\x0313" . $revertReason . "\x0315) (\x0313" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
 					Action::doWarn( $change, $report );
 					checkMySQL();
 					mysql_query( 'UPDATE `vandalism` SET `reverted` = 1 WHERE `id` = \'' . mysql_real_escape_string( $change[ 'mysqlid' ] ) . '\'' );
