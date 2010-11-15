@@ -85,7 +85,7 @@
 				}
 			if( ( $revdata[ 'user' ] == Config::$user ) or ( in_array( $revdata[ 'user' ], explode( ',', Config::$friends ) ) ) )
 				return false;
-			IRC::say( 'debugchannel', 'Reverting ...' );
+			//IRC::say( 'debugchannel', 'Reverting ...' );
 			if( Config::$dry )
 				return true;
 			$rbret = API::$a->rollback(
@@ -123,17 +123,17 @@
 			if( preg_match( '/(assisted|manual)/iS', Config::$status ) ) {
 				echo 'Revert [y/N]? ';
 				if( strtolower( substr( fgets( Globals::$stdin, 3 ), 0, 1 ) ) != 'y' )
-					return false;
+					return Array( false, 'Manual mode says no' );
 			}
 			
 			if( !preg_match( '/(yes|enable|true)/iS', Globals::$run ) )
-				return false;
+				return Array( false, 'Run disabled' );
 			
 			if( $change[ 'user' ] == Config::$user )
-				return false;
+				return Array( false, 'User is myself' );
 			
 			if( Config::$angry )
-				return true;
+				return Array( true, 'Angry-reverting in angry mode' );
 			if( ( time() - Globals::$tfas ) >= 1800 ) {
 				if( preg_match( '/\(\'\'\'\[\[([^|]*)\|more...\]\]\'\'\'\)/iU', API::$q->getpage( 'Wikipedia:Today\'s featured article/' . date( 'F j, Y' ) ), $tfam ) ) {
 					Globals::$tfas = time();
@@ -142,19 +142,19 @@
 			}
 			
 			if( !self::findAndParseBots( $change ) )
-				return false;
+				return Array( false, 'Exclusion compliance' );
 			
 			if( $change[ 'all' ][ 'user' ] == $change[ 'all' ][ 'common' ][ 'creator' ] )
-				return false;
+				return Array( false, 'User is creator' );
 				
 			if( $change[ 'all' ][ 'user_edit_count' ] > 50 )
-				return false;
+				return Array( false, 'User has edit count' );
 			
 			if( Globals::$tfa == $change[ 'title' ] )
-				return true;
+				return Array( true, 'Angry-reverting on TFA' );
 			if( preg_match( '/\* \[\[('. preg_quote( $change[ 'title' ], '/' ) . ')\]\] \- .*/i', Globals::$aoptin ) ) {
 				IRC::say( 'debugchannel', 'Angry-reverting [[' . $change[ 'title' ] . ']].' );
-				return true;
+				return Array( true, 'Angry-reverting on angry-optin' );
 			}
 			$titles = unserialize( file_get_contents( 'titles.txt' ) );
 			if(
@@ -163,9 +163,9 @@
 			) {
 				$titles[ $change[ 'title' ] . $change[ 'user' ] ] = time();
 				file_put_contents( 'titles.txt', serialize( $titles ) );
-				return true;
+				return Array( true, 'Default revert' );
 			}
-			return false;
+			return Array( false, 'Reverted before' );
 		}
 		
 		public static function isWhitelisted( $user ) {
