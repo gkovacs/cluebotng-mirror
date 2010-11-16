@@ -120,6 +120,7 @@
 		}
 		
 		public static function shouldRevert( $change ) {
+			$reason = 'Default revert';
 			if( preg_match( '/(assisted|manual)/iS', Config::$status ) ) {
 				echo 'Revert [y/N]? ';
 				if( strtolower( substr( fgets( Globals::$stdin, 3 ), 0, 1 ) ) != 'y' )
@@ -148,7 +149,10 @@
 				return Array( false, 'User is creator' );
 				
 			if( $change[ 'all' ][ 'user_edit_count' ] > 50 )
-				return Array( false, 'User has edit count' );
+				if( $change[ 'all' ][ 'user_warns' ] / $change[ 'all' ][ 'user_edit_count' ] < 0.1 )
+					return Array( false, 'User has edit count' );
+				else
+					$reason = 'User has edit count, but warns > 10%';
 			
 			if( Globals::$tfa == $change[ 'title' ] )
 				return Array( true, 'Angry-reverting on TFA' );
@@ -163,7 +167,7 @@
 			) {
 				$titles[ $change[ 'title' ] . $change[ 'user' ] ] = time();
 				file_put_contents( 'titles.txt', serialize( $titles ) );
-				return Array( true, 'Default revert' );
+				return Array( true, $reason );
 			}
 			return Array( false, 'Reverted before' );
 		}
