@@ -91,6 +91,8 @@
 				switch( $d[ 'command' ] ) {
 					case '376':
 					case '422':
+						if( isset( Config::$oper ) )
+							self::send( 'OPER ' . Config::$oper );
 						print_r( self::$chans );
 						foreach( self::$chans as $chans )
 							self::send( 'JOIN ' . $chans );
