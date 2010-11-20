@@ -108,6 +108,16 @@
   
   
   <filter>
+    <filter-name>jdo</filter-name>
+    <filter-class>org.cluenet.cluebot.reviewinterface.server.JDOFilter</filter-class>
+  </filter>
+  
+  <filter-mapping>
+    <filter-name>jdo</filter-name>
+    <url-pattern>*</url-pattern>
+  </filter-mapping>
+  
+  <filter>
     <filter-name>requireAdmin</filter-name>
     <filter-class>org.cluenet.cluebot.reviewinterface.server.Authentication</filter-class>
     <init-param>

@@ -31,17 +31,15 @@ public class AdminServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public void createEditGroup( String name, Integer weight, Integer required, List< org.cluenet.cluebot.reviewinterface.shared.Edit > edits ) throws IllegalArgumentException {
-		List< Edit > list = new ArrayList< Edit >();
-		EditGroup eg = new EditGroup( name, list, weight );
+		EditGroup eg = new EditGroup( name, weight );
 		String key = KeyFactory.keyToString( eg.getKey() );
 		
 		addEditsToEditGroup( key, required, edits );
 	}
 
 	@Override
-	public void createUser( String nick, String email, Boolean isAdmin, Boolean sendEmail ) throws IllegalArgumentException {
-		Persist.unuse();
-		new User( nick, new Email( email ), isAdmin );
+	public void createUser( String nick, String email, Boolean isAdmin, Boolean sendEmail, Integer count ) throws IllegalArgumentException {
+		new User( nick, new Email( email ), isAdmin, count );
 		if( sendEmail ) {
 			Properties props = new Properties();
 	        Session session = Session.getDefaultInstance( props, null );
@@ -78,7 +76,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public org.cluenet.cluebot.reviewinterface.shared.EditGroup getEditGroup( String key, Integer editStart, Integer editCount, Integer reviewStart, Integer reviewCount, Integer doneStart, Integer doneCount ) throws IllegalArgumentException {
-		return EditGroup.findByKey( key ).getClientClass( editStart, editStart + editCount, reviewStart, reviewStart + reviewCount, doneStart, doneStart + doneCount );
+		return EditGroup.findByKey( key ).getClientClass( editStart, editCount, reviewStart, reviewCount, doneStart, doneCount );
 	}
 
 	@Override
@@ -99,17 +97,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public void setAdmin( String key, Boolean isAdmin ) throws IllegalArgumentException {
-		try {
-			Transaction.begin();
-			
-			User.findByKey( key ).setAdmin( isAdmin );
-			
-			Transaction.end();
-		} catch( Exception e ) {
-			throw new IllegalArgumentException( e.getMessage() );
-		} finally {
-			Transaction.fin();
-		}
+		User.findByKey( key ).setAdmin( isAdmin );
 	}
 
 	@Override
@@ -131,9 +119,7 @@ public class AdminServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public void setNick( String key, String nick ) throws IllegalArgumentException {
-		Transaction.begin();
 		User.findByKey( key ).setNick( nick );
-		Transaction.end();
 	}
 
 	@Override

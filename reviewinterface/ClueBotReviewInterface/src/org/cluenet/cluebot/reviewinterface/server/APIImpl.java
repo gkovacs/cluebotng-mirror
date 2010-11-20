@@ -69,10 +69,6 @@ public class APIImpl extends HttpServlet {
 		id.appendChild( doc.createTextNode( edit.getId().toString() ) );
 		element.appendChild( id );
 		
-		Element weight = doc.createElement( "Weight" );
-		weight.appendChild( doc.createTextNode( edit.getWeight().toString() ) );
-		element.appendChild( weight );
-		
 		Element required = doc.createElement( "Required" );
 		required.appendChild( doc.createTextNode( edit.getRequired().toString() ) );
 		element.appendChild( required );
@@ -90,7 +86,7 @@ public class APIImpl extends HttpServlet {
 		element.appendChild( vandalism );
 		
 		Element classification = doc.createElement( "Classification" );
-		classification.appendChild( doc.createTextNode( edit.getClassification().toString() ) );
+		classification.appendChild( doc.createTextNode( edit.getKnown().toString() ) );
 		element.appendChild( classification );
 		
 		Element comments = doc.createElement( "Comments" );

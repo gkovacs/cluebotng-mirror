@@ -28,9 +28,7 @@ public class EditDoneQueueImpl extends HttpServlet {
 		
 		Edit edit = Edit.findByKey( eKey );
 		
-		Transaction.begin();
 		EditGroup eg = EditGroup.findByKey( egKey );
 		eg.updateEditState( edit );
-		Transaction.end();
 	}
 }

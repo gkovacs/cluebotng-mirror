@@ -7,13 +7,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.EntityManager;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Query;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Email;
 import com.google.appengine.api.datastore.Key;
@@ -24,37 +23,39 @@ import com.google.appengine.api.datastore.KeyFactory;
  * @author cobi
  *
  */
-@Entity
+@PersistenceCapable(detachable="true")
 public class User extends Persist implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -1480988301383776284L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@PrimaryKey
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key key;
 	
-	@Basic
+	@Persistent
 	private Email email;
 	
-	@Basic
+	@Persistent
 	private Boolean admin = false;
 	
-	@Basic
+	@Persistent
 	private String nick = null;
 	
-	@Basic
+	@Persistent
 	private Integer classifications = 0;
 	
 	
 	/**
+	 * @param count 
 	 * 
 	 */
-	public User( String nick, Email email, Boolean admin ) {
+	public User( String nick, Email email, Boolean admin, Integer count ) {
 		this.nick = nick;
 		this.email = email;
 		this.admin = admin;
+		this.classifications = count;
 		this.store();
 	}
 
@@ -74,7 +75,7 @@ public class User extends Persist implements Serializable {
 	
 	public void setNick( String nick ) {
 		this.nick = nick;
-		this.merge();
+		this.store();
 	}
 
 	public Boolean isAdmin() {
@@ -83,7 +84,7 @@ public class User extends Persist implements Serializable {
 	
 	public void setAdmin( Boolean admin ) {
 		this.admin = admin;
-		this.merge();
+		this.store();
 	}
 	
 	public Integer getClassifications() {
@@ -96,7 +97,7 @@ public class User extends Persist implements Serializable {
 	
 	public void incClassifications() {
 		classifications++;
-		this.merge();
+		this.store();
 	}
 	
 	/**
@@ -118,17 +119,7 @@ public class User extends Persist implements Serializable {
 	}
 
 
-	@Override
-	public void merge() {
-		super.merge();
-		try {
-			TheCache.cache().put( "User-Email-" + this.email.toString(), this );
-		} catch( Exception e ) {
-			
-		}
-	}
-
-
+	@SuppressWarnings( "unchecked" )
 	@Override
 	public void store() {
 		super.store();
@@ -152,6 +143,7 @@ public class User extends Persist implements Serializable {
 				"}";
 	}
 	
+	@SuppressWarnings( "unchecked" )
 	public static User findByKey( Key key ) {
 		String strKey = KeyFactory.keyToString( key );
 		try {
@@ -164,14 +156,12 @@ public class User extends Persist implements Serializable {
 			
 		}
 		
-		EntityManager em = EMF.get().createEntityManager();
+		PersistenceManager pm = JDOFilter.getPM();
 		User person = null;
 		try {
-			person = em.find( User.class, key );
+			person = pm.getObjectById( User.class, key );
 		} catch( Exception e ) {
 			/* Do nothing */
-		} finally {
-			em.close();
 		}
 		
 		try {
@@ -186,6 +176,7 @@ public class User extends Persist implements Serializable {
 		return findByKey( KeyFactory.stringToKey( key ) );
 	}
 	
+	@SuppressWarnings( "unchecked" )
 	public static User findByEmail( Email email ) {
 		String strKey = "User-Email-" + email.toString();
 		try {
@@ -198,16 +189,17 @@ public class User extends Persist implements Serializable {
 			
 		}
 		
-		EntityManager em = EMF.get().createEntityManager();
+		PersistenceManager pm = JDOFilter.getPM();
 		User person = null;
 		try {
-			Query query = em.createQuery( "select from " + User.class.getName() + " where email = :email" );
-			query.setParameter( "email", email );
-			person = (User) query.getSingleResult();
+			Query query = pm.newQuery( "select from " + User.class.getName() + " where email == theEmail" );
+			query.declareImports( "import com.google.appengine.api.datastore.Email;" );
+			query.declareParameters( "Email theEmail" );
+			List< User > list = (List< User >) query.execute( email );
+			if( list.size() > 0 )
+				person = list.get( 0 );
 		} catch( Exception e ) {
 			/* Do nothing */
-		} finally {
-			em.close();
 		}
 		
 		try {
@@ -220,16 +212,15 @@ public class User extends Persist implements Serializable {
 	
 	@SuppressWarnings( "unchecked" )
 	public static List< User > list() {
-		EntityManager em = EMF.get().createEntityManager();
+		PersistenceManager pm = JDOFilter.getPM();
 		List< User > list = new ArrayList< User >();
 		try {
-			Query query = em.createQuery( "select from " + User.class.getName() );
-			list = new ArrayList< User >( (List< User >) query.getResultList() );
+			Query query = pm.newQuery( "select from " + User.class.getName() );
+			list = (List< User >) query.execute();
 		} catch( Exception e ) {
 			/* Do nothing */
-		} finally {
-			em.close();
 		}
+
 		return list;
 	}
 }

@@ -37,6 +37,8 @@ public class NewUserWindow {
 		final TextBox email = new TextBox();
 		final CheckBox isadmin = new CheckBox();
 		final CheckBox sendemail = new CheckBox();
+		final TextBox count = new TextBox();
+		count.setText( "0" );
 		
 		properties.setText( 0, 0, "Nickname:" );
 		properties.setWidget( 0, 1, nick );
@@ -47,6 +49,8 @@ public class NewUserWindow {
 			properties.setWidget( 2, 1, isadmin );
 			properties.setText( 3, 0, "Send welcome e-mail?:" );
 			properties.setWidget( 3, 1, sendemail );
+			properties.setText( 4, 0, "Count:" );
+			properties.setWidget( 4, 1, count );
 		}
 
 		vpanel.add( properties );
@@ -72,7 +76,7 @@ public class NewUserWindow {
 					
 				};
 				if( key == null )
-					admin.createUser( nick.getText(), email.getText(), isadmin.getValue(), sendemail.getValue(), callback );
+					admin.createUser( nick.getText(), email.getText(), isadmin.getValue(), sendemail.getValue(), new Integer( count.getValue() ), callback );
 				else
 					admin.setNick( key, nick.getText(), callback );
 			}

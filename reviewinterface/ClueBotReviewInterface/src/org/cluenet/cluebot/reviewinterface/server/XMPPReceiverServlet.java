@@ -67,11 +67,11 @@ public class XMPPReceiverServlet extends HttpServlet {
 		if( command.equals( "user" ) ) {
 			
 			if( subCommand.equals( "add" ) ) {
-				if( other == null || other.length != 2 ) {
-					xmpp.sendMessage( new MessageBuilder().withRecipientJids( fromJid ).withBody( "Expected user add Nick Name:email@address" ).build() );
+				if( other == null || other.length != 3 ) {
+					xmpp.sendMessage( new MessageBuilder().withRecipientJids( fromJid ).withBody( "Expected user add Nick Name:email@address:count" ).build() );
 					return;
 				}
-				User u = new User( other[ 0 ], new Email( other[ 1 ] ), false );
+				User u = new User( other[ 0 ], new Email( other[ 1 ] ), false, new Integer( other[ 2 ] ) );
 				Properties props = new Properties();
 		        Session session = Session.getDefaultInstance( props, null );
 

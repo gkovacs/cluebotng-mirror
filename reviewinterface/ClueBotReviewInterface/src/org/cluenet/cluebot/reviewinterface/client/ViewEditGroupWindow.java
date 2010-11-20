@@ -62,14 +62,13 @@ public class ViewEditGroupWindow implements Refreshable {
 		editTable.setBorderWidth( 1 );
 		
 		editTable.setText( 0, 0, "ID" );
-		editTable.setText( 0, 1, "Weight" );
-		editTable.setText( 0, 2, "Type" );
-		editTable.setText( 0, 3, "Vandalism" );
-		editTable.setText( 0, 4, "Constructive" );
-		editTable.setText( 0, 5, "Skipped" );
-		editTable.setText( 0, 6, "Required" );
-		editTable.setText( 0, 7, "Comments" );
-		editTable.setText( 0, 8, "Users" );
+		editTable.setText( 0, 1, "Type" );
+		editTable.setText( 0, 2, "Vandalism" );
+		editTable.setText( 0, 3, "Constructive" );
+		editTable.setText( 0, 4, "Skipped" );
+		editTable.setText( 0, 5, "Required" );
+		editTable.setText( 0, 6, "Comments" );
+		editTable.setText( 0, 7, "Users" );
 		
 		int i = 1;
 		
@@ -83,14 +82,13 @@ public class ViewEditGroupWindow implements Refreshable {
 				users += user.userName + " (" + user.classifications.toString() + ")" + ( user.isAdmin ? " (admin)" : "" ) + "\n";
 			
 			editTable.setWidget( i, 0, new Anchor( edit.id.toString(), "http://en.wikipedia.org/w/index.php?action=view&diff=" + edit.id.toString() ) );
-			editTable.setText( i, 1, edit.weight.toString() );
-			editTable.setText( i, 2, edit.classification.toString() );
-			editTable.setText( i, 3, edit.vandalism.toString() );
-			editTable.setText( i, 4, edit.constructive.toString() );
-			editTable.setText( i, 5, edit.skipped.toString() );
-			editTable.setText( i, 6, edit.required.toString() );
-			editTable.setText( i, 7, comments );
-			editTable.setText( i, 8, users );
+			editTable.setText( i, 1, edit.classification.toString() );
+			editTable.setText( i, 2, edit.vandalism.toString() );
+			editTable.setText( i, 3, edit.constructive.toString() );
+			editTable.setText( i, 4, edit.skipped.toString() );
+			editTable.setText( i, 5, edit.required.toString() );
+			editTable.setText( i, 6, comments );
+			editTable.setText( i, 7, users );
 			
 			i++;
 		}
@@ -124,7 +122,7 @@ public class ViewEditGroupWindow implements Refreshable {
 
 			@Override
 			public void onClick( ClickEvent event ) {
-				pageTo( new Integer( editPageStart.getText() ) - new Integer( editPageSize.getText() ), new Integer( editPageSize.getText() ), reviewStart, reviewCount, doneStart, doneCount );
+				pageTo( editGroup.edits.get( 0 ).id, - new Integer( editPageSize.getText() ), reviewStart, reviewCount, doneStart, doneCount );
 			}
 			
 		});
@@ -135,7 +133,7 @@ public class ViewEditGroupWindow implements Refreshable {
 
 			@Override
 			public void onClick( ClickEvent event ) {
-				pageTo( new Integer( editPageStart.getText() ) + new Integer( editPageSize.getText() ), new Integer( editPageSize.getText() ), reviewStart, reviewCount, doneStart, doneCount );
+				pageTo( editGroup.edits.get( editGroup.edits.size() - 1 ).id, new Integer( editPageSize.getText() ), reviewStart, reviewCount, doneStart, doneCount );
 			}
 			
 		});
@@ -147,14 +145,13 @@ public class ViewEditGroupWindow implements Refreshable {
 		reviewTable.setBorderWidth( 1 );
 		
 		reviewTable.setText( 0, 0, "ID" );
-		reviewTable.setText( 0, 1, "Weight" );
-		reviewTable.setText( 0, 2, "Type" );
-		reviewTable.setText( 0, 3, "Vandalism" );
-		reviewTable.setText( 0, 4, "Constructive" );
-		reviewTable.setText( 0, 5, "Skipped" );
-		reviewTable.setText( 0, 6, "Required" );
-		reviewTable.setText( 0, 7, "Comments" );
-		reviewTable.setText( 0, 8, "Users" );
+		reviewTable.setText( 0, 1, "Type" );
+		reviewTable.setText( 0, 2, "Vandalism" );
+		reviewTable.setText( 0, 3, "Constructive" );
+		reviewTable.setText( 0, 4, "Skipped" );
+		reviewTable.setText( 0, 5, "Required" );
+		reviewTable.setText( 0, 6, "Comments" );
+		reviewTable.setText( 0, 7, "Users" );
 		
 		i = 1;
 		
@@ -168,14 +165,13 @@ public class ViewEditGroupWindow implements Refreshable {
 				users += user.userName + " (" + user.classifications.toString() + ")" + ( user.isAdmin ? " (admin)" : "" ) + "<br />\n";
 			
 			reviewTable.setWidget( i, 0, new Anchor( edit.id.toString(), "http://en.wikipedia.org/w/index.php?action=view&diff=" + edit.id.toString() ) );
-			reviewTable.setText( i, 1, edit.weight.toString() );
-			reviewTable.setText( i, 2, edit.classification.toString() );
-			reviewTable.setText( i, 3, edit.vandalism.toString() );
-			reviewTable.setText( i, 4, edit.constructive.toString() );
-			reviewTable.setText( i, 5, edit.skipped.toString() );
-			reviewTable.setText( i, 6, edit.required.toString() );
-			reviewTable.setHTML( i, 7, comments );
-			reviewTable.setHTML( i, 8, users );
+			reviewTable.setText( i, 1, edit.classification.toString() );
+			reviewTable.setText( i, 2, edit.vandalism.toString() );
+			reviewTable.setText( i, 3, edit.constructive.toString() );
+			reviewTable.setText( i, 4, edit.skipped.toString() );
+			reviewTable.setText( i, 5, edit.required.toString() );
+			reviewTable.setHTML( i, 6, comments );
+			reviewTable.setHTML( i, 7, users );
 			
 			i++;
 		}
@@ -210,7 +206,7 @@ public class ViewEditGroupWindow implements Refreshable {
 
 			@Override
 			public void onClick( ClickEvent event ) {
-				pageTo( editStart, editCount, new Integer( reviewPageStart.getText() ) - new Integer( reviewPageSize.getText() ), new Integer( reviewPageSize.getText() ), doneStart, doneCount );
+				pageTo( editStart, editCount, editGroup.reviewed.get( 0 ).id, - new Integer( reviewPageSize.getText() ), doneStart, doneCount );
 			}
 			
 		});
@@ -221,7 +217,7 @@ public class ViewEditGroupWindow implements Refreshable {
 
 			@Override
 			public void onClick( ClickEvent event ) {
-				pageTo( editStart, editCount, new Integer( reviewPageStart.getText() ) + new Integer( reviewPageSize.getText() ), new Integer( reviewPageSize.getText() ), doneStart, doneCount );
+				pageTo( editStart, editCount, editGroup.reviewed.get( editGroup.reviewed.size() - 1 ).id, new Integer( reviewPageSize.getText() ), doneStart, doneCount );
 			}
 			
 		});
@@ -233,14 +229,13 @@ public class ViewEditGroupWindow implements Refreshable {
 		doneTable.setBorderWidth( 1 );
 		
 		doneTable.setText( 0, 0, "ID" );
-		doneTable.setText( 0, 1, "Weight" );
-		doneTable.setText( 0, 2, "Type" );
-		doneTable.setText( 0, 3, "Vandalism" );
-		doneTable.setText( 0, 4, "Constructive" );
-		doneTable.setText( 0, 5, "Skipped" );
-		doneTable.setText( 0, 6, "Required" );
-		doneTable.setText( 0, 7, "Comments" );
-		doneTable.setText( 0, 8, "Users" );
+		doneTable.setText( 0, 1, "Type" );
+		doneTable.setText( 0, 2, "Vandalism" );
+		doneTable.setText( 0, 3, "Constructive" );
+		doneTable.setText( 0, 4, "Skipped" );
+		doneTable.setText( 0, 5, "Required" );
+		doneTable.setText( 0, 6, "Comments" );
+		doneTable.setText( 0, 7, "Users" );
 		
 		i = 1;
 		
@@ -254,14 +249,13 @@ public class ViewEditGroupWindow implements Refreshable {
 				users += user.userName + " (" + user.classifications.toString() + ")" + ( user.isAdmin ? " (admin)" : "" ) + "<br />\n";
 			
 			doneTable.setWidget( i, 0, new Anchor( edit.id.toString(), "http://en.wikipedia.org/w/index.php?action=view&diff=" + edit.id.toString() ) );
-			doneTable.setText( i, 1, edit.weight.toString() );
-			doneTable.setText( i, 2, edit.classification.toString() );
-			doneTable.setText( i, 3, edit.vandalism.toString() );
-			doneTable.setText( i, 4, edit.constructive.toString() );
-			doneTable.setText( i, 5, edit.skipped.toString() );
-			doneTable.setText( i, 6, edit.required.toString() );
-			doneTable.setHTML( i, 7, comments );
-			doneTable.setHTML( i, 8, users );
+			doneTable.setText( i, 1, edit.classification.toString() );
+			doneTable.setText( i, 2, edit.vandalism.toString() );
+			doneTable.setText( i, 3, edit.constructive.toString() );
+			doneTable.setText( i, 4, edit.skipped.toString() );
+			doneTable.setText( i, 5, edit.required.toString() );
+			doneTable.setHTML( i, 6, comments );
+			doneTable.setHTML( i, 7, users );
 			
 			i++;
 		}
@@ -296,7 +290,7 @@ public class ViewEditGroupWindow implements Refreshable {
 
 			@Override
 			public void onClick( ClickEvent event ) {
-				pageTo( editStart, editCount, reviewStart, reviewCount, new Integer( donePageStart.getText() ) - new Integer( donePageSize.getText() ), new Integer( donePageSize.getText() ) );
+				pageTo( editStart, editCount, reviewStart, reviewCount, editGroup.done.get( 0 ).id, - new Integer( donePageSize.getText() ) );
 			}
 			
 		});
@@ -307,7 +301,7 @@ public class ViewEditGroupWindow implements Refreshable {
 
 			@Override
 			public void onClick( ClickEvent event ) {
-				pageTo( editStart, editCount, reviewStart, reviewCount, new Integer( donePageStart.getText() ) + new Integer( donePageSize.getText() ), new Integer( donePageSize.getText() ) );
+				pageTo( editStart, editCount, reviewStart, reviewCount, editGroup.done.get( editGroup.done.size() - 1 ).id, new Integer( donePageSize.getText() ) );
 			}
 			
 		});
@@ -408,6 +402,9 @@ public class ViewEditGroupWindow implements Refreshable {
 			@Override
 			public void onSuccess( EditGroup result ) {
 				editGroup = result;
+				editCount = Math.abs( editCount );
+				reviewCount = Math.abs( reviewCount );
+				doneCount = Math.abs( doneCount );
 				display();
 			}
 			

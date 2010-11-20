@@ -5,9 +5,8 @@ package org.cluenet.cluebot.reviewinterface.server;
 
 import java.io.Serializable;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Transaction;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -18,46 +17,26 @@ import com.google.appengine.api.datastore.KeyFactory;
  *
  */
 public abstract class Persist implements Serializable {
-	private static EntityManager em;
-	private static Boolean use = false;
-	
-	
-	public static void use( EntityManager em ) {
-		Persist.em = em;
-		Persist.use = true;
-	}
-	
-	public static void unuse() {
-		Persist.em = null;
-		Persist.use = false;
-	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4649217473218364991L;
 	
 	public abstract Key getKey();
 	
-	public static void persist( Persist o, Boolean persist ) {
-		if( use )
-			if( !persist )
-				Persist.em.merge( o );
-			else
-				Persist.em.persist( o );
-		else {
-			EntityManager em = EMF.get().createEntityManager();
-			try {
-				EntityTransaction txn = em.getTransaction();
-				txn.begin();
-				try {
-					if( !persist )
-						em.merge( o );
-					else
-						em.persist( o );
-					txn.commit();
-				} catch( Exception e ) {
-					if( txn.isActive() )
-						txn.rollback();
-				}
-			} finally {
-				em.close();
-			}
+	@SuppressWarnings( "unchecked" )
+	public static void persist( Persist o ) {
+		PersistenceManager pm = JDOFilter.getPM();
+		Transaction txn = pm.currentTransaction();
+		try {
+			txn.begin();
+			pm.makePersistent( o );
+			txn.commit();
+		} catch( Exception e ) {
+			if( txn.isActive() )
+				txn.rollback();
+			System.err.println( "Exception!" );
+			e.printStackTrace( System.err );
 		}
 		
 		String strKey = KeyFactory.keyToString( o.getKey() );
@@ -68,14 +47,11 @@ public abstract class Persist implements Serializable {
 		}
 	}
 	
-	public void merge() {
-		Persist.persist( this, false );
-	}
 	public static void store( Persist o ) {
-		Persist.persist( o, true );
+		Persist.persist( o );
 	}
 	public void store() {
-		Persist.persist( this, true );
+		Persist.persist( this );
 	}
 	public static void delete( Persist o ) {
 		String strKey = KeyFactory.keyToString( o.getKey() );
@@ -86,24 +62,15 @@ public abstract class Persist implements Serializable {
 			
 		}
 		
-		if( use ) {
-			Query q = Persist.em.createQuery( "DELETE FROM " + o.getClass().getName() + " WHERE key = :key" );
-			q.setParameter( "key", o.getKey() );
-			q.executeUpdate();
-		} else {
-			EntityManager em = EMF.get().createEntityManager();
-			try {
-				EntityTransaction txn = em.getTransaction();
-				txn.begin();
-				Query q = em.createQuery( "DELETE FROM " + o.getClass().getName() + " WHERE key = :key" );
-				q.setParameter( "key", o.getKey() );
-				q.executeUpdate();
-				txn.commit();
-			} catch( Exception e ) {
-				/* Do nothing */
-			} finally {
-				em.close();
-			}
+		PersistenceManager pm = JDOFilter.getPM();
+		try {
+			Transaction txn = pm.currentTransaction();
+			txn.begin();
+			pm.setDetachAllOnCommit( true );
+			pm.deletePersistent( o );
+			txn.commit();
+		} catch( Exception e ) {
+			/* Do nothing */
 		}
 	}
 	public void delete() {

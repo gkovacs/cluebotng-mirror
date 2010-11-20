@@ -48,7 +48,7 @@ public class DownloadImpl extends HttpServlet {
 			bos.write( ',' );
 			bos.write( CSVEscape( edit.getId().toString() ) );
 			bos.write( ',' );
-			bos.write( CSVEscape( edit.getClassification().toString() ) );
+			bos.write( CSVEscape( edit.getKnown().toString() ) );
 			bos.write( ',' );
 			bos.write( CSVEscape( edit.getVandalism().toString() ) );
 			bos.write( ',' );
@@ -57,8 +57,6 @@ public class DownloadImpl extends HttpServlet {
 			bos.write( CSVEscape( edit.getSkipped().toString() ) );
 			bos.write( ',' );
 			bos.write( CSVEscape( edit.getRequired().toString() ) );
-			bos.write( ',' );
-			bos.write( CSVEscape( edit.getWeight().toString() ) );
 			bos.write( '\n' );
 		}
 		

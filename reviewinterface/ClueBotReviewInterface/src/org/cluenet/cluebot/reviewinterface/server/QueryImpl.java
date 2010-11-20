@@ -6,13 +6,13 @@ package org.cluenet.cluebot.reviewinterface.server;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.jdo.Transaction;
 
 
 /**
@@ -43,12 +43,12 @@ public class QueryImpl extends HttpServlet {
 		if( Authentication.isAdmin( req ) ) {
 			PrintWriter pw = resp.getWriter();
 			String strQuery = req.getParameter( "query" );
-			EntityManager em = EMF.get().createEntityManager();
-			EntityTransaction txn = em.getTransaction();
+			PersistenceManager pm = JDOFilter.getPM();
+			Transaction txn = pm.currentTransaction();
 			try {
 				txn.begin();
-				Query q = em.createQuery( strQuery );
-				q.executeUpdate();
+				Query q = pm.newQuery( strQuery );
+				q.execute();
 				txn.commit();
 			} catch( Exception e ) {
 				pw.println( "<html><body><pre>" );
@@ -58,7 +58,6 @@ public class QueryImpl extends HttpServlet {
 			} finally {
 				if( txn.isActive() )
 					txn.rollback();
-				em.close();
 			}
 		} else
 			super.doPost( req, resp );

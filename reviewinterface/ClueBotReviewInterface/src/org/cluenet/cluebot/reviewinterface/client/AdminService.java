@@ -22,7 +22,7 @@ public interface AdminService extends RemoteService {
 	void reevalEditsInEditGroup( String key ) throws IllegalArgumentException;
 	
 	List< User > getUsers() throws IllegalArgumentException;
-	void createUser( String nick, String email, Boolean isAdmin, Boolean sendEmail ) throws IllegalArgumentException;
+	void createUser( String nick, String email, Boolean isAdmin, Boolean sendEmail, Integer count ) throws IllegalArgumentException;
 	void setAdmin( String key, Boolean isAdmin ) throws IllegalArgumentException;
 	void setNick( String key, String nick ) throws IllegalArgumentException;
 	void deleteUser( String key ) throws IllegalArgumentException;

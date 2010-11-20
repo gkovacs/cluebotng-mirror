@@ -53,10 +53,10 @@ public interface AdminServiceAsync {
 
 	void getEditGroup( String key, Integer editStart, Integer editCount, Integer reviewStart, Integer reviewCount, Integer doneStart, Integer doneCount, AsyncCallback< EditGroup > callback );
 
-	void createUser( String nick, String email, Boolean isAdmin, Boolean sendEmail, AsyncCallback< Void > callback );
-
 	void setNick( String key, String nick, AsyncCallback< Void > callback );
 
 	void reevalEditsInEditGroup( String key, AsyncCallback< Void > callback );
+
+	void createUser( String nick, String email, Boolean isAdmin, Boolean sendEmail, Integer count, AsyncCallback< Void > callback );
 	
 }

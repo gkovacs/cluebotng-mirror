@@ -1,19 +1,17 @@
-/**
- * 
- */
 package org.cluenet.cluebot.reviewinterface.server;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.EntityManager;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Query;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
 import org.cluenet.cluebot.reviewinterface.shared.AdminEdit;
 import org.cluenet.cluebot.reviewinterface.shared.Classification;
 
@@ -24,57 +22,58 @@ import com.google.appengine.api.labs.taskqueue.QueueFactory;
 import com.google.appengine.api.labs.taskqueue.TaskOptions;
 import com.google.appengine.api.labs.taskqueue.TaskOptions.Method;
 
-
-/**
- * @author cobi
- *
- */
-@Entity
-public class Edit extends Persist implements Serializable {
+@PersistenceCapable(detachable="true")
+public class Edit extends Persist {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -4076138576500078491L;
+	private static final long serialVersionUID = -5914711884888506485L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@PrimaryKey
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key key;
 	
-	@Basic
+	@Persistent
 	private Integer id;
 	
-	@Basic
-	private Classification classification;
+	@Persistent
+	private Classification known;
 	
-	@Basic
-	private Integer vandalism;
-	
-	@Basic
-	private Integer constructive;
-	
-	@Basic
-	private Integer skipped;
-	
-	@Basic
+	@Persistent
 	private Integer required;
 	
-	@Basic
-	private Integer weight;
 	
-	@Basic
-	private List< String > comments;
-	
-	@Basic
-	private List< Key > users;
-	
-	private Edit( Integer id, Classification classification, Integer required, Integer weight ) {
+	private Edit( Integer id, Classification known, Integer required ) {
 		this.id = id;
-		this.classification = classification;
+		this.known = known;
 		this.required = required;
-		this.weight = weight;
-		this.vandalism = this.constructive = this.skipped = 0;
-		this.comments = new ArrayList< String >();
-		this.users = new ArrayList< Key >();
+		this.store();
+	}
+
+	@Override
+	public Key getKey() {
+		return key;
+	}
+
+	
+	public Classification getKnown() {
+		return known;
+	}
+
+	
+	public void setKnown( Classification known ) {
+		this.known = known;
+		this.store();
+	}
+
+	
+	public Integer getRequired() {
+		return required;
+	}
+
+	
+	public void setRequired( Integer required ) {
+		this.required = required;
 		this.store();
 	}
 
@@ -82,87 +81,78 @@ public class Edit extends Persist implements Serializable {
 	public Integer getId() {
 		return id;
 	}
-
 	
-	public Classification getClassification() {
-		return classification;
+	@SuppressWarnings( "unchecked" )
+	private List< AttachedEdit > attached() {
+		PersistenceManager pm = JDOFilter.getPM();
+		Query q = pm.newQuery( AttachedEdit.class );
+		q.setFilter( "edit == thisEdit" );
+		q.declareImports( "import com.google.appengine.api.datastore.Key;" );
+		q.declareParameters( "Key thisEdit" );
+		return new ArrayList< AttachedEdit >( (List< AttachedEdit >) q.execute( key ) );
 	}
 	
-	public void newClassification( User user, Classification classification, String comment ) {
-		users.add( user.getKey() );
-		if( comment != null )
-			comments.add( comment );
-		switch( classification ) {
-			case VANDALISM:
-				vandalism++;
-				break;
-			case CONSTRUCTIVE:
-				constructive++;
-				break;
-			case SKIPPED:
-				skipped++;
-				break;
+	@SuppressWarnings( "unchecked" )
+	private List< EditClassification > classifications() {
+		PersistenceManager pm = JDOFilter.getPM();
+		Query q = pm.newQuery( EditClassification.class );
+		q.setFilter( "edit == thisEdit" );
+		q.declareImports( "import com.google.appengine.api.datastore.Key;" );
+		q.declareParameters( "Key thisEdit" );
+		return new ArrayList< EditClassification >( (List< EditClassification >) q.execute( key ) );
+	}
+	
+	private Map< Classification, Integer > count() {
+		Map< Classification, Integer > map = new HashMap< Classification, Integer >();
+		for( EditClassification classification : classifications() ) {
+			Classification type = classification.getClassification();
+			if( !map.containsKey( type ) )
+				map.put( type, 0 );
+			map.put( type, map.get( type ) + 1 );
 		}
-		this.merge();
-		Queue queue = QueueFactory.getQueue( "edit-done-queue" );
-		for( EditGroup eg : EditGroup.findByEdit( this ) )
-			queue.add( TaskOptions.Builder.param( "ekey", KeyFactory.keyToString( key ) ).param( "egkey", KeyFactory.keyToString( eg.getKey() ) ).method( Method.GET ) );
+		return map;	
+	}
+	
+	private Integer count( Classification type ) {
+		Map< Classification, Integer > map = count();
+		if( map.containsKey( type ) )
+			return map.get( type );
+		return 0;
 	}
 	
 	public Integer getVandalism() {
-		return vandalism;
+		return count( Classification.VANDALISM );
 	}
 	
 	public Integer getConstructive() {
-		return constructive;
+		return count( Classification.CONSTRUCTIVE );
 	}
-
 	
 	public Integer getSkipped() {
-		return skipped;
-	}
-
-	
-	public Integer getRequired() {
-		if( required < 2 )
-			return 2;
-		return required;
-	}
-
-	
-	public Integer getWeight() {
-		return weight;
-	}
-
-	
-	public List< String > getComments() {
-		return new ArrayList< String >( comments );
-	}
-
-	
-	public List< Key > getUsers() {
-		return new ArrayList< Key >( users );
-	}
-
-	@Override
-	public Key getKey() {
-		return this.key;
+		return count( Classification.SKIPPED );
 	}
 	
 	public org.cluenet.cluebot.reviewinterface.shared.Edit getClientClass() {
-		return new org.cluenet.cluebot.reviewinterface.shared.Edit( this.id, this.classification );
+		return new org.cluenet.cluebot.reviewinterface.shared.Edit( this.id, this.known );
 	}
 	
 	public AdminEdit getAdminClass() {
 		List< org.cluenet.cluebot.reviewinterface.shared.User > users = new ArrayList< org.cluenet.cluebot.reviewinterface.shared.User >();
-		for( Key key : this.users ) {
-			User user = User.findByKey( key );
-			if( user == null )
-				continue;
-			users.add( user.getClientClass() );
+		Integer vandalism = 0, constructive = 0, skipped = 0;
+		List< String > comments = new ArrayList< String >();
+		for( EditClassification classification : classifications() ) {
+			if( classification.getClassification().equals( Classification.CONSTRUCTIVE ) )
+				constructive++;
+			else if( classification.getClassification().equals( Classification.VANDALISM ) )
+				vandalism++;
+			else if( classification.getClassification().equals( Classification.SKIPPED ) )
+				skipped++;
+			users.add( classification.getUser().getClientClass() );
+			comments.add( classification.getComment() );
 		}
-		return new AdminEdit( id, classification, vandalism, constructive, skipped, getRequired(), weight, new ArrayList< String >( comments ), users );
+		return new AdminEdit( id, known, vandalism, constructive, skipped, getRequired(), comments, users );
 	}
+
 	
 	@Override
 	public void delete() {
@@ -172,21 +162,17 @@ public class Edit extends Persist implements Serializable {
 		} catch( Exception e ) {
 			
 		}
+		
+		for( AttachedEdit ae : attached() )
+			ae.delete();
+		
+		for( EditClassification ec : classifications() )
+			ec.delete();
+		
 		super.delete();
 	}
-
-
-	@Override
-	public void merge() {
-		super.merge();
-		try {
-			TheCache.cache().put( "Edit-Id-" + this.id.toString(), this );
-		} catch( Exception e ) {
-			
-		}
-	}
-
-
+	
+	@SuppressWarnings( "unchecked" )
 	@Override
 	public void store() {
 		super.store();
@@ -197,7 +183,7 @@ public class Edit extends Persist implements Serializable {
 		}
 	}
 
-
+	@SuppressWarnings( "unchecked" )
 	public static Edit findByKey( Key key ) {
 		String strKey = KeyFactory.keyToString( key );
 		try {
@@ -211,14 +197,12 @@ public class Edit extends Persist implements Serializable {
 			
 		}
 		
-		EntityManager em = EMF.get().createEntityManager();
+		PersistenceManager pm = JDOFilter.getPM();
 		Edit edit = null;
 		try {
-			edit = em.find( Edit.class, key );
+			edit = pm.getObjectById( Edit.class, key );
 		} catch( Exception e ) {
 			/* Do nothing */
-		} finally {
-			em.close();
 		}
 		
 		try {
@@ -229,10 +213,7 @@ public class Edit extends Persist implements Serializable {
 		return edit;
 	}
 	
-	public static Edit findByKey( String key ) {
-		return findByKey( KeyFactory.stringToKey( key ) );
-	}
-	
+	@SuppressWarnings( "unchecked" )
 	public static Edit findById( Integer id ) {
 		String strKey = "Edit-Id-" + id.toString();
 		try {
@@ -245,46 +226,74 @@ public class Edit extends Persist implements Serializable {
 			
 		}
 		
-		EntityManager em = EMF.get().createEntityManager();
+		PersistenceManager pm = JDOFilter.getPM();
 		Edit edit = null;
 		try {
-			Query query = em.createQuery( "select from " + Edit.class.getName() + " where id = :theId" );
-			query.setParameter( "theId", id );
-			edit = (Edit) query.getSingleResult();
-		} catch( Exception e ) {
-			System.err.println(e.getMessage());
-		} finally {
-			em.close();
-		}
-		
-		try {
-			TheCache.cache().put( strKey, edit );
+			Query q = pm.newQuery( "SELECT FROM " + Edit.class.getName() + " WHERE id == theId" );
+			q.declareParameters( "Integer theId" );
+			List< Edit > editList = (List< Edit >) q.execute( id );
+			if( editList.size() > 0 )
+				edit = editList.get( 0 );
 		} catch( Exception e ) {
 			
 		}
+		
 		return edit;
 	}
+
+	public static Edit findByKey( String key ) {
+		return findByKey( KeyFactory.stringToKey( key ) );
+	}
 	
-	public static Edit newFromId( Integer id, Classification classification, Integer required, Integer weight ) {
+	public static Edit newFromId( Integer id, Classification classification, Integer required ) {
 		Edit edit = findById( id );
 		if( edit == null )
-			edit = new Edit( id, classification, required, weight );
+			edit = new Edit( id, classification, required );
 		return edit;
 	}
+
+	public List< String > getComments() {
+		List< String > list = new ArrayList< String >();
+		for( EditClassification classification : classifications() )
+			list.add( classification.getComment() );
+		return list;
+	}
 	
+	public List< Key > getUsers() {
+		List< Key > list = new ArrayList< Key >();
+		for( EditClassification classification : classifications() )
+			list.add( classification.getUser().getKey() );
+		return list;
+	}
+
+	public void newClassification( User user, Classification type, String comment ) {
+		new EditClassification( this, type, user, comment );
+		Queue queue = QueueFactory.getQueue( "edit-done-queue" );
+		for( AttachedEdit ae : attached() ) {
+			ae.addUser( user );
+			queue.add(
+            		TaskOptions
+            		.Builder
+            		.param( "ekey", KeyFactory.keyToString( key ) )
+            		.param( "egkey", KeyFactory.keyToString( ae.getEditGroup().getKey() ) )
+            		.method( Method.GET )
+            );
+		}
+	}
+
 	@SuppressWarnings( "unchecked" )
 	public static List< Key > list() {
-		EntityManager em = EMF.get().createEntityManager();
 		List< Key > list = new ArrayList< Key >();
+		PersistenceManager pm = JDOFilter.getPM();
 		try {
-			Query query = em.createQuery( "select from " + Edit.class.getName() );
-			for( Edit edit : (List< Edit >) query.getResultList() )
+			Query q = pm.newQuery( "SELECT FROM " + Edit.class.getName() );
+			List< Edit > editList = (List< Edit >) q.execute();
+			for( Edit edit : editList )
 				list.add( edit.getKey() );
 		} catch( Exception e ) {
-			/* Do nothing */
-		} finally {
-			em.close();
+			
 		}
+		
 		return list;
 	}
 }

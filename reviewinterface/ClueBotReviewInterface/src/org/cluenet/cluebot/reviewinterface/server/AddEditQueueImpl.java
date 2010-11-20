@@ -30,12 +30,10 @@ public class AddEditQueueImpl extends HttpServlet {
 		String strKey = req.getParameter( "key" );
 		String strId = req.getParameter( "id" );
 		String strRequired = req.getParameter( "required" );
-		String strWeight = req.getParameter( "weight" );
 		String strClassification = req.getParameter( "classification" );
 		
 		Integer id = Integer.decode( strId );
 		Integer required = Integer.decode( strRequired );
-		Integer weight = Integer.decode( strWeight );
 		Classification classification;
 		
 		if( strClassification.equals( "CONSTRUCTIVE" ) )
@@ -47,22 +45,12 @@ public class AddEditQueueImpl extends HttpServlet {
 		else
 			classification = Classification.UNKNOWN;
 		
-		Edit edit = Edit.newFromId( id, classification, required, weight );
+		Edit edit = Edit.newFromId( id, classification, required );
 		
 		List< Edit > edits = new ArrayList< Edit >();
 		edits.add( edit );
 		
-		try {
-			Transaction.begin();
-			
-			EditGroup eg = EditGroup.findByKey( strKey );
-			eg.addEdits( edits );
-			
-			Transaction.end();
-		} catch( Exception e ) {
-			resp.sendError( 500 );
-		} finally {
-			Transaction.fin();
-		}
+		EditGroup eg = EditGroup.findByKey( strKey );
+		eg.addEdits( edits );
 	}
 }
