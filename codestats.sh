@@ -1,6 +1,6 @@
 #!/bin/sh
 echo -e "Lang\t  Lines\t  Words\t  Bytes"
-for lang in 'PHP/*.php' 'C++/*.?pp' 'Java/*.java' 'Bash/*.sh' 'Python/*.py'
+for lang in 'PHP/*.php' 'C++/*.?pp' 'Java/*.java' 'Bash/*.sh' 'Python/*.py' 'Make/Makefile'
 do
 	match=$(basename "${lang}")
 	name=$(dirname "${lang}")
