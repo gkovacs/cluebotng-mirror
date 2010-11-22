@@ -1,6 +1,6 @@
 package org.cluenet.cluebot.reviewinterface.client;
 
-import org.cluenet.cluebot.reviewinterface.shared.AdminEdit;
+import org.cluenet.cluebot.reviewinterface.shared.Edit;
 import org.cluenet.cluebot.reviewinterface.shared.EditGroup;
 import org.cluenet.cluebot.reviewinterface.shared.User;
 
@@ -72,7 +72,7 @@ public class ViewEditGroupWindow implements Refreshable {
 		
 		int i = 1;
 		
-		for( final AdminEdit edit : editGroup.edits ) {
+		for( final Edit edit : editGroup.edits ) {
 			String comments = "";
 			for( String comment : edit.comments )
 				comments += comment + "\n";
@@ -155,7 +155,7 @@ public class ViewEditGroupWindow implements Refreshable {
 		
 		i = 1;
 		
-		for( final AdminEdit edit : editGroup.reviewed ) {
+		for( final Edit edit : editGroup.reviewed ) {
 			String comments = "";
 			for( String comment : edit.comments )
 				comments += comment + "<br />\n";
@@ -239,7 +239,7 @@ public class ViewEditGroupWindow implements Refreshable {
 		
 		i = 1;
 		
-		for( final AdminEdit edit : editGroup.done ) {
+		for( final Edit edit : editGroup.done ) {
 			String comments = "";
 			for( String comment : edit.comments )
 				comments += comment + "<br />\n";

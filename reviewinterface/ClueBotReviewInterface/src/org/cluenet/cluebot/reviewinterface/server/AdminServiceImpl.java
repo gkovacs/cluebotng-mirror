@@ -112,7 +112,15 @@ public class AdminServiceImpl extends RemoteServiceServlet implements
 				continue;
 			List< TaskOptions > tasks = new ArrayList< TaskOptions >();
 			for( org.cluenet.cluebot.reviewinterface.shared.Edit edit : edits.subList( fromIndex, toIndex ) )
-				tasks.add( TaskOptions.Builder.param( "id", edit.id.toString() ).param( "classification", edit.classification.toString() ).param( "required", required.toString() ).param( "weight", edit.weight.toString() ).param( "key", key ).method( Method.GET ) );
+				tasks.add(
+						TaskOptions
+						.Builder
+						.param( "id", edit.id.toString() )
+						.param( "classification", edit.classification.toString() )
+						.param( "required", required.toString() )
+						.param( "key", key )
+						.method( Method.GET )
+				);
 			queue.add( tasks );
 		}
 	}

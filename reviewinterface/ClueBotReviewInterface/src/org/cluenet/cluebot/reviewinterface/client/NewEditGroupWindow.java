@@ -97,14 +97,16 @@ public class NewEditGroupWindow {
 		else if( lineParts[ 1 ].equals( "C" ) )
 			type = Classification.CONSTRUCTIVE;
 		
-		Integer weight = 1;
-		if( lineParts.length == 3 )
-			weight = new Integer( lineParts[ 2 ] );
-		
 		return new Edit(
 				new Integer( lineParts[ 0 ] ),
 				type,
-				weight
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null
 		);
 	}
 

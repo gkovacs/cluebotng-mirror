@@ -42,13 +42,16 @@ public class WelcomeImpl extends HttpServlet {
 	        Session session = Session.getDefaultInstance( props, null );
 
 	        String msgBody = "Hello,\r\n" +
-	        		"New user:\r\n" +
-	        		"E-mail: " + email + "\r\n" +
-	        		"Wikipedia: " + req.getParameter( "wikipedia" ) + "\r\n" +
-	        		"Comments: " + req.getParameter( "comments" ) + "\r\n" +
-	        		"\r\n" +
-	        		"Thanks,\r\n" +
-	        		"ClueBot NG Review Interface.";
+					"New user:\r\n" +
+					"E-mail: " + email + "\r\n" +
+					"Wikipedia: " + req.getParameter( "wikipedia" ) + "\r\n" +
+					"Comments: " + req.getParameter( "comments" ) + "\r\n" +
+					"\r\n" +
+					"<http://enwp.org/Special:Contributions/" + req.getParameter( "wikipedia" ) + ">\r\n" +
+					"user add " + req.getParameter( "wikipedia" ) + ":" + email + ":0\r\n" +
+					"\r\n" +
+					"Thanks,\r\n" +
+					"ClueBot NG Review Interface.";
 
 	        try {
 				Message msg = new MimeMessage( session );

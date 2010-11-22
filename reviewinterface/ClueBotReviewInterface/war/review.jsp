@@ -50,8 +50,10 @@
 	</div>
 	<div id="top">
 		<span id="options"></span>
+		<span id="goto"></span>
+		<span id="editid"></span>
 		<span id="username">Username</span>
-		<span id="count">0</span>
+		<span id="count"></span>
 	</div>
   </body>
 </html>

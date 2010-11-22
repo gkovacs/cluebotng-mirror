@@ -11,7 +11,6 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import org.cluenet.cluebot.reviewinterface.shared.AdminEdit;
 import org.cluenet.cluebot.reviewinterface.shared.Status;
 
 import com.google.appengine.api.datastore.Key;
@@ -105,9 +104,9 @@ public class EditGroup extends Persist {
 
 
 	public org.cluenet.cluebot.reviewinterface.shared.EditGroup getClientClass( Integer editStart, Integer editCount, Integer reviewStart, Integer reviewCount, Integer doneStart, Integer doneCount ) {
-		List< AdminEdit > edits = new ArrayList< AdminEdit >();
-		List< AdminEdit > reviewed = new ArrayList< AdminEdit >();
-		List< AdminEdit > done = new ArrayList< AdminEdit >();
+		List< org.cluenet.cluebot.reviewinterface.shared.Edit > edits = new ArrayList< org.cluenet.cluebot.reviewinterface.shared.Edit >();
+		List< org.cluenet.cluebot.reviewinterface.shared.Edit > reviewed = new ArrayList< org.cluenet.cluebot.reviewinterface.shared.Edit >();
+		List< org.cluenet.cluebot.reviewinterface.shared.Edit > done = new ArrayList< org.cluenet.cluebot.reviewinterface.shared.Edit >();
 		
 		for( AttachedEdit ae : getEdits( editStart, editCount ) )
 			edits.add( ae.getEdit().getAdminClass() );
@@ -119,18 +118,34 @@ public class EditGroup extends Persist {
 			done.add( ae.getEdit().getAdminClass() );
 		
 		return new org.cluenet.cluebot.reviewinterface.shared.EditGroup(
-				KeyFactory.keyToString( key ), name, edits, reviewed, done, weight, AttachedEdit.countByStatus( this, Status.DONE ), AttachedEdit.countByStatus( this, Status.PARTIAL ), AttachedEdit.countByStatus( this, Status.NOTDONE )
+				KeyFactory.keyToString( key ),
+				name,
+				edits,
+				reviewed,
+				done,
+				weight,
+				AttachedEdit.countByStatus( this, Status.DONE ),
+				AttachedEdit.countByStatus( this, Status.PARTIAL ),
+				AttachedEdit.countByStatus( this, Status.NOTDONE )
 		);
 	}
 
 
 	public org.cluenet.cluebot.reviewinterface.shared.EditGroup getLightClientClass() {
-		List< AdminEdit > edits = new ArrayList< AdminEdit >();
-		List< AdminEdit > reviewed = new ArrayList< AdminEdit >();
-		List< AdminEdit > done = new ArrayList< AdminEdit >();
+		List< org.cluenet.cluebot.reviewinterface.shared.Edit > edits = new ArrayList< org.cluenet.cluebot.reviewinterface.shared.Edit >();
+		List< org.cluenet.cluebot.reviewinterface.shared.Edit > reviewed = new ArrayList< org.cluenet.cluebot.reviewinterface.shared.Edit >();
+		List< org.cluenet.cluebot.reviewinterface.shared.Edit > done = new ArrayList< org.cluenet.cluebot.reviewinterface.shared.Edit >();
 		
 		return new org.cluenet.cluebot.reviewinterface.shared.EditGroup(
-				KeyFactory.keyToString( key ), name, edits, reviewed, done, weight, AttachedEdit.countByStatus( this, Status.DONE ), AttachedEdit.countByStatus( this, Status.PARTIAL ), AttachedEdit.countByStatus( this, Status.NOTDONE )
+				KeyFactory.keyToString( key ),
+				name,
+				edits,
+				reviewed,
+				done,
+				weight,
+				AttachedEdit.countByStatus( this, Status.DONE ),
+				AttachedEdit.countByStatus( this, Status.PARTIAL ),
+				AttachedEdit.countByStatus( this, Status.NOTDONE )
 		);
 	}
 

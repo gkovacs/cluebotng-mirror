@@ -18,8 +18,15 @@
   <system-properties>
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
   </system-properties>
-    <inbound-services>
-  	  <service>xmpp_message</service>
-	</inbound-services>
+  <inbound-services>
+    <service>xmpp_message</service>
+  </inbound-services>
+
+  <admin-console>
+    <page name="Interface Admin" url="/admin.jsp" />
+    <page name="Interface Review" url="/review.jsp" />
+	<page name="Interface Welcome" url="/welcome" />
+	<page name="Appstats" url="/appstats/" />
+  </admin-console>
 
 </appengine-web-app>

@@ -95,6 +95,10 @@ public class User extends Persist implements Serializable {
 		return new org.cluenet.cluebot.reviewinterface.shared.User( nick, email.getEmail(), classifications, admin, KeyFactory.keyToString( key ) );
 	}
 	
+	public org.cluenet.cluebot.reviewinterface.shared.User getPublicClientClass() {
+		return new org.cluenet.cluebot.reviewinterface.shared.User( nick, "[hidden]", classifications, admin, KeyFactory.keyToString( key ) );
+	}
+	
 	public void incClassifications() {
 		classifications++;
 		this.store();

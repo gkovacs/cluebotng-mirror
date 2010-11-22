@@ -7,7 +7,7 @@ import java.util.List;
 public class EditGroup implements Serializable {
 
 	private static final long serialVersionUID = 5609605098542355175L;
-	public EditGroup( String key, String name, List< AdminEdit > edits, List< AdminEdit > reviewed, List< AdminEdit > done, Integer weight, Integer countDone, Integer countReviewed, Integer countLeft ) {
+	public EditGroup( String key, String name, List< Edit > edits, List< Edit > reviewed, List< Edit > done, Integer weight, Integer countDone, Integer countReviewed, Integer countLeft ) {
 		this.key = key;
 		this.name = name;
 		this.edits = edits;
@@ -25,9 +25,9 @@ public class EditGroup implements Serializable {
 	
 	public String key;
 	public String name;
-	public List< AdminEdit > edits;
-	public List< AdminEdit > reviewed;
-	public List< AdminEdit > done;
+	public List< Edit > edits;
+	public List< Edit > reviewed;
+	public List< Edit > done;
 	public Integer weight;
 	public Integer countDone;
 	public Integer countReviewed;

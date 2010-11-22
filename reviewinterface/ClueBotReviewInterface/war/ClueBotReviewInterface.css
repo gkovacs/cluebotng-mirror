@@ -35,9 +35,14 @@ body {
 #top #options .options * {
 	padding-left: 1em;
 }
-#top #username, #top #count {
+#top #username, #top #count, #top #editid, #top #goto {
 	margin-right: 1em;
 }
+
+#top #goto input {
+	height: 10px;
+}
+
 #iframediv {
 	position: absolute;
 	top: 25px;

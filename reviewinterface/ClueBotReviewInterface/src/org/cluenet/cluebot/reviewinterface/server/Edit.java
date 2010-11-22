@@ -12,7 +12,6 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import org.cluenet.cluebot.reviewinterface.shared.AdminEdit;
 import org.cluenet.cluebot.reviewinterface.shared.Classification;
 
 import com.google.appengine.api.datastore.Key;
@@ -133,11 +132,20 @@ public class Edit extends Persist {
 	}
 	
 	public org.cluenet.cluebot.reviewinterface.shared.Edit getClientClass() {
-		return new org.cluenet.cluebot.reviewinterface.shared.Edit( this.id, this.known );
+		return getClass( false, false );
 	}
 	
-	public AdminEdit getAdminClass() {
+	public org.cluenet.cluebot.reviewinterface.shared.Edit getAdminClass() {
+		return getClass( true, false );
+	}
+	
+	public org.cluenet.cluebot.reviewinterface.shared.Edit getLightClass() {
+		return getClass( false, true );
+	}
+	
+	private org.cluenet.cluebot.reviewinterface.shared.Edit getClass( Boolean admin, Boolean light ) {
 		List< org.cluenet.cluebot.reviewinterface.shared.User > users = new ArrayList< org.cluenet.cluebot.reviewinterface.shared.User >();
+		List< org.cluenet.cluebot.reviewinterface.shared.ClientClassification > classifications = new ArrayList< org.cluenet.cluebot.reviewinterface.shared.ClientClassification >();
 		Integer vandalism = 0, constructive = 0, skipped = 0;
 		List< String > comments = new ArrayList< String >();
 		for( EditClassification classification : classifications() ) {
@@ -147,10 +155,25 @@ public class Edit extends Persist {
 				vandalism++;
 			else if( classification.getClassification().equals( Classification.SKIPPED ) )
 				skipped++;
-			users.add( classification.getUser().getClientClass() );
+			if( admin )
+				users.add( classification.getUser().getClientClass() );
+			else
+				users.add( classification.getUser().getPublicClientClass() );
 			comments.add( classification.getComment() );
+			if( !light )
+				classifications.add( classification.getClientClass( admin ) );
 		}
-		return new AdminEdit( id, known, vandalism, constructive, skipped, getRequired(), comments, users );
+		return new org.cluenet.cluebot.reviewinterface.shared.Edit(
+				id,
+				known,
+				vandalism,
+				constructive,
+				skipped,
+				getRequired(),
+				comments,
+				users,
+				classifications
+		);
 	}
 
 	
@@ -267,7 +290,13 @@ public class Edit extends Persist {
 	}
 
 	public void newClassification( User user, Classification type, String comment ) {
-		new EditClassification( this, type, user, comment );
+		EditClassification ec = EditClassification.findByEditUser( this, user );
+		if( ec == null )
+			new EditClassification( this, type, user, comment );
+		else {
+			ec.setClassification( type );
+			ec.setComment( comment );
+		}
 		Queue queue = QueueFactory.getQueue( "edit-done-queue" );
 		for( AttachedEdit ae : attached() ) {
 			ae.addUser( user );

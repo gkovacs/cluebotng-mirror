@@ -114,6 +114,7 @@ public class AttachedEdit extends Persist {
 		Integer vandalism = edit.getVandalism();
 		Integer skipped = edit.getSkipped();
 		Integer sum = constructive + vandalism + skipped;
+		Integer max = Math.max( constructive, Math.max( vandalism, skipped ) );
 
 		if( sum == 0 && !this.status.equals( Status.NOTDONE ) ) {
 			this.status = Status.NOTDONE;
@@ -121,7 +122,7 @@ public class AttachedEdit extends Persist {
 			return;
 		}
 
-		if( sum >= required )
+		if( max >= required )
 			if(	2 * skipped > sum || constructive >= 3 * vandalism || vandalism >= 3 * constructive )
 				if( !this.status.equals( Status.DONE ) ) {
 					this.status = Status.DONE;

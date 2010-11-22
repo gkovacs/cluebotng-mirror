@@ -12,7 +12,10 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -42,10 +45,85 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 	
 	private void setUser( String name, Integer count ) {
 		RootPanel.get( "username" ).getElement().setInnerText( name );
-		RootPanel.get( "count" ).getElement().setInnerText( count.toString() );
+		
+		Anchor anchor = new Anchor( "javascript:void;" );
+		anchor.setText( count.toString() );
+		anchor.addClickHandler( new ClickHandler() {
+
+			@Override
+			public void onClick( ClickEvent event ) {
+				viewContributions();
+			}
+			
+		});
+		
+		RootPanel.get( "count" ).clear();
+		RootPanel.get( "count" ).add( anchor );
 	}
 	
-	private void doWait() {
+	private void viewContributions() {
+		new ViewContributions( this );
+	}
+	
+	private void setId( Integer id, final String url, Boolean isAdmin ) {
+		Anchor anchor;
+		
+		if( isAdmin )
+			anchor = new Anchor( "javascript:void;" );
+		else
+			anchor = new Anchor( url );
+		
+		anchor.setText( id.toString() );
+		
+		if( isAdmin )
+			anchor.addClickHandler( new ClickHandler() {
+	
+				@Override
+				public void onClick( ClickEvent event ) {
+					new EditInfoWindow( currentEdit, url );
+				}
+				
+			});
+		
+		RootPanel.get( "editid" ).clear();
+		RootPanel.get( "editid" ).add( anchor );
+		
+		if( isAdmin ) {
+			final TextBox gotoId = new TextBox();
+			gotoId.addKeyPressHandler( new KeyPressHandler(){
+	
+				@Override
+				public void onKeyPress( KeyPressEvent event ) {
+					if( event.getCharCode() == 13 )
+						gotoPage( new Integer( gotoId.getText() ) );
+				}
+			
+			});
+			
+			RootPanel.get( "goto" ).clear();
+			RootPanel.get( "goto" ).add( gotoId );
+		}
+	}
+	
+	public void gotoPage( Integer id ) {
+		doWait();
+		review.getId( id, this );
+	}
+	
+	public static void error( String error ) {
+		VerticalPanel hpanel = new VerticalPanel();
+		hpanel.add( new Label( "An error occurred.  Please refresh the page." ) );
+		hpanel.add( new Label( error ) );
+		DialogBox errorBox = new DialogBox();
+		errorBox.setText( "Error" );
+		errorBox.setAnimationEnabled( true );
+		errorBox.add( hpanel );
+		errorBox.center();
+		errorBox.setModal( true );
+		errorBox.show();
+	}
+	
+	public void doWait() {
 		pleaseWait = new DialogBox();
 		pleaseWait.setText( "Please Wait" );
 		pleaseWait.setAnimationEnabled( true );
@@ -195,6 +273,7 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 		setUser( result.user.userName, result.user.classifications );
 		currentEdit = result.edit;
 		setURL( getURL() + currentEdit.id );
+		setId( currentEdit.id, getURL() + currentEdit.id, result.user.isAdmin );
 	}
 	
 	private String getURL() {
