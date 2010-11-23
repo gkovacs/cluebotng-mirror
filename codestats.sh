@@ -1,9 +1,11 @@
-#!/bin/sh
-echo -e "Lang\t  Lines\t  Words\t  Bytes"
+#!/bin/bash
+(
+echo "LANG LINES WORDS BYTES"
 for lang in 'PHP/*.php' 'C++/*.?pp' 'Java/*.java' 'Bash/*.sh' 'Python/*.py' 'Make/Makefile'
 do
 	match=$(basename "${lang}")
 	name=$(dirname "${lang}")
-	echo -ne "${name}:\t"
+	echo -n "${name}: "
 	find . -iname "${match}" -print0 | xargs -0 cat | wc
 done
+) | column -t
