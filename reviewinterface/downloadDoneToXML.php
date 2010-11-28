@@ -19,7 +19,7 @@
 				$required = (String) $edit->Required;
 				$constructive = (String) $edit->Constructive;
 				$skipped = (String) $edit->Skipped;
-				$vandalism = (String) $edit->Vandalism
+				$vandalism = (String) $edit->Vandalism;
 				$max = max( $constructive, $skipped, $vandalism );
 				$sum = $constructive + $skipped + $vandalism;
 
