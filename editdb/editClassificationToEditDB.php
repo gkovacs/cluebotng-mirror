@@ -8,7 +8,7 @@
 	
 	$source = $argv[ 1 ];
 	
-	$in = fopen( 'php://input', 'r' );
+	$in = fopen( 'php://stdin', 'r' );
 	while( !feof( $in ) ) {
 		$line = trim( fgets( $in, 512 ) );
 		
