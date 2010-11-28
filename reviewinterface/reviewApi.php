@@ -40,24 +40,25 @@
 			}
 		}
 		
-		
-		$context = stream_context_create(
-			Array(
-				'http' => Array(
-					'method'  => 'POST',
-					'content' => implode( '&', $parts ),
-					'header'  => 'Content-Type: application/x-www-form-urlencoded'
-				)
+		$contextArray = Array(
+			'http' => Array(
+				'method'  => 'POST',
+				'content' => implode( '&', $parts ),
+				'header'  => 'Content-Type: application/x-www-form-urlencoded'
 			)
 		);
+
+		$context = stream_context_create( $contextArray );
 		$url = 'http://cluebotreview.g.cluenet.org/api';
-		return Array( $url, $context );
+		return Array( $url, $context, $contextArray );
 	}
 	
 	function callReviewAPI( $data ) {
 		$data = normalizeReviewAPIInput( $data );
-		list( $url, $context ) = callDataToURL( $data );
+		list( $url, $context, $contextData ) = callDataToURL( $data );
+		print_r( Array( 'url' => $url, 'context' => $contextData ) );
 		$xml = file_get_contents( $url, false, $context );
+		print_r( $xml );
 		return simplexml_load_string( $xml );
 	}
 ?>

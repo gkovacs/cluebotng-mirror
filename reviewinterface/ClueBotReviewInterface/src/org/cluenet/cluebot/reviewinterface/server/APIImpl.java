@@ -93,7 +93,8 @@ public class APIImpl extends HttpServlet {
 		for( String comment : edit.getComments() ) {
 			Element commentElement = doc.createElement( "Comment" );
 			commentElement.appendChild( doc.createTextNode( comment ) );
-			comments.appendChild( commentElement );
+			if( comment != null )
+				comments.appendChild( commentElement );
 		}
 		element.appendChild( comments );
 		
@@ -242,7 +243,41 @@ public class APIImpl extends HttpServlet {
 			StreamResult result =  new StreamResult( res.getOutputStream() );
 			transformer.transform(source, result);
 		} catch( Exception e ) {
-			
+			try {
+				DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+				DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+				Document doc = docBuilder.newDocument();
+				
+				Element root = doc.createElement( "API" );
+				doc.appendChild( root );
+				
+				Element error = doc.createElement( "Error" );
+				Element message = doc.createElement( "Message" );
+				message.appendChild( doc.createTextNode( e.getMessage() ) );
+				error.appendChild( message );
+				Element stackTrace = doc.createElement( "StackTrace" );
+				error.appendChild( stackTrace );
+				
+				for( StackTraceElement ste : e.getStackTrace() ) {
+					Element steDom = doc.createElement( "StackTraceElement" );
+					steDom.appendChild( doc.createTextNode( ste.toString() ) );
+					stackTrace.appendChild( steDom );
+				}
+				root.appendChild( error );
+				
+				TransformerFactory transformerFactory = TransformerFactory.newInstance();
+				Transformer transformer = transformerFactory.newTransformer();
+				DOMSource source = new DOMSource( doc );
+				StreamResult result =  new StreamResult( res.getOutputStream() );
+				transformer.transform(source, result);
+			} catch( Exception ex ) {
+				res.getWriter().println( "Error: " + ex.getMessage() );
+				ex.printStackTrace( res.getWriter() );
+				res.getWriter().println();
+				res.getWriter().println();
+				res.getWriter().println( "While throwing error: " + e.getMessage() );
+				e.printStackTrace( res.getWriter() );
+			}
 		}
 	}
 }
