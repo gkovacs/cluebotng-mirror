@@ -16,20 +16,23 @@
 				$xml->writeElement( 'Vandalism', (String) $edit->Vandalism );
 				$xml->writeElement( 'OriginalClassification', (String) $edit->Classification );
 				
-				$type = '';
-				if( ( (String) $edit->Constructive ) == ( (String) $edit->Required ) )
-					$type = 'C';
-				else if( ( (String) $edit->Skipped ) == ( (String) $edit->Required ) )
+				$required = (String) $edit->Required;
+				$constructive = (String) $edit->Constructive;
+				$skipped = (String) $edit->Skipped;
+				$vandalism = (String) $edit->Vandalism
+				$max = max( $constructive, $skipped, $vandalism );
+				$sum = $constructive + $skipped + $vandalism;
+
+				if( $max < $required )
+					$type = 'U';
+				else if( 2 * $skipped > $sum )
 					$type = 'S';
-				else if( ( (String) $edit->Vandalism ) == ( (String) $edit->Required ) )
+				else if( $constructive >= 3 * $vandalism )
+					$type = 'C';
+				else if( $vandalism >= 3 * $constructive )
 					$type = 'V';
 				else
 					$type = 'U';
-				
-				if( $type == 'V' and ( (String) $edit->Constructive ) > 0 )
-					$type .= 'S';
-				else if( $type == 'C' and ( (String) $edit->Vandalism ) > 0 )
-					$type .= 'S';
 				
 				$xml->writeElement( 'RealClassification', $type );
 				
