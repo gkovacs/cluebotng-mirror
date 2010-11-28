@@ -22,10 +22,10 @@
 		if( !$row ) {
 			echo 'Inserting ' . $id . ' ...';
 			$ret = insertEdit( $id, $isVand, $isActive, $reviewers, $reviewers_agreeing, $source );
-				if( $ret )
-					echo ' Done.' . "\n";
-				else
-					echo ' Failed.' . "\n";
+			if( $ret )
+				echo ' Done.' . "\n";
+			else
+				echo ' Failed.' . "\n";
 		} else {
 			$updates = Array();
 			if( $row[ 'isvandalism' ] != $isVand )
