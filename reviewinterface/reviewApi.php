@@ -56,9 +56,7 @@
 	function callReviewAPI( $data ) {
 		$data = normalizeReviewAPIInput( $data );
 		list( $url, $context, $contextData ) = callDataToURL( $data );
-		print_r( Array( 'url' => $url, 'context' => $contextData ) );
 		$xml = file_get_contents( $url, false, $context );
-		print_r( $xml );
 		return simplexml_load_string( $xml );
 	}
 ?>
