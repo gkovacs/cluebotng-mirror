@@ -21,6 +21,12 @@
 			case 'C': list( $isVand, $isActive ) = Array( 0, 1 ); break;
 		}
 		
+		$mysql = getMasterMySQL();
+		$row = mysql_fetch_assoc( mysql_query( 'SELECT `editid` FROM `editset` WHERE `editid` = \'' . mysql_real_escape_string( $id ) . '\'' ) );
+		
+		if( $row )
+			continue;
+		
 		echo 'Inserting ' . $id . ' ...';
 		$ret = insertEdit( $id, $isVand, $isActive, 0, 0, $source );
 		if( $ret )
