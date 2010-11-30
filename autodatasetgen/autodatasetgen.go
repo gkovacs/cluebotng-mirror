@@ -17,11 +17,11 @@ type pipelineStep struct {
 
 type pipelinePackage struct {
 	id int
-	page int
+	page uint
 	user string
 	comment string
 	nextUser string
-	nextId int
+	nextId uint
 	nextComment string
 	delta int
 	origSize int
@@ -130,12 +130,12 @@ func getURL(url string) (data string, error os.Error) {
 }
 
 func main() {
-	rangeGenerator(1, 500,
+	rangeGenerator(341000000, 342000000,
 	filter(true, func(id *pipelinePackage, db *mysql.MySQL) bool {
 		//If edit is in ns0, return true.
 		res, err := db.Query("SELECT `page_namespace`, `page_id`, `rev_user_text`, `rev_comment` FROM `revision` JOIN `page` ON `rev_page` = `page_id` WHERE `rev_id` = " + strconv.Itoa(id.id))
 		if err != nil {
-			fmt.Printf("Error: %v\n", err)
+			fmt.Printf("1Error: %v\n", err)
 			return false
 		}
 		row := res.FetchRow()
@@ -143,7 +143,7 @@ func main() {
 			return false
 		}
 		if row[0] == 0 {
-			id.page, _ = row[1].(int)
+			id.page, _ = row[1].(uint)
 			id.user, _ = row[2].(string)
 			id.comment, _ = row[3].(string)
 			return true
@@ -152,20 +152,20 @@ func main() {
 	},
 	branch(true, func(id *pipelinePackage, db *mysql.MySQL) bool {
 		//If edit was reverted, return true.
-		res, err := db.Query("SELECT `rev_id`, `rev_user_text`, `rev_comment` FROM `revision` WHERE `rev_page` = " + strconv.Itoa(id.page) + " AND `rev_id` > " + strconv.Itoa(id.id) + " ORDER BY `rev_id` DESC LIMIT 1")
+		res, err := db.Query("SELECT `rev_id`, `rev_user_text`, `rev_comment` FROM `revision` WHERE `rev_page` = " + strconv.Uitoa(id.page) + " AND `rev_id` > " + strconv.Itoa(id.id) + " ORDER BY `rev_id` ASC LIMIT 1")
 		if err != nil {
-			fmt.Printf("Error: %v\n", err)
+			fmt.Printf("2Error: %v\n", err)
 			return false
 		}
 		row := res.FetchRow()
 		if row == nil {
 			return false
 		}
-		id.nextId, _ = row[0].(int)
+		id.nextId, _ = row[0].(uint)
 		id.nextUser, _ = row[1].(string)
 		id.nextComment, _ = row[2].(string)
 		if (strings.Contains(id.nextComment, "Revert") || strings.Contains(id.nextComment, "Undid")) && (strings.Contains(id.nextComment, id.user) || strings.Contains(id.nextComment, strconv.Itoa(id.id))) {
-			if strings.Contains(id.nextUser, "Bot") {
+			if !strings.Contains(id.nextUser, "Bot") {
 				return true
 			}
 		}
@@ -175,7 +175,7 @@ func main() {
 		//If user was warned, return true.
 		res, err := db.Query("SELECT `rev_id` FROM `revision` JOIN `page` ON `page_id` = `rev_page` WHERE `page_namespace` = 3 AND `page_title` = '" + db.Escape(strings.Replace(id.user, " ", "_", -1)) + "' AND `rev_user_text` = '" + db.Escape(id.nextUser) + "' AND (`rev_comment` LIKE '%warning%' OR `rev_comment` LIKE 'General note: Nonconstructive%') LIMIT 1")
 		if err != nil {
-			fmt.Printf("Error: %v\n", err)
+			fmt.Printf("3Error: %v\n", err)
 			return false
 		}
 		row := res.FetchRow()
@@ -184,7 +184,7 @@ func main() {
 		}
 		return true
 	},
-	filter(true, func(id *pipelinePackage, db *mysql.MySQL) bool {
+	filter(false, func(id *pipelinePackage, db *mysql.MySQL) bool {
 		//If user still has warning, return true.
 		data, err := getURL("http://en.wikipedia.org/w/index.php?action=raw&title=User_talk:" + http.URLEscape(id.user))
 		if err != nil {
@@ -199,14 +199,17 @@ func main() {
 		//If warner has >300 edits, return true.
 		res, err := db.Query("SELECT `user_editcount` FROM `user` WHERE `user_name` = '" + db.Escape(id.nextUser) + "'")
 		if err != nil {
-			fmt.Printf("Error: %v\n", err)
+			fmt.Printf("4Error: %v\n", err)
 			return false
 		}
 		row := res.FetchRow()
 		if row == nil {
 			return false
 		}
-		editCount, _ := row[0].(int)
+		editCount, worked := row[0].(int)
+		if !worked {
+			fmt.Printf("Error-2: %v\n", row[0])
+		}
 		if editCount > 300 {
 			return true
 		}
@@ -214,11 +217,11 @@ func main() {
 	},
 	outputSink("%d V\n")))),
 
-	filter(true, func(id *pipelinePackage, db *mysql.MySQL) bool {
+	filter(false, func(id *pipelinePackage, db *mysql.MySQL) bool {
 		//If user has no warnings on talk page, return true.
 		data, err := getURL("http://en.wikipedia.org/w/index.php?action=raw&title=User_talk:" + http.URLEscape(id.user))
 		if err != nil {
-			fmt.Printf("Error: %v\n", err)
+			fmt.Printf("5Error: %v\n", err)
 			return false
 		}
 		if err != nil {
@@ -233,14 +236,17 @@ func main() {
 		//If user has more than 100 edits, return true.
 		res, err := db.Query("SELECT `user_editcount` FROM `user` WHERE `user_name` = '" + db.Escape(id.user) + "'")
 		if err != nil {
-			fmt.Printf("Error: %v\n", err)
+			fmt.Printf("6Error: %v\n", err)
 			return false
 		}
 		row := res.FetchRow()
 		if row == nil {
 			return false
 		}
-		editCount, _ := row[0].(int)
+		editCount, worked := row[0].(int)
+		if !worked {
+			fmt.Printf("Error0: %v\n", row[0])
+		}
 		if editCount > 100 {
 			return true
 		}
@@ -249,16 +255,16 @@ func main() {
 	outputSink("%d C\n"),
 	filter(true, func(id *pipelinePackage, db *mysql.MySQL) bool {
 		//If page has more than 8 revisions since, return true.
-		res, err := db.Query("SELECT COUNT(*) FROM `revision` WHERE `rev_page` = " + strconv.Itoa(id.page) + " AND `rev_id` > " + strconv.Itoa(id.id))
+		res, err := db.Query("SELECT COUNT(*) FROM `revision` WHERE `rev_page` = " + strconv.Uitoa(id.page) + " AND `rev_id` > " + strconv.Itoa(id.id))
 		if err != nil {
-			fmt.Printf("Error: %v\n", err)
+			fmt.Printf("7Error: %v\n", err)
 			return false
 		}
 		row := res.FetchRow()
 		if row == nil {
 			return false
 		}
-		count, _ := row[0].(int)
+		count, _ := row[0].(uint)
 		if count > 8 {
 			return true
 		}
@@ -266,16 +272,19 @@ func main() {
 	},
 	filter(true, func(id *pipelinePackage, db *mysql.MySQL) bool {
 		//If any of the next 8 edits are reverts, return false.
-		res, err := db.Query("SELECT COUNT(*) FROM (SELECT `rev_comment` FROM `revision` WHERE `rev_page` = " + strconv.Itoa(id.page) + " AND `rev_id` > " + strconv.Itoa(id.id) + " LIMIT 8) AS `temp` WHERE `rev_comment` LIKE '%revert%' OR `rev_comment` LIKE 'Undid%'")
+		res, err := db.Query("SELECT COUNT(*) FROM (SELECT `rev_comment` FROM `revision` WHERE `rev_page` = " + strconv.Uitoa(id.page) + " AND `rev_id` > " + strconv.Itoa(id.id) + " LIMIT 8) AS `temp` WHERE `rev_comment` LIKE '%revert%' OR `rev_comment` LIKE 'Undid%'")
 		if err != nil {
-			fmt.Printf("Error: %v\n", err)
+			fmt.Printf("8Error: %v\n", err)
 			return false
 		}
 		row := res.FetchRow()
 		if row == nil {
 			return false
 		}
-		count, _ := row[0].(int)
+		count, worked := row[0].(int)
+		if !worked {
+			fmt.Printf("Error2: %v\n", row[0])
+		}
 		if count > 0 {
 			return false
 		}
@@ -283,17 +292,25 @@ func main() {
 	},
 	filter(true, func(id *pipelinePackage, db *mysql.MySQL) bool {
 		//If edit resulted in increase in page length, and next 4 edits resulted in decrease, return false.
-		res, err := db.Query("SELECT `a`.`rev_len` - `b`.`rev_len`, `b`.`rev_len` FROM `revision` AS `a` JOIN `revision` AS `b` ON `a`.`rev_parent_id` = `b`.`rev_id` WHERE `a`.`rev_id` >= " + strconv.Itoa(id.id) + " AND `a`.`rev_page` = " + strconv.Itoa(id.page) + " ORDER BY `a`.`rev_id` ASC LIMIT 5")
+		res, err := db.Query("SELECT `a`.`rev_len` - `b`.`rev_len`, `b`.`rev_len` FROM `revision` AS `a` JOIN `revision` AS `b` ON `a`.`rev_parent_id` = `b`.`rev_id` WHERE `a`.`rev_id` >= " + strconv.Itoa(id.id) + " AND `a`.`rev_page` = " + strconv.Uitoa(id.page) + " ORDER BY `a`.`rev_id` ASC LIMIT 5")
 		if err != nil {
-			fmt.Printf("Error: %v\n", err)
+			fmt.Printf("9Error: %v\n", err)
 			return false
 		}
 		row := res.FetchRow()
 		if row == nil {
 			return false
 		}
-		id.delta, _ = row[0].(int)
-		id.origSize, _ = row[1].(int)
+		delta, worked0 := row[0].(int)
+		id.delta = delta
+		if !worked0 {
+			fmt.Printf("Error3: %v\n", row[0])
+		}
+		origSize, worked1 := row[1].(int)
+		id.origSize = origSize
+		if !worked1 {
+			fmt.Printf("Error4: %v\n", row[1])
+		}
 		if id.delta <= 0 {
 			return true
 		}
@@ -315,9 +332,9 @@ func main() {
 			return true
 		}
 
-		res, err := db.Query("SELECT `rev_len` FROM `revision` WHERE `rev_id` > " + strconv.Itoa(id.id) + " AND `rev_page` = " + strconv.Itoa(id.page) + " ORDER BY `a`.`rev_id` ASC LIMIT 8")
+		res, err := db.Query("SELECT `rev_len` FROM `revision` WHERE `rev_id` > " + strconv.Itoa(id.id) + " AND `rev_page` = " + strconv.Uitoa(id.page) + " ORDER BY `a`.`rev_id` ASC LIMIT 8")
 		if err != nil {
-			fmt.Printf("Error: %v\n", err)
+			fmt.Printf("0Error: %v\n", err)
 			return false
 		}
 		for {
@@ -325,7 +342,10 @@ func main() {
 			if row == nil {
 				break
 			}
-			length, _ := row[0].(int)
+			length, worked := row[0].(int)
+			if !worked {
+				fmt.Printf("Error5: %v\n", row[0])
+			}
 			diff := length - id.origSize
 			if diff < 10 && diff > -10 {
 				return false
