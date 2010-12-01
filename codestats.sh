@@ -1,7 +1,7 @@
 #!/bin/bash
 (
 echo "LANG LINES WORDS BYTES"
-for lang in 'PHP/*.php' 'C++/*.?pp' 'Java/*.java' 'Bash/*.sh' 'Python/*.py' 'Make/Makefile' 'Config/*.conf'
+for lang in 'PHP/*.php' 'C++/*.?pp' 'Java/*.java' 'Bash/*.sh' 'Python/*.py' 'Make/Makefile' 'Config/*.conf' 'Go/*.go'
 do
 	match=$(basename "${lang}")
 	name=$(dirname "${lang}")
