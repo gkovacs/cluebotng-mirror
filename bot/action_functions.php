@@ -35,7 +35,6 @@
 					. '* {{' . ( ( long2ip( ip2long( $change[ 'user' ] ) ) == $change[ 'user' ] ) ? 'IPvandal' : 'Vandal' ) . '|' . $change[ 'user' ] . '}}'
 					. ' - ' . $report . ' (Automated) ~~~~' . "\n",
 					'Automatically reporting [[Special:Contributions/' . $change[ 'user' ] . ']].' .
-					'Questions, comments, complaints -> [[User:' . Config::$user . '/B|BRFA]]' .
 					' (bot)',
 					false,
 					false
@@ -54,8 +53,7 @@
 				. '|3=' . $report
 				. ' <!{{subst:ns:0}}-- MySQL ID: ' . $change[ 'mysqlid' ] . ' --{{subst:ns:0}}>}} ~~~~'
 				. "\n",
-				'Warning [[Special:Contributions/' . $change[ 'user' ] . '|' . $change[ 'user' ] . ']] - #' . $warning . ' ' .
-				'Questions, comments, complaints -> [[User:' . Config::$user . '/B|BRFA]]',
+				'Warning [[Special:Contributions/' . $change[ 'user' ] . '|' . $change[ 'user' ] . ']] - #' . $warning,
 				false,
 				false
 			); /* Warn the user */
@@ -94,7 +92,7 @@
 				'Reverting possible vandalism by [[Special:Contributions/' . $change[ 'user' ] . '|' . $change[ 'user' ] . ']] ' .
 				'to ' . ( ( $revid == 0 ) ? 'older version' : 'version by ' . $revdata[ 'user' ] ) . '. ' .
 				//'False positive? [[User:' . Config::$user . '/FalsePositives|Report it]]. ' .
-				'Questions, comments, complaints -> [[User:' . Config::$user . '/B|BRFA]] ' .
+				'False positive? [[User:' . Config::$user . '/FalsePositives|Report it]]. ' .
 				'Thanks, [[User:' . Config::$user . '|' . Config::$user . ']]. (' . $change[ 'mysqlid' ] . ') (Bot)',
 				$rbtok
 			);
