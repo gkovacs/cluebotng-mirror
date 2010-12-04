@@ -47,6 +47,16 @@
   </servlet-mapping>
   
   <servlet>
+    <servlet-name>statisticsServlet</servlet-name>
+    <servlet-class>org.cluenet.cluebot.reviewinterface.server.StatisticsImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>statisticsServlet</servlet-name>
+    <url-pattern>/_ah/cron/stats</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>reviewServlet</servlet-name>
     <servlet-class>org.cluenet.cluebot.reviewinterface.server.ReviewServiceImpl</servlet-class>
   </servlet>

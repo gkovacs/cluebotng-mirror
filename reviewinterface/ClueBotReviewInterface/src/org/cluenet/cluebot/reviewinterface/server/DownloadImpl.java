@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.tools.tar.TarConstants;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
+import org.cluenet.cluebot.reviewinterface.shared.Classification;
+
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
@@ -206,17 +208,14 @@ public class DownloadImpl extends HttpServlet {
 		for( Key key : eg.getDone() ) {
 			Edit edit = Edit.findByKey( key );
 			pw.print( edit.getId().toString() + " " );
-			if( edit.getVandalism() >= edit.getRequired() )
-				if( edit.getConstructive() > 0 )
-					pw.println( "VS" );
-				else
-					pw.println( "V" );
-			else if( edit.getConstructive() >= edit.getRequired() )
-				if( edit.getVandalism() > 0 )
-					pw.println( "CS" );
-				else
-					pw.println( "C" );
-			else if( edit.getSkipped() >= edit.getRequired() )
+			
+			Classification cls = edit.calculateClassification();
+			
+			if( cls.equals( Classification.CONSTRUCTIVE ) )
+				pw.println( "C" );
+			else if( cls.equals( Classification.VANDALISM ) )
+				pw.println( "V" );
+			else if( cls.equals( Classification.SKIPPED ) )
 				pw.println( "S" );
 			else
 				pw.println( "U" );

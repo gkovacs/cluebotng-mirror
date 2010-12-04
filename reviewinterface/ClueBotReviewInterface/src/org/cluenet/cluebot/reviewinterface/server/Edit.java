@@ -13,6 +13,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import org.cluenet.cluebot.reviewinterface.shared.Classification;
+import org.cluenet.cluebot.reviewinterface.shared.Status;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -81,6 +82,40 @@ public class Edit extends Persist {
 		return id;
 	}
 	
+	public Status calculateStatus() {
+		Integer required = getRequired();
+		Integer constructive = getConstructive();
+		Integer vandalism = getVandalism();
+		Integer skipped = getSkipped();
+		Integer sum = constructive + vandalism + skipped;
+		Integer max = Math.max( constructive, Math.max( vandalism, skipped ) );
+
+		if( sum == 0 )
+			return Status.NOTDONE;
+
+		if( max >= required )
+			if( calculateClassification().equals( Classification.UNKNOWN ) )
+				return Status.DONE;
+		
+		return Status.PARTIAL;
+	}
+	
+	public Classification calculateClassification() {
+		Integer constructive = getConstructive();
+		Integer vandalism = getVandalism();
+		Integer skipped = getSkipped();
+		Integer sum = constructive + vandalism + skipped;
+
+		if( 2 * skipped > sum )
+			return Classification.SKIPPED;
+		if( constructive >= 3 * vandalism )
+			return Classification.CONSTRUCTIVE;
+		if( vandalism >= 3 * constructive )
+			return Classification.VANDALISM;
+
+		return Classification.UNKNOWN;
+	}
+	
 	@SuppressWarnings( "unchecked" )
 	private List< AttachedEdit > attached() {
 		PersistenceManager pm = JDOFilter.getPM();
@@ -92,7 +127,7 @@ public class Edit extends Persist {
 	}
 	
 	@SuppressWarnings( "unchecked" )
-	private List< EditClassification > classifications() {
+	public List< EditClassification > classifications() {
 		PersistenceManager pm = JDOFilter.getPM();
 		Query q = pm.newQuery( EditClassification.class );
 		q.setFilter( "edit == thisEdit" );

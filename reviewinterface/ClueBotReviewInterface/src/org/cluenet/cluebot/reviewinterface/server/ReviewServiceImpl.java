@@ -82,24 +82,27 @@ public class ReviewServiceImpl extends RemoteServiceServlet implements
 
 	@Override
 	public List< ClientClassification > getClassifications( String start, Integer count ) throws Exception {
-		try {
-			Key key = null;
-			if( start != null && !start.equals( "" ) )
-				key = KeyFactory.stringToKey( start );
-		
-			List< ClientClassification > list = new ArrayList< ClientClassification >();
+		for( Integer i = 0 ; i < 10 ; i++ )
+			try {
+				Key key = null;
+				if( start != null && !start.equals( "" ) )
+					key = KeyFactory.stringToKey( start );
 			
-			User user = User.findByEmail( new Email( UserServiceFactory.getUserService().getCurrentUser().getEmail() ) );
-			if( user == null )
-				throw new IllegalArgumentException( "You have no user account." );
-			
-			for( EditClassification ec : EditClassification.findByUser( user, key, count ) )
-				list.add( ec.getClientClass( false, true ) );
-			
-			return list;
-		} catch( Exception e ) {
-			e.printStackTrace();
-			throw new IllegalArgumentException( e.getMessage() );
-		}
+				List< ClientClassification > list = new ArrayList< ClientClassification >();
+				
+				User user = User.findByEmail( new Email( UserServiceFactory.getUserService().getCurrentUser().getEmail() ) );
+				if( user == null )
+					throw new IllegalArgumentException( "You have no user account." );
+				
+				for( EditClassification ec : EditClassification.findByUser( user, key, count ) )
+					list.add( ec.getClientClass( false, true ) );
+				
+				return list;
+			} catch( Exception e ) {
+				e.printStackTrace();
+				if( i >= 9 )
+					throw new IllegalArgumentException( e.getMessage() );
+			}
+		return null;
 	}
 }

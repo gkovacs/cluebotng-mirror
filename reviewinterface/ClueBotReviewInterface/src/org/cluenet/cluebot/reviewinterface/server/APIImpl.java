@@ -89,6 +89,10 @@ public class APIImpl extends HttpServlet {
 		classification.appendChild( doc.createTextNode( edit.getKnown().toString() ) );
 		element.appendChild( classification );
 		
+		Element newClassification = doc.createElement( "NewClassification" );
+		newClassification.appendChild( doc.createTextNode( edit.calculateClassification().toString() ) );
+		element.appendChild( newClassification );
+		
 		Element comments = doc.createElement( "Comments" );
 		for( String comment : edit.getComments() ) {
 			Element commentElement = doc.createElement( "Comment" );
@@ -105,6 +109,30 @@ public class APIImpl extends HttpServlet {
 			users.appendChild( userKeyElement );
 		}
 		element.appendChild( users );
+		
+		Element classifications = doc.createElement( "EditClassifications" );
+		for( EditClassification ec : edit.classifications() ) {
+			Element editClassification = doc.createElement( "EditClassification" );
+			
+			Element ecKey = doc.createElement( "Key" );
+			ecKey.appendChild( doc.createTextNode( KeyFactory.keyToString( ec.getKey() ) ) );
+			editClassification.appendChild( ecKey );
+			
+			Element userKeyElement = doc.createElement( "UserKey" );
+			userKeyElement.appendChild( doc.createTextNode( KeyFactory.keyToString( ec.getUser().getKey() ) ) );
+			editClassification.appendChild( userKeyElement );
+			
+			Element ecClassification = doc.createElement( "Classification" );
+			ecClassification.appendChild( doc.createTextNode( ec.getClassification().toString() ) );
+			editClassification.appendChild( ecClassification );
+			
+			Element comment = doc.createElement( "Comment" );
+			comment.appendChild( doc.createTextNode( ec.getComment() ) );
+			editClassification.appendChild( comment );
+			
+			classifications.appendChild( editClassification );
+		}
+		element.appendChild( classifications );
 		
 		return element;
 	}

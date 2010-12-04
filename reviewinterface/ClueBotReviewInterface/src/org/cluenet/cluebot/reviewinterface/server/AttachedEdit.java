@@ -109,32 +109,14 @@ public class AttachedEdit extends Persist {
 
 	public void updateEditState() {
 		Edit edit = Edit.findByKey( this.edit );
-		Integer required = edit.getRequired();
-		Integer constructive = edit.getConstructive();
-		Integer vandalism = edit.getVandalism();
-		Integer skipped = edit.getSkipped();
-		Integer sum = constructive + vandalism + skipped;
-		Integer max = Math.max( constructive, Math.max( vandalism, skipped ) );
-
-		if( sum == 0 && !this.status.equals( Status.NOTDONE ) ) {
-			this.status = Status.NOTDONE;
-			this.store();
+		
+		Status status = edit.calculateStatus();
+		
+		if( this.status.equals( status ) )
 			return;
-		}
-
-		if( max >= required )
-			if(	2 * skipped > sum || constructive >= 3 * vandalism || vandalism >= 3 * constructive )
-				if( !this.status.equals( Status.DONE ) ) {
-					this.status = Status.DONE;
-					this.store();
-					return;
-				}
-
-		if( !this.status.equals( Status.PARTIAL ) ) {
-			this.status = Status.PARTIAL;
-			this.store();
-			return;
-		}
+		
+		this.status = status;
+		this.store();
 	}
 	
 	public static Boolean hasWaitingEditsForEditGroup( EditGroup eg ) {
