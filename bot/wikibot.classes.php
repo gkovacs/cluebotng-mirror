@@ -609,7 +609,8 @@
 				'user' => $user,
 				'summary' => $reason,
 				'token' => $token,
-				'markbot' => 0
+				'markbot' => 0,
+				'bot' => 0
 			);
 
 			echo 'Posting to API: ';
