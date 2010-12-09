@@ -6,4 +6,10 @@
     <schedule>every day 00:00</schedule>
     <timezone>America/New_York</timezone>
   </cron>
+  <cron>
+    <url>/_ah/cron/reportinterface</url>
+    <description>Fetch data from report interface</description>
+    <schedule>every 1 hours</schedule>
+    <timezone>America/New_York</timezone>
+  </cron>
 </cronentries>

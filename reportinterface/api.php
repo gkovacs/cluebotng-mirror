@@ -8,5 +8,5 @@
 	while( $row = mysql_fetch_assoc( $result ) )
 		$ids[] = $row[ 'new_id' ];
 	
-	echo implode( ':', $ids );
+	echo implode( "\n", $ids );
 ?>

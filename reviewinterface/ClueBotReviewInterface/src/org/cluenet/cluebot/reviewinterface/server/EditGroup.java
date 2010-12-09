@@ -152,7 +152,8 @@ public class EditGroup extends Persist {
 
 	public void addEdits( List< Edit > edits ) {
 		for( Edit edit : edits )
-			new AttachedEdit( this, edit, Status.NOTDONE );
+			if( AttachedEdit.findByEditGroupAndEdit( this, edit ) == null )
+				new AttachedEdit( this, edit, Status.NOTDONE );
 	}
 
 

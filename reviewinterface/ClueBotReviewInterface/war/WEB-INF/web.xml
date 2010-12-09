@@ -67,6 +67,16 @@
   </servlet-mapping>
   
   <servlet>
+    <servlet-name>ReportInterfaceServlet</servlet-name>
+    <servlet-class>org.cluenet.cluebot.reviewinterface.server.ReportInterfaceCronImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>ReportInterfaceServlet</servlet-name>
+  	<url-pattern>/_ah/cron/reportinterface</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>reviewServlet</servlet-name>
     <servlet-class>org.cluenet.cluebot.reviewinterface.server.ReviewServiceImpl</servlet-class>
   </servlet>

@@ -104,7 +104,9 @@ public class AttachedEdit extends Persist {
 		q.declareImports( "import com.google.appengine.api.datastore.Key;" );
 		q.declareParameters( "Key theEdit, Key theEditGroup" );
 		List< AttachedEdit > ae = (List< AttachedEdit >) q.execute( edit, editGroup );
-		return (AttachedEdit) ae.get( 0 );
+		if( ae.size() > 0 )
+			return (AttachedEdit) ae.get( 0 );
+		return null;
 	}
 
 	public void updateEditState() {
