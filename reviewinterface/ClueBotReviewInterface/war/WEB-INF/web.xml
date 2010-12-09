@@ -47,6 +47,16 @@
   </servlet-mapping>
   
   <servlet>
+    <servlet-name>runStatsServlet</servlet-name>
+    <servlet-class>org.cluenet.cluebot.reviewinterface.server.RunStatsImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>runStatsServlet</servlet-name>
+    <url-pattern>/stats</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
     <servlet-name>statisticsServlet</servlet-name>
     <servlet-class>org.cluenet.cluebot.reviewinterface.server.StatisticsImpl</servlet-class>
   </servlet>

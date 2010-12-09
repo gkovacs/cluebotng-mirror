@@ -84,9 +84,10 @@ public class Edit extends Persist {
 	
 	public Status calculateStatus() {
 		Integer required = getRequired();
-		Integer constructive = getConstructive();
-		Integer vandalism = getVandalism();
-		Integer skipped = getSkipped();
+		Map< Classification, Integer > map = count();
+		Integer constructive = map.containsKey( Classification.CONSTRUCTIVE ) ? map.get( Classification.CONSTRUCTIVE ) : 0;
+		Integer vandalism = map.containsKey( Classification.VANDALISM ) ? map.get( Classification.VANDALISM ) : 0;
+		Integer skipped = map.containsKey( Classification.SKIPPED ) ? map.get( Classification.SKIPPED ) : 0;
 		Integer sum = constructive + vandalism + skipped;
 		Integer max = Math.max( constructive, Math.max( vandalism, skipped ) );
 
@@ -94,16 +95,17 @@ public class Edit extends Persist {
 			return Status.NOTDONE;
 
 		if( max >= required )
-			if( calculateClassification().equals( Classification.UNKNOWN ) )
+			if( !calculateClassification().equals( Classification.UNKNOWN ) )
 				return Status.DONE;
 		
 		return Status.PARTIAL;
 	}
 	
 	public Classification calculateClassification() {
-		Integer constructive = getConstructive();
-		Integer vandalism = getVandalism();
-		Integer skipped = getSkipped();
+		Map< Classification, Integer > map = count();
+		Integer constructive = map.containsKey( Classification.CONSTRUCTIVE ) ? map.get( Classification.CONSTRUCTIVE ) : 0;
+		Integer vandalism = map.containsKey( Classification.VANDALISM ) ? map.get( Classification.VANDALISM ) : 0;
+		Integer skipped = map.containsKey( Classification.SKIPPED ) ? map.get( Classification.SKIPPED ) : 0;
 		Integer sum = constructive + vandalism + skipped;
 
 		if( 2 * skipped > sum )

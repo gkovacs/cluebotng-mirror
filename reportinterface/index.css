@@ -1,0 +1,102 @@
+#left {
+	display: block;
+	left: 0px;
+	top: 0;
+	width: 250px;
+	border-right: 1px solid #d3e1f9;
+	padding-right: 10px;
+	margin-right: 10px;
+}
+#content {
+	display: table-cell;
+	padding-top: 1em;
+/*	width: 100%;*/
+}
+#left h2 {
+	padding-top: 1em;
+	padding-bottom: .17em;
+	border-bottom: 1px solid #d3e1f9;
+	font-size: 120%;
+	padding-left: 1em;
+}
+.floatleft {
+	float: left;
+}
+#top .floatleft {
+	padding-left: 1em;
+	margin-left: 1em;
+}
+.floatright {
+	float: right;
+}
+#top .floatright {
+	padding-right: 1em;
+	margin-right: 1em;
+}
+#top {
+	height: 70px;
+}
+.hline {
+	clear: both;
+	border-bottom: 1px solid #d3e1f9;
+}
+#title, .title {
+	vertical-align: middle;
+}
+.image {
+	border: 1px dashed #d3e1f9;
+	margin: 10px;
+	padding: 5px;
+}
+.reporttable {
+	width: 100%;
+}
+.reporttable tr th {
+	text-align: left;
+	vertical-align: top;
+}
+div.comment {
+	border: 1px dashed #000000;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	min-height: 100px;
+}
+.commentuser {
+	float: left;
+	width: 200px;
+	padding-left: 5px;
+}
+.commentheader {
+	background: #aaffaa;
+	border-bottom: 1px solid #d3e1f9;
+	padding: 5px;
+	font-size: small;
+}
+.commentid {
+	float: right;
+}
+.commentdata {
+	/*padding: 5px;*/
+	background: #eefeee;
+}
+.commentdata2 {
+	margin-left: 200px;
+	border-left: 1px solid #d3e1f9;
+	background: #ffffff;
+	min-height: 100px;
+}
+.commentbody {
+	padding: 5px;
+}
+.commentbody p {
+	margin-top: 0;
+}
+.reportertable {
+	border: 1px dashed #000000;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+.diffborder {
+	border: 1px dashed #000000;
+	width: 100%;
+}

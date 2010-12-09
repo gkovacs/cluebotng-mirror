@@ -7,12 +7,17 @@
   </queue>
   <queue>
     <name>edit-done-queue</name>
-    <rate>3/s</rate>
+    <rate>30/s</rate>
 	<bucket-size>1</bucket-size>
   </queue>
   <queue>
     <name>garbage-collection-queue</name>
     <rate>30/s</rate>
 	<bucket-size>30</bucket-size>
+  </queue>
+  <queue>
+    <name>default-queue</name>
+    <rate>10/s</rate>
+	<bucket-size>1</bucket-size>
   </queue>
 </queue-entries>
