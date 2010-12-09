@@ -28,6 +28,9 @@
 				if( $set !== null ) {
 					mysql_query( 'UPDATE `users` SET ' . $set . ' WHERE `userid` = \'' . mysql_real_escape_string( $_REQUEST[ 'uid' ] ) . '\'' );
 				}
+				
+				rc( '[[report:Special:UserAdmin]] ' . $_REQUEST[ 'action' ] . ' http://' . $_SERVER[ 'HTTP_HOST' ] . $_SERVER[ 'PHP_SELF' ] . '?page=User+Admin * ' . $_SESSION[ 'username' ] . ' * ' . $_REQUEST[ 'action' ] . ' ' . $_REQUEST[ 'user' ] );
+				
 				header( 'Location: ?page=User+Admin' );
 				die();
 			}
@@ -54,10 +57,10 @@
 				echo '<tr>';
 				echo '<td>';
 				if( $user[ 'admin' ] != 'super' ) {
-					echo '<a href="?page=User+Admin&action=delete&uid=' . $user[ 'id' ] . '">X</a> &middot; ';
-					echo '<a href="?page=User+Admin&action=superadmin&uid=' . $user[ 'id' ] . '">++</a> &middot; ';
-					echo '<a href="?page=User+Admin&action=admin&uid=' . $user[ 'id' ] . '">+</a> &middot; ';
-					echo '<a href="?page=User+Admin&action=deadmin&uid=' . $user[ 'id' ] . '">-</a> ';
+					echo '<a href="?page=User+Admin&action=delete&uid=' . $user[ 'id' ] . '&user=' . urlencode( $user[ 'user' ] ) . '">X</a> &middot; ';
+					echo '<a href="?page=User+Admin&action=superadmin&uid=' . $user[ 'id' ] . '&user=' . urlencode( $user[ 'user' ] ) . '">++</a> &middot; ';
+					echo '<a href="?page=User+Admin&action=admin&uid=' . $user[ 'id' ] . '&user=' . urlencode( $user[ 'user' ] ) . '">+</a> &middot; ';
+					echo '<a href="?page=User+Admin&action=deadmin&uid=' . $user[ 'id' ] . '&user=' . urlencode( $user[ 'user' ] ) . '">-</a> ';
 				} else
 					echo 'None';
 				echo '</td>';

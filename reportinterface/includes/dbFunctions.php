@@ -32,6 +32,8 @@
 		$query.= ')';
 		
 		mysql_query( $query );
+		
+		rc( '[[report:' . $id . ']] new http://' . $_SERVER[ 'HTTP_HOST' ] . $_SERVER[ 'PHP_SELF' ] . '?page=View&id=' . $id . ' * ' . $user . ' * New Report' );
 	}
 	
 	function createComment( $id, $user, $comment, $forceUser = false ) {
@@ -52,6 +54,8 @@
 		$query.= ')';
 		
 		mysql_query( $query );
+		
+		rc( '[[report:' . $id . ']] comment http://' . $_SERVER[ 'HTTP_HOST' ] . $_SERVER[ 'PHP_SELF' ] . '?page=View&id=' . $id . ' * ' . $user . ' * ' . $comment );
 	}
 	
 	function getReport( $id ) {
@@ -127,5 +131,15 @@
 		if( $_SESSION[ 'sadmin' ] === true )
 			return true;
 		return false;
+	}
+	
+	function rc( $line ) {
+		global $rchost, $rcport;
+		$rc = fsockopen( 'udp://' . $rchost, $rcport );
+		$line = str_replace( Array( "\r", "\n" ), Array( '', '/' ), $line );
+		if( strlen( $line ) > 400 )
+			$line = substr( $line, 0, 394 ) . ' [...]';
+		fwrite( $rc, $line );
+		fclose( $rc );
 	}
 ?>

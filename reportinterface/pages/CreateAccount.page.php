@@ -9,6 +9,9 @@
 				$query.= '0)';
 				
 				mysql_query( $query );
+				
+				rc( '[[report:Special:NewUser]] new http://' . $_SERVER[ 'HTTP_HOST' ] . $_SERVER[ 'PHP_SELF' ] . '?page=User+Admin * ' . $_POST[ 'username' ] . ' * New User' );
+				
 				header( 'Location: ?page=Sign+In' );
 				die();
 			}

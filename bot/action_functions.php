@@ -51,7 +51,9 @@
 				. '|1=' . $warning
 				. '|2=' . str_replace( 'File:', ':File:', $change[ 'title' ] )
 				. '|3=' . $report
-				. ' <!{{subst:ns:0}}-- MySQL ID: ' . $change[ 'mysqlid' ] . ' --{{subst:ns:0}}>}} ~~~~'
+				. ' <!{{subst:ns:0}}-- MySQL ID: ' . $change[ 'mysqlid' ] . ' --{{subst:ns:0}}>'
+				. '|4=' . $change[ 'mysqlid' ]
+				. '}} ~~~~'
 				. "\n",
 				'Warning [[Special:Contributions/' . $change[ 'user' ] . '|' . $change[ 'user' ] . ']] - #' . $warning,
 				false,
