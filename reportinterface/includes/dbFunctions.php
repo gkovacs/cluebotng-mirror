@@ -2,9 +2,14 @@
 	$statuses = Array(
 		'Reported',
 		'Invalid',
-		'Deferred to Review Interface',
+		'Sending to Review Interface',
 		'Bug',
-		'Resolved'
+		'Resolved',
+		'Queued to be reviewed',
+		'Partially reviewed',
+		'Reviewed - Included in dataset as Constructive',
+		'Reviewed - Included in dataset as Vandalism',
+		'Reviewed - Not included in dataset'
 	);
 	
 	function statusIdToName( $status ) {
@@ -56,6 +61,17 @@
 		mysql_query( $query );
 		
 		rc( '[[report:' . $id . ']] comment http://' . $_SERVER[ 'HTTP_HOST' ] . $_SERVER[ 'PHP_SELF' ] . '?page=View&id=' . $id . ' * ' . $user . ' * ' . $comment );
+	}
+	
+	function updateStatusIfIncorrect( $id, $statusId, $username ) {
+		$row = mysql_fetch_assoc( mysql_query( 'SELECT `status` FROM `reports` WHERE `revertid` = \'' . mysql_real_escape_string( $id ) . '\'' ) );
+		if( $row[ 'status' ] != $statusId )
+			updateStatus( $id, $statusId, $username );
+	}
+	
+	function updateStatus( $id, $statusId, $username ) {
+		mysql_query( 'UPDATE `reports` SET `status` = \'' . mysql_real_escape_string( $statusId ) . '\' WHERE `revertid` = \'' . mysql_real_escape_string( $id ) . '\'' );
+		createComment( $id, 'System', $username . ' has marked this report as "' . statusIdToName( $statusId ) . '".', true );
 	}
 	
 	function getReport( $id ) {

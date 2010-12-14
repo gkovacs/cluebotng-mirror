@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -67,6 +68,10 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 	
 	private void setId( Integer id, final String url, Boolean isAdmin ) {
 		Anchor anchor;
+		
+		if( !isAdmin )
+			if( Window.Location.getHash().equals( "#admin" ) )
+				isAdmin = true;
 		
 		if( isAdmin )
 			anchor = new Anchor( "javascript:void;" );
@@ -242,6 +247,15 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 		buttonBox.show();
 	}
 	
+	public boolean isParsableToInt( String i ) {
+		try {
+			Integer.parseInt(i);
+			return true;
+		} catch( NumberFormatException nfe ) {
+			return false;
+		}
+	}
+	
 	/**
 	 * This is the entry point method.
 	 */
@@ -249,7 +263,10 @@ public class ClueBotReviewInterface implements EntryPoint, AsyncCallback< Return
 		showButtons();
 		setOptions();
 		doWait();
-		review.getId( this );
+		if( Window.Location.getHash() != null && isParsableToInt( Window.Location.getHash().substring( 1 ) ) )
+			review.getId( new Integer( Window.Location.getHash().substring( 1 ) ), this );	
+		else
+			review.getId( this );
 	}
 
 	@Override

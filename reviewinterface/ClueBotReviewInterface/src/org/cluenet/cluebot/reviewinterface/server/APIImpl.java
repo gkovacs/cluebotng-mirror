@@ -58,8 +58,18 @@ public class APIImpl extends HttpServlet {
 	}
 	
 	private Element getEdit( Document doc, String key ) {
-		Edit edit = Edit.findByKey( key );
+		return getEdit( doc, Edit.findByKey( key ) );
+	}
+	
+	private Element getEdit( Document doc, Integer id ) {
+		return getEdit( doc, Edit.findById( id ) );
+	}
+	
+	private Element getEdit( Document doc, Edit edit ) {
 		Element element = doc.createElement( "Edit" );
+		
+		if( edit == null )
+			return element;
 		
 		Element ekey = doc.createElement( "Key" );
 		ekey.appendChild( doc.createTextNode( KeyFactory.keyToString( edit.getKey() ) ) );
@@ -88,6 +98,10 @@ public class APIImpl extends HttpServlet {
 		Element classification = doc.createElement( "Classification" );
 		classification.appendChild( doc.createTextNode( edit.getKnown().toString() ) );
 		element.appendChild( classification );
+		
+		Element status = doc.createElement( "Status" );
+		status.appendChild( doc.createTextNode( edit.calculateStatus().toString() ) );
+		element.appendChild( status );
 		
 		Element newClassification = doc.createElement( "NewClassification" );
 		newClassification.appendChild( doc.createTextNode( edit.calculateClassification().toString() ) );
@@ -126,8 +140,11 @@ public class APIImpl extends HttpServlet {
 			ecClassification.appendChild( doc.createTextNode( ec.getClassification().toString() ) );
 			editClassification.appendChild( ecClassification );
 			
+			String strComment = "";
+			if( ec.getComment() != null )
+				strComment = ec.getComment();
 			Element comment = doc.createElement( "Comment" );
-			comment.appendChild( doc.createTextNode( ec.getComment() ) );
+			comment.appendChild( doc.createTextNode( strComment ) );
 			editClassification.appendChild( comment );
 			
 			classifications.appendChild( editClassification );
@@ -139,8 +156,12 @@ public class APIImpl extends HttpServlet {
 	
 	private Element processGetEdit( Document doc, HttpServletRequest req ) {
 		Element element = doc.createElement( "GetEdit" );
-		for( String key : req.getParameter( "geKeys" ).split( ":" ) )
-			element.appendChild( getEdit( doc, key ) );
+		if( req.getParameterMap().containsKey( "geKeys" ) )
+			for( String key : req.getParameter( "geKeys" ).split( ":" ) )
+				element.appendChild( getEdit( doc, key ) );
+		if( req.getParameterMap().containsKey( "geIds" ) )
+			for( String id : req.getParameter( "geIds" ).split( ":" ) )
+				element.appendChild( getEdit( doc, new Integer( id ) ) );
 		return element;
 	}
 	
@@ -219,6 +240,7 @@ public class APIImpl extends HttpServlet {
 				"|-Edits:\n" +
 				"| `-getEdit - Get edit information from edit key.\n" +
 				"|   |-geKeys - Colon seperated list of edit keys.\n" +
+				"|   |-geIds - Colon seperated list of edit IDs.\n" +
 				"|   `- http://cluebotreview.g.cluenet.org/api?getEdit&geKeys=key1:key2:...:keyN\n" +
 				"|-EditGroups:\n" +
 				"| |-listEditGroups - List keys for all EditGroups known to the system.\n" +

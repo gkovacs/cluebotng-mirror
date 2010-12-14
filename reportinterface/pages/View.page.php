@@ -22,8 +22,7 @@
 				}
 				
 			if( isset( $_REQUEST[ 'status' ] ) and isAdmin() ) {
-				mysql_query( 'UPDATE `reports` SET `status` = \'' . mysql_real_escape_string( $_REQUEST[ 'status' ] ) . '\' WHERE `revertid` = \'' . mysql_real_escape_string( $this->id ) . '\'' );
-				createComment( $this->id, 'System', $_SESSION[ 'username' ] . ' has marked this report as "' . statusIdToName( $_REQUEST[ 'status' ] ) . '".', true );
+				updateStatus( $this->id, $_REQUEST[ 'status' ], $_SESSION[ 'username' ] );
 				header( 'Location: ?page=View&id=' . $this->id );
 				die();
 			}

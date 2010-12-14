@@ -107,7 +107,11 @@ public class Edit extends Persist {
 		Integer vandalism = map.containsKey( Classification.VANDALISM ) ? map.get( Classification.VANDALISM ) : 0;
 		Integer skipped = map.containsKey( Classification.SKIPPED ) ? map.get( Classification.SKIPPED ) : 0;
 		Integer sum = constructive + vandalism + skipped;
+		Integer max = Math.max( constructive, Math.max( vandalism, skipped ) );
 
+		if( max < required )
+			return Classification.UNKNOWN;
+		
 		if( 2 * skipped > sum )
 			return Classification.SKIPPED;
 		if( constructive >= 3 * vandalism )

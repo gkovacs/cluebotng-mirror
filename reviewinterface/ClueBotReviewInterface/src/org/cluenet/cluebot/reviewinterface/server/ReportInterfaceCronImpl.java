@@ -29,16 +29,18 @@ public class ReportInterfaceCronImpl extends HttpServlet {
 	protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {
 		List< Integer > edits = new ArrayList< Integer >();
 		
-		URL url = new URL( "http://cobihome.external.cluenet.org:8888/reportinterface/api.php" );
-		BufferedReader reader = new BufferedReader( new InputStreamReader( url.openStream() ) );
-        String line;
-        
-        while( ( line = reader.readLine() ) != null ) {
-        	edits.add( new Integer( line ) );
-        }
+		String reportRoot = "http://cobihome.external.cluenet.org:8888/reportinterface/"; 
 		
-        reader.close();
-        
+		URL url = new URL( reportRoot + "api.php" );
+		BufferedReader reader = new BufferedReader( new InputStreamReader( url.openStream() ) );
+		String line;
+		
+		while( ( line = reader.readLine() ) != null ) {
+			edits.add( new Integer( line ) );
+		}
+		
+		reader.close();
+		
 		Queue queue = QueueFactory.getQueue( "add-edit-queue" );
 		for( int i = 0 ; i <= edits.size() / 100 ; i++ ) {
 			int fromIndex = 100 * i;
@@ -58,8 +60,19 @@ public class ReportInterfaceCronImpl extends HttpServlet {
 						.param( "key", "ag1jbHVlYm90cmV2aWV3chELEglFZGl0R3JvdXAY7qxHDA" )
 						.method( Method.GET )
 				);
-				queue.add( tasks );
-			}
+			queue.add( tasks );
 		}
+		
+		try {
+			url = new URL( reportRoot + "update.php" );
+			reader = new BufferedReader( new InputStreamReader( url.openStream() ) );
+			
+			while( ( line = reader.readLine() ) != null );
+			
+			reader.close();
+		} catch( Exception e ) {
+			/* Nothing */
+		}
+	}
 	
 }
