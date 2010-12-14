@@ -4,7 +4,7 @@
 	function getEditIdsData( $ids ) {
 		$data = Array();
 		foreach( array_chunk( $ids, 50 ) as $list ) {
-			$xml = file_get_contents( 'http://cluebotreview.g.cluenet.org/api?getEdit&geIds=' . urlencode( implode( ':', $list ) ) );
+			$xml = file_get_contents( 'http://review.cluebot.cluenet.org/api?getEdit&geIds=' . urlencode( implode( ':', $list ) ) );
 			$parsed = simplexml_load_string( $xml );
 			foreach( $parsed->GetEdit->Edit as $edit )
 				if( isset( $edit->ID ) )

@@ -29,7 +29,7 @@ public class ReportInterfaceCronImpl extends HttpServlet {
 	protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {
 		List< Integer > edits = new ArrayList< Integer >();
 		
-		String reportRoot = "http://cobihome.external.cluenet.org:8888/reportinterface/"; 
+		String reportRoot = "http://report.cluebot.cluenet.org/"; 
 		
 		URL url = new URL( reportRoot + "api.php" );
 		BufferedReader reader = new BufferedReader( new InputStreamReader( url.openStream() ) );
