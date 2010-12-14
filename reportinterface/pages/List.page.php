@@ -4,10 +4,10 @@
 		
 		public function __construct() {
 			if( !isset( $_REQUEST[ 'showall' ] ) )
-				$where = ' WHERE `status` = 0 OR `status` = 3';
+				$where = ' WHERE `status` = 0 OR `status` = 3 OR `status` IN (2,5,6)';
 			else
 				$where = '';
-			$result = mysql_query( 'SELECT `revertid`, `reporter`, `status` FROM `reports`' . $where );
+			$result = mysql_query( 'SELECT `revertid`, `reporter`, `status` FROM `reports`' . $where . ' ORDER BY `status` ASC' );
 			$this->ids = Array();
 			while( $row = mysql_fetch_assoc( $result ) )
 				$this->ids[] = Array(
