@@ -74,6 +74,7 @@
 					Action::doWarn( $change, $report );
 					checkMySQL();
 					mysql_query( 'UPDATE `vandalism` SET `reverted` = 1 WHERE `id` = \'' . mysql_real_escape_string( $change[ 'mysqlid' ] ) . '\'' );
+					Feed::bail( $change, $revertReason, $s, true );
 				} else {
 					$rv2 = API::$a->revisions( $change[ 'title' ], 1 );
 					if( $change[ 'user' ] != $rv2[ 0 ][ 'user' ] ) {

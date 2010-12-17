@@ -26,9 +26,9 @@
 			}
 		}
 		
-		public static function bail( $change, $why = '', $score = 'N/A' ) {
+		public static function bail( $change, $why = '', $score = 'N/A', $reverted = false ) {
 			$udp = fsockopen( 'udp://' . Config::$udphost, Config::$udpport );
-			fwrite( $udp, $change[ 'rawline' ] . "\003 # " . $score . ' # ' . $why );
+			fwrite( $udp, $change[ 'rawline' ] . "\003 # " . $score . ' # ' . $why . ' # ' . $reverted );
 			fclose( $udp );
 		}
 		
