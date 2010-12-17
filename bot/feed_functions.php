@@ -17,7 +17,7 @@
 
 			while( !feof( self::$fd ) ) {
 				$rawline = fgets( self::$fd, 1024 );
-				$line = str_replace( Array( "\n", "\r" ), '', $rawline )
+				$line = str_replace( Array( "\n", "\r" ), '', $rawline );
 				if( !$line ) {
 					fclose( self::$fd );
 					break;
