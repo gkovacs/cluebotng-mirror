@@ -54,7 +54,7 @@
 						if( strtolower( $d[ 'target' ] ) == self::$channel ) {
 							$rawmessage = $d[ 'pieces' ][ 0 ];
 							
-							$message = str_replace( "\002", '', $message );
+							$message = str_replace( "\002", '', $rawmessage );
 							$message = preg_replace( '/\003(\d\d?(,\d\d?)?)?/', '', $message );
 							
 							$data = parseFeed( $message );
