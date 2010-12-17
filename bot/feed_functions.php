@@ -17,14 +17,19 @@
 
 			while( !feof( self::$fd ) ) {
 				$rawline = fgets( self::$fd, 1024 );
-				$line = str_replace( array( "\n", "\r", "\002" ), '', $rawline );
-				$line = preg_replace( '/\003(\d\d?(,\d\d?)?)?/', '', $line );
+				$line = str_replace( Array( "\n", "\r" ), '', $rawline )
 				if( !$line ) {
 					fclose( self::$fd );
 					break;
 				}
 				self::loop( $line );
 			}
+		}
+		
+		public static function bail( $change, $why = '', $score = 'N/A' ) {
+			$udp = fsockopen( 'udp://' . Config::$udphost, Config::$udpport );
+			fwrite( $udp, $change[ 'rawline' ] . "\003 # " . $score . ' # ' . $why );
+			fclose( $udp );
 		}
 		
 		private static function loop( $line ) {
@@ -47,15 +52,23 @@
 						break;
 					case 'privmsg':
 						if( strtolower( $d[ 'target' ] ) == self::$channel ) {
-							$message = $d[ 'pieces' ][ 0 ];
+							$rawmessage = $d[ 'pieces' ][ 0 ];
+							
+							$message = str_replace( "\002", '', $message );
+							$message = preg_replace( '/\003(\d\d?(,\d\d?)?)?/', '', $message );
 							
 							$data = parseFeed( $message );
 							
 							if( $data === false )
 								return;
 							
-							if( stripos( 'N', $data[ 'flags' ] ) !== false )
+							$data[ 'line' ] = $message;
+							$data[ 'rawline' ] = $rawmessage;
+							
+							if( stripos( 'N', $data[ 'flags' ] ) !== false ) {
+								self::bail( $data, 'New article' );
 								return;
+							}
 
 							$stalkchannel = array();
 
@@ -96,8 +109,10 @@
 								and ( ( !preg_match( '/\* \[\[(' . preg_quote( $data[ 'namespace' ] . $data[ 'title' ], '/' ) . ')\]\] \- .*/i', Globals::$optin ) ) )
 //								and ( $change[ 'flags' ] != 'move' )
 //								and ( $change[ 'namespace' ] != 'Template:')
-							)
+							) {
+								self::bail( $data, 'Outside of valid namespaces' );
 								return;
+							}
 							
 							echo 'Processing: ' . $message . "\n";
 							Process::processEdit( $data );

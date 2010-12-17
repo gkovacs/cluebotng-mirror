@@ -1,12 +1,17 @@
 <?PHP
 	class Process {
 		public static function processEditThread( $change ) {
-			if( !isVandalism( $change[ 'all' ], $s ) )
+			if( !isVandalism( $change[ 'all' ], $s ) ) {
+				Feed::bail( $change, 'Below threshold', $s );
 				return;
+			}
 			
 			echo 'Is ' . $change[ 'user' ] . ' whitelisted ?' . "\n";
-			if( Action::isWhitelisted( $change[ 'user' ] ) )
+			if( Action::isWhitelisted( $change[ 'user' ] ) ) {
+				Feed::bail( $change, 'Whitelisted', $s );
 				return;
+			}
+			
 			echo 'No.' . "\n";
 			
 			$reason = 'ANN scored at ' . $s;
@@ -34,7 +39,7 @@
 							unset( $oftVand[ $art ][ $key ] );
 			$oftVand[ $change[ 'title' ] ][] = time();
 			if( count( $oftVand[ $change[ 'title' ] ] ) >= 30 )
-				IRC::say( 'reportchannel', '!admin [['.$change['title'].']] has been vandalized '.(count($tmp[$change['title']])).' times in the last 2 days.' );
+				IRC::say( 'reportchannel', '!admin [['.$change['title'].']] has been vandalized '.( count( $oftVand[ $change[ 'title' ] ] ) ).' times in the last 2 days.' );
 			file_put_contents( 'oftenvandalized.txt', serialize( $oftVand ) );
 
 			//IRC::say( 'debugchannel', 'Possible vandalism: ' . $change[ 'title' ] . ' changed by ' . $change[ 'user' ] . ' ' . $reason . '(' . $s . ')' );
@@ -76,10 +81,13 @@
 						IRC::say( 'debugchannel', $ircreport . "\x0303Not Reverted\x0315) (\x0313Beaten by " . $rv2[ 0 ][ 'user' ] . "\x0315) (\x0302" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
 						checkMySQL();
 						mysql_query( 'INSERT INTO `beaten` (`id`,`article`,`diff`,`user`) VALUES (NULL,\'' . mysql_real_escape_string( $change['title'] ) . '\',\'' . mysql_real_escape_string( $change[ 'url' ] ) . '\',\'' . mysql_real_escape_string( $rv2[ 0 ][ 'user' ] ) . '\')' );
+						Feed::bail( $change, 'Beaten by ' . $rv2[ 0 ][ 'user' ], $s );
 					}
 				}
-			} else
+			} else {
 				IRC::say( 'debugchannel', $ircreport . "\x0303Not Reverted\x0315) (\x0313" . $revertReason . "\x0315) (\x0302" . ( microtime( true ) - $change[ 'startTime' ] ) . " \x0315s)" );
+				Feed::bail( $change, $revertReason, $s );
+			}
 		}
 		
 		public static function processEdit( $change ) {

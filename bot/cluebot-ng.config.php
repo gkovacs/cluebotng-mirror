@@ -13,6 +13,9 @@
 		public static $mysqlpass = '';
 		public static $mysqldb = 'cluebot';
 		
+		public static $udphost = 'localhost';
+		public static $udpport = 3334;
+		
 		public static $coreip = 'localhost';
 		public static $coreport = 3565;
 		
