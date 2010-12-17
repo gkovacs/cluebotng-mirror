@@ -28,7 +28,7 @@
 		
 		public static function bail( $change, $why = '', $score = 'N/A', $reverted = false ) {
 			$udp = fsockopen( 'udp://' . Config::$udphost, Config::$udpport );
-			fwrite( $udp, $change[ 'rawline' ] . "\003 # " . $score . ' # ' . $why . ' # ' . $reverted );
+			fwrite( $udp, $change[ 'rawline' ] . "\003 # " . $score . ' # ' . $why . ' # ' . ( $reverted ? 'Reverted' : 'Not reverted' ) );
 			fclose( $udp );
 		}
 		
