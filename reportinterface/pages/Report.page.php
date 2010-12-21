@@ -43,7 +43,7 @@
 			echo '<tr><th>Your username:</th><td><input type="text" name="user" value="' . $user . '"></td></tr>';
 			echo '<tr><th>Reverted:</th><td>' . ( ( $this->row[ 'reverted' ] == 1 ) ? 'Yes' : '<b><u><font color="red">No</font></u></b>' ) . '</td></tr>';
 			if( $this->row[ 'reverted' ] == 1 ) {
-				echo '<tr><th>Comment<br />(optional):</th><td><textarea name="comment" cols=80 rows=25></textarea></td></tr>';
+				echo '<tr><th>Comment<br />(optional):</th><td><textarea name="comment" cols=80 rows=3></textarea><br /><small><em>Note</em>: Comments are completely optional.  You do not have to justify your edit.<br />If this is a false positive, then you\'re right, and the bot is wrong - you don\'t need to explain why.</small></td></tr>';
 				echo '<tr><td colspan=2><input type="submit" name="submit" value="Report false positive" /></td></tr>';
 			}
 			echo '</table>';
