@@ -25,6 +25,7 @@
 			curl_setopt( $this->ch, CURLOPT_MAXCONNECTS, 100 );
 			curl_setopt( $this->ch, CURLOPT_CLOSEPOLICY, CURLCLOSEPOLICY_LEAST_RECENTLY_USED );
 			curl_setopt( $this->ch, CURLOPT_USERAGENT, 'ClueBot/2.0' );
+			curl_setopt( $this->ch, CURLOPT_ENCODING, '' );
 			if( isset( Config::$proxyhost ) and isset( Config::$proxyport ) and ( Config::$proxyport != null ) and ( Config::$proxyhost != null ) ) {
 				curl_setopt( $this->ch, CURLOPT_PROXYTYPE, isset( Config::$proxytype ) ? Config::$proxytype : CURLPROXY_HTTP );
 				curl_setopt( $this->ch, CURLOPT_PROXY, Config::$proxyhost );
