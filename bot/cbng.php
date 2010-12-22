@@ -69,6 +69,7 @@
 		curl_setopt( $ch, CURLOPT_TIMEOUT, 120 );
 		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, 10 );
 		curl_setopt( $ch, CURLOPT_HTTPGET, 1 );
+		curl_setopt( $ch, CURLOPT_ENCODING, '' );
 		return $ch;
 	}
 	
