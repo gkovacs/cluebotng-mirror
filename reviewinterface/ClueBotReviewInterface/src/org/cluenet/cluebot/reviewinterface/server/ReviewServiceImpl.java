@@ -45,10 +45,18 @@ public class ReviewServiceImpl extends RemoteServiceServlet implements
 			User user = User.findByEmail( new Email( UserServiceFactory.getUserService().getCurrentUser().getEmail() ) );
 			if( user == null )
 				throw new IllegalArgumentException( "You have no user account." );
-			EditGroup eg = EditGroup.getRandomEditGroup();
+			EditGroup eg = null;
+			Edit randomEdit = null;
+			for( Integer iter = 0 ; iter < 20 ; iter++ ) {
+				eg = EditGroup.getRandomEditGroup();
+				if( eg == null )
+					continue;
+				randomEdit = eg.getRandomEdit( user );
+				if( randomEdit != null )
+					break;
+			}
 			if( eg == null )
 				throw new IllegalArgumentException( "No more edit groups available." );
-			Edit randomEdit = eg.getRandomEdit( user );
 			if( randomEdit == null )
 				throw new IllegalArgumentException( "No more edits available for " + eg.getName() + "." );
 			return new ReturnData(
