@@ -1,6 +1,7 @@
 
 package org.cluenet.cluebot.reviewinterface.server;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.cluenet.cluebot.reviewinterface.shared.Classification;
@@ -26,7 +27,8 @@ public class Statistics {
 		stats += "{{/EditGroupFooter}}\n\n";
 		
 		stats += "{{/UserHeader}}\n";
-		for( User u : User.list() ) {
+		
+		for( User u : new ArrayList< User >( User.list() ) ) {
 			Key start = null;
 			Integer requested = 500;
 			Integer got;
