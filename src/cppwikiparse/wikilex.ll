@@ -1,0 +1,192 @@
+/* wikilex.yy.cpp is generated from wikilex.ll, which is generated from wikilex.ll.template */
+/* Any modifications should go in wikilex.ll.template */
+
+%option outfile="wikilex.yy.cpp"
+%option header-file="wikilex.yy.h"
+%option noyywrap
+%option reentrant
+
+%s COND1 COND2
+
+
+%top{
+
+#include <iostream>
+using std::cout;
+
+}
+
+%{
+
+/* This isn't in %top because the flex structures need to be defined before including it */
+#include "wikilex.ll.hpp"
+
+/* Read next section of buffer */
+#define YY_INPUT(buf, result, max_size) \
+	{ \
+		WikiLex * wikilexp = reinterpret_cast<WikiLex *>(yyextra); \
+		if(wikilexp->fullbuf_read_pos >= wikilexp->fullbuf_len) { \
+			result = YY_NULL; \
+		} else { \
+			int l = wikilexp->fullbuf_len - wikilexp->fullbuf_read_pos; \
+			if(l > max_size) l = max_size; \
+			if(l > wikilexp->prefer_block_size) l = wikilexp->prefer_block_size; \
+			memcpy(buf, wikilexp->fullbuf_start + wikilexp->fullbuf_read_pos, l); \
+			wikilexp->fullbuf_read_pos += l; \
+			result = l; \
+		} \
+	}
+
+/* Track current position and update returned vals.
+   Also check if there's text in our "buffer" and if so, return it. */
+#define YY_STANDARD_ACTION { \
+		if(start_text_offset != -1) { \
+			if(arg_charpptr) *arg_charpptr = wikilex.fullbuf_start + start_text_offset; \
+			if(arg_intptr) *arg_intptr = wikilex.fullbuf_pos - start_text_offset; \
+			if(yyleng) yyless(0); \
+			return WikiLex::TEXT; \
+		} \
+		if(arg_charpptr) *arg_charpptr = wikilex.fullbuf_start + wikilex.fullbuf_pos; \
+		if(arg_intptr) *arg_intptr = yyleng; \
+		if(yyleng) wikilex.fullbuf_pos += yyleng; \
+	}
+
+#define RETTOKEN(toktyp) YY_STANDARD_ACTION; return WikiLex::toktyp;
+
+enum WikiLex_YYLex_Act { WikiLex_YYLex_Act_Begin, WikiLex_YYLex_Act_FlushBuffer, WikiLex_YYLex_Act_GetCond, WikiLex_YYLex_Act_SetBol, WikiLex_YYLex_Act_GetBol, WikiLex_YYLex_Act_NextTok };
+
+/* Very hackish.
+Some functions that we want to access outside yylex() are only (technically) accessible from inside.
+So pass in an action and misc parameters, and have it do different things at the beginning. */
+#define YY_DECL int wikilex_yylex(WikiLex_YYLex_Act yylexact, int arg_int, int * arg_intptr, const unsigned char ** arg_charpptr, yyscan_t yyscanner)
+
+/* Defines for some actions.  Do not use within yylex(), only externally. */
+#define YYACT_BEGIN(ncond, yyscanner) wikilex_yylex(WikiLex_YYLex_Act_Begin, ncond, NULL, NULL, yyscanner)
+#define YYACT_GETCOND(yyscanner) wikilex_yylex(WikiLex_YYLex_Act_GetCond, 0, NULL, NULL, yyscanner)
+#define YYACT_FLUSH(yyscanner) wikilex_yylex(WikiLex_YYLex_Act_FlushBuffer, 0, NULL, NULL, yyscanner)
+#define YYACT_GETBOL(yyscanner) wikilex_yylex(WikiLex_YYLex_Act_GetBol, 0, NULL, NULL, yyscanner)
+#define YYACT_SETBOL(newbol, yyscanner) wikilex_yylex(WikiLex_YYLex_Act_SetBol, newbol, NULL, NULL, yyscanner)
+#define YYACT_NEXTTOK(textstartptr, textlenptr, yyscanner) wikilex_yylex(WikiLex_YYLex_Act_NextTok, 0, textlenptr, textstartptr, yyscanner)
+
+%}
+
+%%
+
+%{
+	/* WikiLex class */
+	WikiLex & wikilex = *(reinterpret_cast<WikiLex *>(yyextra));
+
+	/* Starting offset of text block */
+	int start_text_offset = -1;
+
+	/* Hack to be able to trigger externally some stuff only supported from inside yylex() */
+	switch(yylexact) {
+		case WikiLex_YYLex_Act_Begin: BEGIN(arg_int); return 0;
+		case WikiLex_YYLex_Act_GetCond: return YY_START;
+		case WikiLex_YYLex_Act_FlushBuffer: YY_FLUSH_BUFFER; return 0;
+		case WikiLex_YYLex_Act_SetBol: yy_set_bol(arg_int); return 0;
+		case WikiLex_YYLex_Act_GetBol: return YY_AT_BOL();
+		case WikiLex_YYLex_Act_NextTok: break;
+		default: return 0;
+	}
+	
+	if(wikilex.pending_eof) {
+		if(arg_intptr) *arg_intptr = 0;
+		if(arg_charpptr) *arg_charpptr = wikilex.fullbuf_start + wikilex.fullbuf_len;
+		return WikiLex::END;
+	}
+%}
+
+<COND1>\{\{+		RETTOKEN(CURLY_OPEN_SERIES);
+<COND2>\{\{		RETTOKEN(CURLY_OPEN_2);
+
+
+ /* On EOF, make sure we're back to the initial condition, and terminate */
+<<EOF>>					wikilex.pending_eof = true; YY_STANDARD_ACTION; return WikiLex::END;
+
+ /* Catch-all rule. */
+(?s:.)					if(start_text_offset == -1) start_text_offset = wikilex.fullbuf_pos; wikilex.fullbuf_pos += yyleng;
+
+%%
+
+
+WikiLex::WikiLex(const unsigned char *buf, int buflen) {
+	pending_eof = false;
+	prefer_block_size = 256;	// Not too big, so skipping around isn't too inefficient
+	yylex_init_extra(reinterpret_cast<void *>(this), &this->scanner);
+	if(buf && buflen) setFullBuffer(buf, buflen);
+}
+
+WikiLex::~WikiLex() {
+	yylex_destroy(this->scanner);
+}
+
+void WikiLex::setFullBuffer(const unsigned char *buf, int buflen) {
+	fullbuf_start = buf;
+	fullbuf_len = buflen;
+	fullbuf_pos = 0;
+	fullbuf_read_pos = 0;
+	pending_token_type = -1;
+	pending_eof = false;
+	YYACT_FLUSH(this->scanner);
+	YYACT_SETBOL(1, this->scanner);
+}
+
+int WikiLex::getBufferPos() {
+	return fullbuf_pos;
+}
+
+void WikiLex::resetBufferPos(int pos) {
+	if(pos == fullbuf_pos) return;
+	YYACT_FLUSH(this->scanner);
+	fullbuf_pos = fullbuf_read_pos = pos;
+	int bol;
+	if(pos == 0) {
+		bol = 1;
+	} else if(fullbuf_start[pos - 1] == '\n') {
+		bol = 1;
+	} else {
+		bol = 0;
+	}
+	YYACT_SETBOL(bol, this->scanner);
+	if(pos >= fullbuf_len) pending_eof = true; else pending_eof = false;
+}
+
+void WikiLex::setCondition(int cond) {
+	/* If there's a pending token, it's already been read by the scanner, and setting
+	a new condition won't affect how it's read.  In this case, the scanner actually
+	has to be backed up. */
+	if(pending_token_type > -1) {
+		resetBufferPos(fullbuf_pos - pending_token_len);
+		pending_token_type = -1;
+	}
+	YYACT_BEGIN(cond, this->scanner);
+}
+
+int WikiLex::getCondition() {
+	return YYACT_GETCOND(this->scanner);
+}
+
+int WikiLex::nextToken(const unsigned char ** textpos, int * textlen) {
+	if(pending_token_type > -1) {
+		if(textpos) *textpos = pending_token_pos;
+		if(textlen) *textlen = pending_token_len;
+		int ptt = pending_token_type;
+		pending_token_type = -1;
+		return ptt;
+	}
+	return YYACT_NEXTTOK(textpos, textlen, this->scanner);
+}
+
+int WikiLex::peekToken(const unsigned char ** textpos, int * textlen) {
+	if(pending_token_type > -1) {
+		*textpos = pending_token_pos;
+		*textlen = pending_token_len;
+		return pending_token_type;
+	}
+	pending_token_type = YYACT_NEXTTOK(&pending_token_pos, &pending_token_len, this->scanner);
+	if(textpos) *textpos = pending_token_pos;
+	if(textlen) *textlen = pending_token_len;
+	return pending_token_type;
+}
+

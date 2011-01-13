@@ -19,6 +19,8 @@
 
 namespace WPCluebot {
 
+
+#ifdef USE_BROKEN_HALF_WRITTEN_BAD_STUFF
 class TriePoolWordSet {
 	public:
 		TriePoolWordSet() : poolalloc(sizeof(Node)) {
@@ -96,6 +98,7 @@ class TriePoolWordSet {
 			np->value = -1;
 		}
 };
+#endif
 
 //typedef StringTrieMap<int,256,0> WordSet;
 typedef std::map<std::string,int> WordSet;

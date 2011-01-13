@@ -1,0 +1,87 @@
+{{Infobox Military Person
+|name=Sir Norman Bottomley
+|lived= 18 September 1891 &ndash; {{death date and age|1970|8|13|1891|9|13|df=yes}}
+|placeofbirth= [[Yorkshire]]
+|placeofdeath= 
+|image=
+|caption=
+|nickname=
+|allegiance= {{flag|United Kingdom}}
+|serviceyears=1914 - 1948
+|rank=[[Air Chief Marshal]]
+|branch= {{Air force|United Kingdom}}
+|commands=[[Inspector-General of the RAF]]<br>[[RAF Bomber Command|Bomber Command]]<br>[[No. 5 Group RAF|No. 5 Group]]
+|battles=[[World War I]]<br>[[World War II]]
+|awards=[[Knight Commander of the Order of the Bath]]<ref>8 Jun 1944 (CB - 17 Mar 1941)</ref><br>[[Companion of the Order of the Indian Empire]]<ref>11 May 1937</ref><br>[[Distinguished Service Order]]<ref>21 Dec 1937</ref><br>[[Air Force Cross (United Kingdom)|Air Force Cross]]<ref>2 Nov 1918</ref><br>[[Mention in Despatches]] (5)<ref>12 Nov 1937, 18 Feb 1938 (2), 14 Jun 1938, 1 Jan 1941</ref> 
+|laterwork=Director of Administration at the [[BBC]] 1948-1956
+}}
+
+[[Air Chief Marshal]] '''Sir Norman Howard Bottomley''' [[Order of the Bath|KCB]] [[Order of the Indian Empire|CIE]] [[Distinguished Service Order|DSO]] [[Air Force Cross (United Kingdom)|AFC]] [[Royal Air Force|RAF]] (18 September 1891 – 13 August 1970) was the [[Yorkshire]]-born successor to [[Arthur Travers Harris|Arthur 'Bomber' Harris]] as Commander-in-Chief of [[RAF Bomber Command]] in 1945.
+
+Born in Yorkshire, Bottomley was educated at [[Halifax School]] and the [[University of Rennes]] in [[Brittany]] before being commissioned into the [[East Yorkshire Regiment]] as a subaltern with which he served until transferring to the [[Royal Flying Corps]] in 1915. He flew with the RAF during [[World War I]].
+
+Between the wars Bottomley's appointments included service in the Middle East and the command of [[No. IV Squadron RAF|No. 4 (AC) Squadron RAF]] and [[No. 1 Group RAF|No. 1 (Indian) Group]].  Bottomley was [[Senior Air Staff Officer]] at Bomber Command headquarters between 1938 and 1940, and was appointed [[Air Officer Commanding]] [[No. 5 Group RAF]] in November 1940.  He was later promoted to Deputy Chief of the Air Staff in 1943.  On the 15 September 1945, he followed [[Arthur Travers Harris|Sir Arthur 'Bomber' Harris]] as Commander-in-Chief Bomber Command, retaining command until 16 January 1947.
+
+Bottomley became [[Inspector-General of the RAF]] in 1947 and retired the following year.
+
+From 1948 until 1956, he held the post of Director of Administration at the [[BBC]], acting as [[Director General]] when Sir [[Ian Jacob]] was away.<ref>[www.wmin.ac.uk/mad/pdf/WPCC-Vol2-No1-Peter_Goodwin.pdf]</ref>
+
+Sir Norman Bottomley died on 13 August 1970, aged seventy-eight.
+
+==References==
+{{reflist}}
+*[http://www.rafweb.org/Biographies/Bottomley.htm Air of Authority - A History of RAF Organisation - Air Chf Mshl Bottomley]
+*[http://www.london-gazette.co.uk/issues/exact=Norman+Howard+Bottomley/start=1 London Gazette Entries]
+*[http://www.npg.org.uk/live/search/person.asp?LinkID=mp56725 1940 Photographs of Bottomley held by the National Portrait Gallery, London]
+*[http://www.rafmuseum.org.uk/online-exhibitions/dambusters/18_bufton_letter.cfm Letter from Bufton to Bottomley re Dambusters Raid]
+*[http://www.gazettes-online.co.uk/issues/exact=Norman+Howard+Bottomley/start=1 London Gazette entries]
+
+{{s-start}}
+{{s-mil}}
+{{succession box|
+ title=Air Officer Commanding [[No. 5 Group RAF|No. 5 Group]]|
+ before=[[Arthur Travers Harris|A T Harris]]|
+ after=[[John Slessor|J C Slessor]]|
+ years=1940&ndash;1941}}
+|-
+{{s-bef|before=[[Arthur Harris (RAF officer)|A T Harris]]}}
+{{s-ttl|title=[[Deputy Chief of the Air Staff]]<br><small>From 3 May 1942 to 30 Jul 1943 the post was titled Assistant Chief of the Air Staff (Operations)</small>|years=1 June 1941 &ndash; 15 September 1945}}
+{{s-aft|after=[[Albert Durston|Sir Albert Durston]]}}
+|-
+{{succession box|
+ title=Commander-in-Chief [[RAF Bomber Command|Bomber Command]]|
+ before=[[Arthur Travers Harris|Sir Arthur Harris]]|
+ after=[[Hugh William Lumsden Saunders|Sir Hugh Saunders]]|
+ years=1945&ndash;1947}}
+|-
+{{s-bef|before=[[Arthur Barratt|Sir Arthur Barratt]]}}
+{{s-ttl|title=[[Inspector-General of the RAF]] |years=1947}}
+{{s-aft|after=[[George Pirie (RAF officer)|Sir George Pirie]]}}
+{{s-end}}
+
+{{Persondata <!-- Metadata: see [[Wikipedia:Persondata]]. -->
+| NAME              = Bottomley, Norman
+| ALTERNATIVE NAMES =
+| SHORT DESCRIPTION =
+| DATE OF BIRTH     = 13 September 1891
+| PLACE OF BIRTH    = [[Yorkshire]]
+| DATE OF DEATH     = 13 August 1970
+| PLACE OF DEATH    =
+}}
+{{DEFAULTSORT:Bottomley, Norman}}
+[[Category:1891 births]]
+[[Category:1970 deaths]]
+[[Category:East Yorkshire Regiment officers]]
+[[Category:Royal Flying Corps officers]]
+[[Category:British Army personnel of World War I]]
+[[Category:Royal Air Force air marshals]]
+[[Category:Knights Commander of the Order of the Bath]]
+[[Category:Companions of the Order of the Indian Empire]]
+[[Category:Companions of the Distinguished Service Order]]
+[[Category:People from Yorkshire]]
+[[Category:Recipients of the Air Force Cross (United Kingdom)]]
+[[Category:Royal Air Force personnel of World War II]]
+
+[[ca:Norman Bottomley]]
+[[de:Norman Bottomley]]
+
