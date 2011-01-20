@@ -25,12 +25,14 @@
 		}
 		
 		private static function aiv( $change, $report ) {
-			$aivdata = API::$q->getpage( 'Wikipedia:Administrator_intervention_against_vandalism/TB2' );
+			$aivdata = API::$q->getpage( 'Wikipedia:Administrator intervention against vandalism/TB2' );
+			if( !$aivdata )
+				return;
 			if( !preg_match( '/' . preg_quote( $change[ 'user' ], '/' ) . '/i', $aivdata ) ) {
 				IRC::say( 'aivchannel', '!admin Reporting [[User:' . $change[ 'user' ] . ']] to [[WP:AIV]]. Contributions: [[Special:Contributions/' . $change[ 'user' ] . ']] Block: [[Special:Blockip/' . $change[ 'user' ] . ']]' );
 				
 				API::$a->edit(
-					'Wikipedia:Administrator_intervention_against_vandalism/TB2',
+					'Wikipedia:Administrator intervention against vandalism/TB2',
 					$aivdata . "\n\n"
 					. '* {{' . ( ( long2ip( ip2long( $change[ 'user' ] ) ) == $change[ 'user' ] ) ? 'IPvandal' : 'Vandal' ) . '|' . $change[ 'user' ] . '}}'
 					. ' - ' . $report . ' (Automated) ~~~~' . "\n",
